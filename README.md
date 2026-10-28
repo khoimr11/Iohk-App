@@ -1,4 +1,4 @@
-# Tiệm Phim
+# Ánh Bạc — Film Lab
 
 App chỉnh ảnh kiểu film chạy trên trình duyệt, có 103 preset Nhật Bản, Hong Kong, kiểu Fujifilm, Nikon, Leica, film màu cổ điển, điện ảnh, Retro / Y2K, vintage, đen trắng và đặc biệt. Có hạt film, halation, bloom, light leak, in ngày giờ, duotone và hiệu ứng máy số đời đầu. Ảnh được xử lý ngay trên máy (WebGL), không upload đi đâu.
 
