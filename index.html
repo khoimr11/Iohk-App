@@ -286,6 +286,12 @@ body.mob .mtoolpanel{display:flex}
 #cCanvas{max-width:100%;max-height:72vh;cursor:pointer;display:block}
 .cside{display:flex;flex-direction:column;gap:12px;overflow:auto;min-height:0;max-height:80vh}
 @media (max-width:899px){.collage .cbox{grid-template-columns:minmax(0,1fr);overflow:auto}.cprev{min-height:30dvh}#cCanvas{max-height:42dvh}.cside{max-height:none}}
+details.fold{border-top:1px solid var(--line);padding-top:10px}
+details.fold summary{cursor:pointer;font-size:13px;font-weight:600;list-style:none;display:flex;align-items:center;gap:6px;padding:4px 0}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::before{content:"";width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .2s;margin:0 4px}
+details.fold[open] summary::before{transform:rotate(45deg)}
+details.fold>.tpane-in{margin-top:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -1294,11 +1300,11 @@ function wire(){
 
 /* ---------- Editing tools: pipeline ---------- */
 const GEO0={rot:0,flipH:false,flipV:false,angle:0,crop:null,aspect:"free"};
-const AI0={bg:"keep",bgColor:"#f2ede4",bgBlur:60,skin:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
+const AI0={bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
 const OPS=[];
 Object.assign(state,{geo:Object.assign({},GEO0),opsLen:0,overlays:[],frame:"none",ai:Object.assign({},AI0)});
 let tool=null,origPrev=null,retPrev=null,geoPrev=null,geoOrig=null,geoInfo=null,imgRect={x:0,y:0,w:1,h:1},selId=null,cropDraft=null,handMode=false;
-let retDirty=true,geoDirty=true,aiData=null,AIM=null,aiBusy=false;
+let retDirty=true,geoDirty=true,aiData=null,AIM=null,aiBusy=false,aiFailed=false,colorSkin=null;
 const bboxes=new Map();
 const brush={beauty:"smooth",reshape:"push",blur:"mosaic",size:30,strength:60,lip:"#c2334d",color:"#ffffff",pen:"pen",penSize:12};
 function mk(w,h){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w));c.height=Math.max(1,Math.round(h));return {c,x:c.getContext("2d",{willReadFrequently:true})};}
@@ -1312,7 +1318,7 @@ function setSource(src,sample){
   t.getContext("2d").drawImage(origPrev,(origPrev.width-s)/2,(origPrev.height-s)/2,s,s,0,0,128,128);thumbSrc=t;
   if(thumbTex)gl.deleteTexture(thumbTex);thumbTex=makeTex(0,0,thumbSrc);
   OPS.length=0;state.opsLen=0;state.overlays=[];state.geo=Object.assign({},GEO0);state.ai=Object.assign({},AI0);state.frame="none";
-  aiData=null;selId=null;cropDraft=null;bboxes.clear();
+  aiData=null;colorSkin=null;selId=null;cropDraft=null;bboxes.clear();
   seed=Math.random()*100;
   $("badge").hidden=!sample;$("sizeInfo").textContent=fullSrc.width+"×"+fullSrc.height;
   history=[];hIdx=-1;pushHistory();
@@ -1414,7 +1420,7 @@ async function loadAI(){
 }
 function maskCanvas(arr,w,h,fn){const m=mk(w,h),d=m.x.createImageData(w,h),p=d.data;for(let i=0;i<w*h;i++){p[i*4]=p[i*4+1]=p[i*4+2]=255;p[i*4+3]=Math.round(255*fn(i));}m.x.putImageData(d,0,0);return m.c;}
 const sstep=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
-async function analyzeAI(){
+async function analyzeAI(silent){
   if(aiBusy||!origPrev)return;aiBusy=true;renderToolUI();
   try{
     const a=await loadAI();let res=null;
@@ -1424,16 +1430,46 @@ async function analyzeAI(){
     const bgC=maskCanvas(res.bg,res.w,res.h,i=>sstep(0.3,0.7,res.bg[i]));
     const skinC=maskCanvas(res.bg,res.w,res.h,i=>Math.min(1,(res.face?res.face[i]:0)+(res.body?res.body[i]:0)));
     const fr=a.face.detect(origPrev);aiData={bgC,skinC,faces:(fr&&fr.faceLandmarks)||[]};
-    retDirty=true;toast(aiData.faces.length?"Đã nhận diện "+aiData.faces.length+" khuôn mặt":"Không thấy khuôn mặt; vẫn dùng được phần nền");
-  }catch(err){aiData=null;toast("Không tải được AI. Tính năng này cần bản web GitHub và mạng internet.");if(window.console)console.warn(err);}
+    aiFailed=false;retDirty=true;if(!silent)toast(aiData.faces.length?"Đã nhận diện "+aiData.faces.length+" khuôn mặt":"Không thấy khuôn mặt; vẫn dùng được phần nền");
+  }catch(err){aiData=null;aiFailed=true;if(!silent)toast("Không tải được AI. Tính năng này cần bản web GitHub và mạng internet.");if(window.console)console.warn(err);}
   finally{aiBusy=false;renderToolUI();schedule();}
 }
 const LIP_OUT=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185],LIP_IN=[78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,13,82,81,80,191];
 const JAW_L=[132,58,172,136,150,149],JAW_R=[361,288,397,365,379,378];
+function skinMaskCanvas(){
+  if(aiData)return aiData.skinC;
+  if(!colorSkin&&origPrev){const s=scaled(origPrev,800),d=s.getContext("2d",{willReadFrequently:true}).getImageData(0,0,s.width,s.height).data,n=s.width*s.height,a=new Float32Array(n);
+    for(let i=0;i<n;i++){const r=d[i*4],g=d[i*4+1],b=d[i*4+2],y=0.299*r+0.587*g+0.114*b,cb=128-0.1687*r-0.3313*g+0.5*b,cr=128+0.5*r-0.4187*g-0.0813*b;
+      a[i]=y>45&&r>g&&r>b?sstep(0,1,Math.min((cb-74)/6,(130-cb)/6))*sstep(0,1,Math.min((cr-132)/5,(176-cr)/5)):0;}
+    const m=maskCanvas(a,s.width,s.height,i=>a[i]);colorSkin=blurRegion(m,0,0,m.width,m.height,3);}
+  return colorSkin;
+}
+function autoAcne(x,W,H,mask,amt){
+  const s=Math.min(1,1800/Math.max(W,H)),w=Math.max(1,Math.round(W*s)),h=Math.max(1,Math.round(H*s));
+  const sm=mk(w,h);sm.x.drawImage(x.canvas,0,0,w,h);const I=sm.x.getImageData(0,0,w,h).data;
+  const B=blurRegion(sm.c,0,0,w,h,Math.max(2,w*0.009)).getContext("2d").getImageData(0,0,w,h).data;
+  const mm=mk(w,h);mm.x.drawImage(mask,0,0,w,h);const M=mm.x.getImageData(0,0,w,h).data;
+  const out=mm.x.createImageData(w,h),o=out.data,t0=15-amt*7;
+  for(let i=0;i<w*h;i++){const k=i*4,li=I[k]*0.3+I[k+1]*0.59+I[k+2]*0.11,lb=B[k]*0.3+B[k+1]*0.59+B[k+2]*0.11,red=(I[k]-I[k+1])-(B[k]-B[k+1]);
+    const sc=Math.max(lb-li,red*0.7),a=Math.max(0,Math.min(1,(sc-t0)/10))*(M[k+3]/255);o[k]=o[k+1]=o[k+2]=255;o[k+3]=a*255;}
+  const sp=mk(w,h);sp.x.putImageData(out,0,0);
+  const grow=blurRegion(sp.c,0,0,w,h,Math.max(2,w*0.004)),gd=grow.getContext("2d"),gi=gd.getImageData(0,0,w,h);
+  for(let k=3;k<gi.data.length;k+=4)gi.data[k]=Math.min(255,gi.data[k]*2.6);gd.putImageData(gi,0,0);
+  const P=mk(w,h);P.x.drawImage(sm.c,0,0);P.x.globalCompositeOperation="destination-out";P.x.drawImage(grow,0,0);
+  const fill=blurRegion(P.c,0,0,w,h,Math.max(3,w*0.02)),fx=fill.getContext("2d"),fi=fx.getImageData(0,0,w,h);
+  for(let k=3;k<fi.data.length;k+=4)fi.data[k]=255;fx.putImageData(fi,0,0);
+  fx.globalCompositeOperation="destination-in";fx.drawImage(grow,0,0);
+  x.save();x.globalAlpha=Math.min(1,0.7+amt*0.3);x.drawImage(fill,0,0,W,H);x.restore();
+}
 function applyAIFace(x,W,H){
-  if(!aiData)return;const A=state.ai;
-  if(A.skin>0){const e=blurRegion(x.canvas,0,0,W,H,Math.max(2,W*0.006));const ex=e.getContext("2d");ex.globalCompositeOperation="destination-in";ex.drawImage(aiData.skinC,0,0,W,H);
-    x.save();x.globalAlpha=A.skin/100*0.85;x.drawImage(e,0,0);x.restore();}
+  const A=state.ai;if(!origPrev)return;
+  if(A.acne>0||A.skin>0||A.bright>0){const mask=skinMaskCanvas();if(mask){
+    if(A.acne>0){autoAcne(x,W,H,mask,A.acne/100);if(A.acne>=60)autoAcne(x,W,H,mask,A.acne/100);}
+    if(A.skin>0){const e=blurRegion(x.canvas,0,0,W,H,Math.max(2,W*0.006)),ex=e.getContext("2d");ex.globalCompositeOperation="destination-in";ex.drawImage(mask,0,0,W,H);
+      x.save();x.globalAlpha=A.skin/100*0.8;x.drawImage(e,0,0);x.restore();}
+    if(A.bright>0){const L=mk(W,H);L.x.fillStyle="#fff1ea";L.x.fillRect(0,0,W,H);L.x.globalCompositeOperation="destination-in";L.x.drawImage(mask,0,0,W,H);
+      x.save();x.globalCompositeOperation="soft-light";x.globalAlpha=A.bright/100*0.85;x.drawImage(L.c,0,0);x.globalCompositeOperation="screen";x.globalAlpha=A.bright/100*0.16;x.drawImage(L.c,0,0);x.restore();}}}
+  if(!aiData)return;
   aiData.faces.forEach(f=>{
     const P=i=>[f[i].x*W,f[i].y*H],fw=Math.hypot(P(234)[0]-P(454)[0],P(234)[1]-P(454)[1]);
     if(A.slim>0){const nose=P(1);[...JAW_L,...JAW_R].forEach(i=>{const p=P(i),dir=Math.sign(nose[0]-p[0]),amt=A.slim/100*fw*0.045;pushWarp(x,p,[p[0]+dir*amt,p[1]],fw*0.16,1);});}
@@ -1559,7 +1595,7 @@ function restore(i){
 function commitOp(op){OPS.length=state.opsLen;OPS.push(op);state.opsLen=OPS.length;pushHistory();}
 
 /* ---------- Tool UI ---------- */
-const TOOLS=[["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","AI"],["collage","Ghép ảnh"]];
+const TOOLS=[["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];
 const BRUSH_T=new Set(["beauty","reshape","blur"]);
 const COLORS=["#ffffff","#111111","#f2a33a","#ff4d5e","#ff8fc7","#7a5cff","#3ec9ff","#5fe08a","#ffe45c"];
 const LIPS=["#c2334d","#e0566f","#a8323e","#d9776b","#8e2a4f","#f08a8a"];
@@ -1592,11 +1628,24 @@ function panelFor(t){
       btn("Áp dụng","primary",()=>{setTool(null);toast("Đã cắt ảnh");}));box.append(r2,hint("Kéo khung trên ảnh để chọn vùng giữ lại. Kéo bốn góc để đổi cỡ."));
   }
   else if(t==="beauty"){
-    const s=sec("Cọ làm đẹp");s.appendChild(chipRow([["smooth","Mịn da"],["heal","Xoá mụn"],["teeth","Trắng răng"],["lips","Son môi"]],brush.beauty,v=>{brush.beauty=v;renderToolUI();}));box.appendChild(s);
-    if(brush.beauty==="lips"){const s2=sec("Màu son");s2.appendChild(swRow(LIPS,brush.lip,c=>{brush.lip=c;renderToolUI();}));box.appendChild(s2);}
-    box.append(brushSizeRow(),sld("Độ mạnh",10,100,brush.strength,v=>{brush.strength=v;},null));
-    box.appendChild(hint({smooth:"Tô lên vùng da để làm mịn.",heal:"Chấm lên mụn hoặc vết thâm. Dùng cọ nhỏ vừa bằng vết.",teeth:"Tô nhẹ lên răng.",lips:"Tô lên môi. Cọ nhỏ cho đường viền gọn."}[brush.beauty]+" Muốn làm đẹp tự động cả khuôn mặt, dùng mục AI."));
-    const r=el("div","btnrow");r.append(handBtn(),btn("Bỏ mọi nét cọ","",clearOps));box.appendChild(r);
+    const A=state.ai,faces=aiData?aiData.faces.length:0;
+    const s=sec("Làm đẹp một chạm");
+    s.appendChild(el("p","note",aiBusy?"Đang phân tích khuôn mặt…":aiData?(faces?"Đã nhận diện "+faces+" khuôn mặt. Làm đẹp cả da, mắt và khuôn mặt.":"Không thấy khuôn mặt rõ; vẫn làm đẹp da."):"Chế độ cơ bản: nhận vùng da theo màu. Mở bản web GitHub để làm đẹp chính xác hơn bằng AI."));
+    s.appendChild(chipRow([[0,"Tắt"],[35,"Tự nhiên"],[60,"Rạng rỡ"],[85,"Lung linh"]],[0,35,60,85].includes(A.level)?A.level:-1,v=>{setLevel(v);retDirty=true;schedule();pushHistory();renderToolUI();}));
+    s.appendChild(sld("Mức làm đẹp",0,100,A.level,v=>{setLevel(v);beautyLive();},()=>{pushHistory();renderToolUI();}));
+    box.appendChild(s);
+    const d=document.createElement("details");d.className="fold";d.open=!!beautyOpen.fine;d.ontoggle=()=>{beautyOpen.fine=d.open;};
+    d.appendChild(el("summary",null,"Tinh chỉnh từng phần"));const f=el("div","tpane-in");
+    const one=(lab,k)=>sld(lab,0,100,A[k],v=>{A[k]=v;beautyLive();},()=>pushHistory());
+    f.append(one("Mịn da","skin"),one("Sáng da","bright"),one("Xoá mụn tự động","acne"));
+    if(faces){f.append(one("Mắt to","eyes"),one("Gọn mặt","slim"),one("Son môi","lips"));f.appendChild(swRow(LIPS,A.lipColor,c=>{A.lipColor=c;beautyLive();pushHistory();renderToolUI();}));}
+    d.appendChild(f);box.appendChild(d);
+    const d2=document.createElement("details");d2.className="fold";d2.open=!!beautyOpen.brush;d2.ontoggle=()=>{beautyOpen.brush=d2.open;};
+    d2.appendChild(el("summary",null,"Sửa tay bằng cọ"));const g=el("div","tpane-in");
+    g.appendChild(chipRow([["smooth","Mịn da"],["heal","Xoá mụn"],["teeth","Trắng răng"],["lips","Son môi"]],brush.beauty,v=>{brush.beauty=v;renderToolUI();}));
+    if(brush.beauty==="lips")g.appendChild(swRow(LIPS,brush.lip,c=>{brush.lip=c;renderToolUI();}));
+    g.append(brushSizeRow(),sld("Độ mạnh cọ",10,100,brush.strength,v=>{brush.strength=v;},null),hint("Dùng khi còn sót mụn lớn hoặc muốn trắng răng. Tô trực tiếp lên ảnh."));
+    const r=el("div","btnrow");r.append(handBtn(),btn("Bỏ mọi nét cọ","",clearOps));g.appendChild(r);d2.appendChild(g);box.appendChild(d2);
   }
   else if(t==="reshape"){
     const s=sec("Nắn dáng");s.appendChild(chipRow([["push","Đẩy"],["bloat","Phóng to"],["pinch","Thu nhỏ"]],brush.reshape,v=>{brush.reshape=v;renderToolUI();}));box.appendChild(s);
@@ -1637,23 +1686,22 @@ function panelFor(t){
   }
   else if(t==="frame"){const s=sec("Khung");s.appendChild(chipRow(FRAMES,state.frame,v=>{state.frame=v;pushHistory();renderToolUI();schedule();}));box.append(s,hint("Khung được thêm vào ảnh khi lưu."));}
   else if(t==="ai"){
-    if(!aiData){box.appendChild(hint("AI chạy ngay trên máy bạn để nhận diện khuôn mặt và tách người khỏi nền. Lần đầu cần tải khoảng 20MB mô hình. Chỉ chạy được trên bản web GitHub, không chạy trong khung xem của Claude."));
-      const b=btn(aiBusy?"Đang tải và phân tích…":"Phân tích ảnh bằng AI","primary",analyzeAI);b.disabled=aiBusy;box.appendChild(b);}
+    if(!aiData){box.appendChild(hint("AI chạy ngay trên máy bạn để tách người khỏi nền, không tốn token Claude. Lần đầu cần tải khoảng 20MB mô hình. Chỉ chạy được trên bản web GitHub, không chạy trong khung xem của Claude."));
+      const b=btn(aiBusy?"Đang tải và phân tích…":"Phân tích ảnh bằng AI","primary",()=>{aiFailed=false;analyzeAI(false);});b.disabled=aiBusy;box.appendChild(b);}
     else{const A=state.ai,upd=()=>{retDirty=true;schedule();};
       const s=sec("Nền");s.appendChild(chipRow([["keep","Giữ nguyên"],["blur","Làm mờ"],["color","Đổi màu"],["remove","Xoá nền"]],A.bg,v=>{A.bg=v;upd();pushHistory();renderToolUI();}));
       if(A.bg==="blur")s.appendChild(sld("Độ mờ nền",10,100,A.bgBlur,v=>{A.bgBlur=v;},v=>{upd();pushHistory();}));
       if(A.bg==="color")s.appendChild(swRow(BGS,A.bgColor,c=>{A.bgColor=c;upd();pushHistory();renderToolUI();}));
       if(A.bg==="remove")s.appendChild(hint("Ảnh được lưu dạng PNG nền trong suốt nếu không chọn khung."));
       box.appendChild(s);
-      const s2=sec("Làm đẹp tự động");
-      if(!aiData.faces.length)s2.appendChild(hint("Không thấy khuôn mặt trong ảnh, nên chỉ dùng được Mịn da."));
-      s2.append(sld("Mịn da",0,100,A.skin,v=>{A.skin=v;},v=>{upd();pushHistory();}),sld("Son môi",0,100,A.lips,v=>{A.lips=v;},v=>{upd();pushHistory();}));
-      s2.appendChild(swRow(LIPS,A.lipColor,c=>{A.lipColor=c;upd();pushHistory();renderToolUI();}));
-      s2.append(sld("Mắt to",0,100,A.eyes,v=>{A.eyes=v;},v=>{upd();pushHistory();}),sld("Gọn mặt",0,100,A.slim,v=>{A.slim=v;},v=>{upd();pushHistory();}));
-      box.append(s2,hint("Kéo thả thanh rồi buông tay để áp dụng."));}
+      box.appendChild(hint("Làm đẹp khuôn mặt bằng AI nằm ở mục Làm đẹp."));}
   }
   return box;
 }
+const beautyOpen={fine:false,brush:false};
+function setLevel(v){const A=state.ai;A.level=v;const f=v/100;A.skin=Math.round(70*f);A.bright=Math.round(50*f);A.acne=v>0?Math.round(40+60*f):0;
+  const faces=aiData&&aiData.faces.length;A.eyes=faces?Math.round(22*f):0;A.slim=faces?Math.round(25*f):0;}
+let bT=null;function beautyLive(){clearTimeout(bT);bT=setTimeout(()=>{retDirty=true;schedule();},90);}
 function clearOps(){if(!state.opsLen)return;state.opsLen=0;retDirty=true;pushHistory();schedule();toast("Đã bỏ mọi nét cọ");}
 function deleteSel(){const i=state.overlays.findIndex(o=>o.id===selId);if(i<0)return;state.overlays.splice(i,1);selId=null;pushHistory();renderToolUI();schedule();}
 function geoChange(fn){fn(state.geo);state.geo.crop=null;geoDirty=true;rebuildPrev();cropDraft=fitAspect(state.geo.aspect||"free");pushHistory();schedule();}
@@ -1677,6 +1725,7 @@ function setTool(t){
   if(t==="crop"){geoDirty=true;resetZoom();rebuildPrev();cropDraft=state.geo.crop?Object.assign({},state.geo.crop):{x:0,y:0,w:1,h:1};}
   if(t!=="text"&&t!=="sticker")selId=null;
   if(!desk&&t&&mTab!=="edit")setMTab("edit");
+  if((t==="beauty"||t==="ai")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
   renderToolUI();schedule();
 }
 function setMTab(t){
