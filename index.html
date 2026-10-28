@@ -4,295 +4,548 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tiệm Phim</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tiệm Phim">
+<meta name="theme-color" content="#0c0d0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=DotGothic16&display=swap">
 <style>
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{padding-top:0}
 body{margin:0}
 [hidden]{display:none!important}
-/* Layout: darkroom editor — photo stage left, film-shop counter (presets, sliders) right; stacks on phones. Single dark look by choice. */
+img{max-width:100%}
+/* Layout: photo fills the window over a blurred copy of itself; three glass layers float above it (toolbar, library, inspector) on desktop; on phones a glass pill on top and a thumb-zone dock below. Single dark look by choice. */
 :root{
-  --bg:#111316;
-  --panel:#181b1f;
-  --raise:#22262b;
-  --line:#2d3238;
-  --fg:#ede6d9;
-  --muted:#918b80;
-  --accent:#efa23b;
-  --accent-ink:#1b1306;
+  --bg:#0c0d0f;
+  --fg:#f2ede4;
+  --muted:rgba(242,237,228,.62);
+  --faint:rgba(242,237,228,.38);
+  --line:rgba(255,255,255,.11);
+  --glass:rgba(28,30,35,.50);
+  --glass-solid:#1b1d21;
+  --well:rgba(255,255,255,.055);
+  --well-hi:rgba(255,255,255,.10);
+  --accent:#f2a33a;
+  --accent-ink:#1e1405;
   --stamp:#ff9a3c;
+  --r-panel:24px;--r-inner:12px;--pad:12px;
+  --libw:288px;--inspw:328px;
   --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-mark:"DotGothic16","Courier New",ui-monospace,monospace;
   color-scheme:dark;
 }
-html,body{height:100%}
-body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased}
+@media (max-width:1240px){:root{--libw:256px;--inspw:300px}}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 button,input{font:inherit;color:inherit}
-button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{cursor:pointer;background:none;border:0;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-.app{height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 372px;grid-template-rows:auto minmax(0,1fr);gap:0 16px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 14px}
+/* Background extension: a blurred copy of the photo */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#bgc{position:absolute;inset:-12%;width:124%;height:124%;filter:blur(42px) saturate(1.3) brightness(.5);opacity:.95}
 
-header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px}
-.brand{display:flex;align-items:baseline;gap:12px;min-width:0}
-.brand h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.02em}
-.edge{font-family:var(--font-mark);color:var(--accent);font-size:13px;letter-spacing:.12em;white-space:nowrap}
-.actions{display:flex;gap:8px}
-.btn{border:1px solid var(--line);background:var(--raise);border-radius:6px;padding:8px 14px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
-.btn:hover{border-color:#454b53}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
-.btn.primary:hover{filter:brightness(1.06)}
-.btn[disabled]{opacity:.55;cursor:progress}
-.btn.icon{padding:7px 10px}
+/* Glass material */
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(170%);backdrop-filter:blur(28px) saturate(170%);
+  border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 14px 44px rgba(0,0,0,.42)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:var(--glass-solid)}}
+@media (prefers-reduced-transparency:reduce){.glass{background:var(--glass-solid);-webkit-backdrop-filter:none;backdrop-filter:none}}
+body.solid .glass{background:var(--glass-solid);-webkit-backdrop-filter:none;backdrop-filter:none}
 
-.viewer{position:relative;min-height:0;border-radius:8px;overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 40%,#1a1d21 0%,#0d0f11 100%)}
-.stage{position:absolute;inset:14px;display:flex;align-items:center;justify-content:center}
-#view{max-width:100%;max-height:100%;display:block;box-shadow:0 10px 40px rgba(0,0,0,.55);touch-action:manipulation;-webkit-touch-callout:none;user-select:none;cursor:pointer}
-.viewer.drag{outline:2px dashed var(--accent);outline-offset:-8px}
-.badge{position:absolute;top:12px;left:12px;font-size:12px;background:rgba(17,19,22,.78);border:1px solid var(--line);border-radius:4px;padding:4px 8px;color:var(--muted)}
-.badge b{color:var(--fg);font-weight:500}
-.vtools{position:absolute;top:10px;right:10px;display:flex;gap:6px}
-.vtools .btn{background:rgba(17,19,22,.8);padding:6px 10px;font-size:13px}
-.hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted);background:rgba(17,19,22,.75);padding:4px 10px;border-radius:4px;white-space:nowrap}
-.cmpflag{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-family:var(--font-mark);letter-spacing:.15em;background:var(--fg);color:#111;padding:3px 10px;border-radius:3px;font-size:12px}
+/* Buttons */
+.ib{width:36px;height:36px;border-radius:18px;display:inline-grid;place-items:center;color:var(--fg)}
+.ib:hover{background:var(--well-hi)}
+.ib[aria-pressed="true"]{background:var(--fg);color:#141414}
+.ib[disabled]{opacity:.35;cursor:default;background:none}
+.pbtn{height:36px;border-radius:18px;padding:0 16px;background:var(--accent);color:var(--accent-ink);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.pbtn:hover{filter:brightness(1.06)}
+.pbtn[disabled]{opacity:.6;cursor:progress}
+.tbtn{height:32px;border-radius:16px;padding:0 14px;background:var(--well);border:1px solid var(--line);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.tbtn:hover{background:var(--well-hi)}
+.sep{width:1px;height:20px;background:var(--line);margin:0 4px}
 
-.panel{min-height:0;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.tabs{display:flex;border-bottom:1px solid var(--line)}
-.tab{flex:1;background:none;border:0;padding:12px 6px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
-.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
-.pane{flex:1;min-height:0;overflow:auto;padding:14px 14px 18px;display:flex;flex-direction:column;gap:16px}
+/* App frame */
+#center{position:fixed;z-index:2;display:flex;flex-direction:column;gap:12px}
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%;will-change:transform}
+#holder{position:relative;max-width:100%;max-height:100%;display:flex}
+#view{display:block;max-width:100%;max-height:100%;border-radius:4px;box-shadow:0 16px 50px rgba(0,0,0,.55);-webkit-touch-callout:none}
+#split{position:absolute;top:0;bottom:0;width:0;border-left:2px solid #fff;box-shadow:0 0 8px rgba(0,0,0,.5);cursor:ew-resize;touch-action:none}
+#split::after{content:"";position:absolute;top:50%;left:-15px;width:28px;height:28px;margin-top:-14px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+#split::before{content:"TRƯỚC   SAU";position:absolute;top:10px;left:-46px;width:92px;text-align:center;font:11px var(--font-mark);letter-spacing:.12em;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);white-space:pre}
+.flag{position:absolute;top:12px;left:50%;transform:translateX(-50%);font:12px var(--font-mark);letter-spacing:.16em;background:var(--fg);color:#111;padding:3px 10px;border-radius:999px;z-index:3}
+.badge{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted);background:rgba(12,13,15,.6);padding:4px 12px;border-radius:999px;white-space:nowrap;z-index:3;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}
+.drag #stage{outline:2px dashed var(--accent);outline-offset:-6px;border-radius:16px}
+.errbox{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
 
+/* ---------- Desktop ---------- */
+.m-only{display:none!important}
+body.desk #center{top:12px;bottom:12px;left:calc(var(--libw) + 24px);right:calc(var(--inspw) + 24px);transition:left .25s ease,right .25s ease}
+body.desk.no-lib #center{left:12px}
+body.desk.no-insp #center{right:12px}
+.toolbar{align-self:center;display:flex;align-items:center;gap:2px;padding:6px;border-radius:24px;flex-wrap:nowrap;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.toolbar::-webkit-scrollbar{display:none}
+.panel{position:fixed;z-index:3;top:12px;bottom:12px;border-radius:var(--r-panel);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease,opacity .25s ease}
+.lib{left:12px;width:var(--libw)}
+.insp{right:12px;width:var(--inspw)}
+body.no-lib .lib{transform:translateX(calc(-100% - 24px));opacity:0;pointer-events:none}
+body.no-insp .insp{transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none}
+.phead{padding:16px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.ptitle{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ptitle h2{margin:0;font-size:15px;font-weight:600}
+.ptitle span{font:12px var(--font-mark);color:var(--faint)}
+.search{display:flex;align-items:center;gap:8px;background:var(--well);border:1px solid var(--line);border-radius:var(--r-inner);padding:0 10px;height:36px;color:var(--muted)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);height:100%}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:4px 11px;font-size:12.5px;color:var(--muted)}
-.chip[aria-pressed="true"]{background:var(--fg);color:#121212;border-color:var(--fg)}
-
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
-.tile{background:none;border:0;padding:0;display:flex;flex-direction:column;gap:5px;text-align:left;min-width:0}
-.tile canvas{width:100%;aspect-ratio:1;display:block;border-radius:4px;background:var(--raise);outline:2px solid transparent;outline-offset:2px}
+.chip{height:28px;padding:0 11px;border-radius:14px;background:var(--well);border:1px solid var(--line);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.chip:hover{color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--fg);color:#141414;border-color:var(--fg)}
+.pscroll{flex:1;min-height:0;overflow:auto;padding:4px 12px 16px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.fam{margin-top:6px}
+.famhead{width:100%;display:flex;align-items:center;gap:8px;padding:8px 4px;font-weight:600;font-size:13px;color:var(--fg)}
+.famhead .n{font:12px var(--font-mark);color:var(--faint);margin-left:auto}
+.famhead svg{transition:transform .2s}
+.famhead[aria-expanded="false"] svg{transform:rotate(-90deg)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;gap:5px;text-align:left;min-width:0;border-radius:var(--r-inner)}
+.tile canvas{width:100%;aspect-ratio:1;display:block;border-radius:var(--r-inner);background:var(--well);outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}
+.tile:hover canvas{outline-color:rgba(255,255,255,.35)}
 .tile[aria-pressed="true"] canvas{outline-color:var(--accent)}
-.tname{font-family:var(--font-mark);font-size:12px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tname{font:12.5px var(--font-mark);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
 .tile[aria-pressed="true"] .tname{color:var(--accent)}
+.empty{color:var(--muted);font-size:13px;padding:16px 4px}
 
-.info{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
-.info h3{margin:0;font-family:var(--font-mark);font-weight:400;font-size:16px;letter-spacing:.05em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.info p{margin:0;color:var(--muted);font-size:13px;max-width:60ch}
-.edited{font-family:var(--font-ui);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:0 5px;letter-spacing:0}
-
-.group{display:flex;flex-direction:column;gap:12px}
-.group h4{margin:0;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
-.row label{font-size:13px}
-.val{font-family:var(--font-mark);font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted);min-width:4ch;text-align:right;display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.card{margin:0 12px;padding:14px;border-radius:16px;background:var(--well);display:flex;flex-direction:column;gap:8px}
+.card h3{margin:0;font:400 17px var(--font-mark);letter-spacing:.04em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card p{margin:0;color:var(--muted);font-size:12.5px}
+.edited{font:500 11px var(--font-ui);color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 7px}
+.linkbtn{font-size:12.5px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;align-self:flex-start}
+.linkbtn:hover{color:var(--fg)}
+#hist{width:100%;height:56px;display:block;border-radius:10px;background:rgba(0,0,0,.25)}
+.seg{display:flex;padding:3px;margin:12px 12px 4px;border-radius:999px;background:var(--well)}
+.seg button{flex:1;height:32px;border-radius:999px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:rgba(255,255,255,.16);color:var(--fg)}
+.iscroll{flex:1;min-height:0;overflow:auto;padding:8px 12px 18px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.group{padding:10px 4px 6px;display:flex;flex-direction:column;gap:6px}
+.group+.group{border-top:1px solid var(--line)}
+.ghead{display:flex;align-items:center;justify-content:space-between}
+.ghead h4{margin:0;font-size:13px;font-weight:600}
+.eye{width:28px;height:28px;border-radius:14px;display:grid;place-items:center;color:var(--muted)}
+.eye:hover{background:var(--well-hi);color:var(--fg)}
+.eye[aria-pressed="false"]{color:var(--accent)}
+.group.off .row{opacity:.4}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 8px}
+.row label{font-size:13px;color:var(--muted)}
+.val{font:13px var(--font-mark);font-variant-numeric:tabular-nums;color:var(--faint);min-width:44px;text-align:right;padding:2px 4px;border-radius:6px;display:inline-flex;gap:6px;align-items:center;justify-content:flex-end}
+.val:hover{background:var(--well-hi)}
 .val.on{color:var(--fg)}
-.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.val input{width:52px;background:var(--well-hi);border:1px solid var(--line);border-radius:6px;text-align:right;font:13px var(--font-mark);color:var(--fg);padding:1px 4px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
 .row input[type=range]{grid-column:1/-1}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:var(--track,var(--line))}
-input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--track,var(--line))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--fg);margin-top:-6.5px;border:2px solid var(--panel)}
-input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--fg);border:2px solid var(--panel)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;margin:0;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--track,rgba(255,255,255,.16))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--track,rgba(255,255,255,.16))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;margin-top:-7px;box-shadow:0 1px 6px rgba(0,0,0,.45);transition:transform .15s,background .15s}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.45)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.45);background:rgba(255,255,255,.55);box-shadow:0 0 0 1px #fff,0 4px 14px rgba(0,0,0,.4)}
+input[type=range]:active::-moz-range-thumb{transform:scale(1.45);background:rgba(255,255,255,.55)}
 input.hue{--track:linear-gradient(90deg,#f33,#fb3,#bf3,#3f6,#3ff,#36f,#b3f,#f3b,#f33)}
-.note{font-size:12px;color:var(--muted);margin:0}
+.note{font-size:12px;color:var(--faint);margin:6px 4px 0}
+.dateopts{display:flex;flex-direction:column;gap:8px}
+.dateopts .seg{margin:0}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{background:var(--well);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0;color:var(--fg)}
+.inline .field{flex:1}
 
-.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.toggle input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
-.daterow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.daterow input[type=date],.field{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-width:0}
+.recipe{display:flex;flex-direction:column;gap:12px;padding:6px 4px}
+.recipe h4{margin:6px 0 0;font-size:13px;font-weight:600}
+.recipe p{margin:0;color:var(--muted);font-size:12.5px}
+.minelist{display:flex;flex-direction:column;gap:6px}
+.mine{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--well)}
+.mine span{flex:1;min-width:0;font:13px var(--font-mark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mine button{font-size:12.5px;color:var(--muted);padding:2px 6px;border-radius:6px}
+.mine button:hover{color:var(--fg);background:var(--well-hi)}
+.mine button.warn{color:#ff8f7a}
+.codebox{font-family:ui-monospace,Menlo,monospace;font-size:11px;word-break:break-all;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:8px;color:var(--muted);max-height:70px;overflow:auto}
 .stampprev{font-family:var(--font-mark);color:var(--stamp);text-shadow:0 0 6px rgba(255,100,20,.7);letter-spacing:.08em}
 
-.mine{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
-.inline{display:flex;gap:8px}
-.inline .field{flex:1}
-.codebox{font-family:ui-monospace,Menlo,monospace;font-size:11px;word-break:break-all;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:8px;color:var(--muted);max-height:72px;overflow:auto}
+/* ---------- Mobile ---------- */
+body.mob .d-only{display:none!important}
+body.mob .m-only{display:flex!important}
+body.mob #center{inset:0;padding:calc(8px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));gap:10px;height:100dvh;box-sizing:border-box}
+.mtop{align-self:center;align-items:center;gap:2px;padding:5px;border-radius:24px}
+.mtop .ib{width:44px;height:44px;border-radius:22px}
+.mtop .pbtn{height:40px;margin-left:4px}
+.mdock{flex-direction:column;gap:10px}
+.mpane{flex-direction:column;gap:8px}
+.mchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px}
+.mchips::-webkit-scrollbar,.strip::-webkit-scrollbar{display:none}
+.mchips .chip{height:32px}
+.strip{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 2px;scroll-snap-type:x proximity}
+.strip .tile{width:76px;flex:none;scroll-snap-align:start}
+.strip .tname{font-size:11.5px;text-align:center;padding:0}
+.mstrength{display:flex;flex-direction:column;gap:2px;padding:6px 12px;border-radius:16px}
+.bigrow{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px}
+.bigrow b{font-weight:500;font-size:14px}
+.bigrow span{font:15px var(--font-mark);color:var(--fg)}
+.mslider{padding:8px 14px 4px;border-radius:20px;flex-direction:column;gap:2px}
+.mslider input[type=range]{height:40px}
+.mslider input[type=range]::-webkit-slider-thumb{width:26px;height:26px;margin-top:-11px}
+.mslider input[type=range]::-moz-range-thumb{width:26px;height:26px}
+.tools{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.tools::-webkit-scrollbar{display:none}
+.tool{height:36px;padding:0 14px;border-radius:18px;background:var(--well);border:1px solid var(--line);font-size:13px;white-space:nowrap;color:var(--muted);flex:none;position:relative}
+.tool[aria-pressed="true"]{background:var(--fg);color:#141414;border-color:var(--fg)}
+.tool.set::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.tabbar{align-self:center;display:flex;gap:2px;padding:5px;border-radius:30px;transition:transform .2s ease,opacity .2s ease}
+.tab{min-width:72px;height:50px;border-radius:25px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500;color:var(--muted)}
+.tab[aria-selected="true"]{background:rgba(255,255,255,.15);color:var(--fg)}
+body.dragging .tabbar{transform:scale(.82) translateY(8px);opacity:.55}
+.sheet{position:fixed;z-index:20;left:max(8px,env(safe-area-inset-left,0px));right:max(8px,env(safe-area-inset-right,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  max-height:62dvh;border-radius:30px;display:flex;flex-direction:column;transform:translateY(calc(100% + 24px));transition:transform .28s cubic-bezier(.2,.8,.2,1),max-height .28s}
+.sheet.open{transform:none}
+.sheet.full{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px));background:var(--glass-solid)}
+.sheethead{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 0 18px}
+.grab{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.3);margin:8px auto 0;display:block}
+.sheetbody{overflow:auto;padding:4px 16px 18px}
+.scrim{position:fixed;inset:0;z-index:19;background:rgba(0,0,0,.25)}
+body.desk .sheet,body.desk .scrim{display:none}
 
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:#121212;padding:9px 16px;border-radius:6px;font-weight:500;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:30;max-width:calc(100% - 32px)}
-.overlay{position:fixed;inset:0;background:rgba(8,9,10,.92);z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+@media (max-width:899px) and (orientation:landscape) and (max-height:520px){
+  body.mob #center{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr);column-gap:12px}
+  body.mob .mtop{grid-column:1;grid-row:1}
+  body.mob #stage{grid-column:1;grid-row:2}
+  body.mob .mdock{grid-column:2;grid-row:1/3;justify-content:flex-end;overflow:hidden}
+  .strip .tile{width:64px}
+}
+
+/* Overlays */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:#121212;padding:10px 18px;border-radius:999px;font-weight:500;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:50;max-width:calc(100% - 32px);text-align:center}
+body.mob .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.overlay{position:fixed;inset:0;background:rgba(8,9,10,.9);z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .overlay img{max-width:100%;max-height:70vh;box-shadow:0 10px 40px rgba(0,0,0,.6)}
 .overlay p{margin:0;color:var(--muted);text-align:center;max-width:46ch}
-.errbox{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
-
-@media (max-width:860px){
-  html,body{height:auto}
-  .app{height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;gap:12px}
-  header{grid-column:1}
-  .viewer{height:min(58vh,520px)}
-  .pane{overflow:visible}
-  .hint{display:none}
-}
-@media (max-width:420px){ .edge{display:none} .btn{padding:8px 11px} }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.help{border-radius:24px;padding:20px 22px;max-width:420px;width:100%;box-sizing:border-box}
+.help h3{margin:0 0 12px;font-size:16px}
+.help dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0 0 16px}
+.help dt{font:13px var(--font-mark);background:var(--well-hi);border-radius:6px;padding:1px 8px;justify-self:start}
+.help dd{margin:0;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header>
-    <div class="brand">
-      <h1>Tiệm Phim</h1>
-      <span class="edge" aria-hidden="true">▸ 400 · 36EXP · フィルム</span>
-    </div>
-    <div class="actions">
-      <button class="btn" id="openBtn" type="button">Mở ảnh</button>
-      <button class="btn primary" id="saveBtn" type="button">Lưu ảnh</button>
-      <input type="file" id="file" accept="image/*" hidden>
-    </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M12 15V5M7.5 9.5L12 5l4.5 4.5M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 5v10M7.5 10.5L12 15l4.5-4.5M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M5 12h10a4 4 0 0 1 0 8h-3"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 8l4 4-4 4M19 12H9a4 4 0 0 0 0 8h3"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.5"/><path d="M12 3v18"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8.5v5M8.5 11h5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.5"/><path d="M9.5 5v14"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.5"/><path d="M14.5 5v14"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.8 9.8a2.3 2.3 0 1 1 3.3 2c-.7.4-1.1.8-1.1 1.6M12 16.6v.1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12z"/><path d="M4 4l16 16"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.8"/><rect x="13" y="4" width="7" height="7" rx="1.8"/><rect x="4" y="13" width="7" height="7" rx="1.8"/><rect x="13" y="13" width="7" height="7" rx="1.8"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.3" fill="#1b1d21"/><circle cx="15" cy="17" r="2.3" fill="#1b1d21"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3.5L7 20z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+</svg>
+
+<div id="bg"><canvas id="bgc" width="96" height="64"></canvas></div>
+
+<aside class="panel lib glass d-only" aria-label="Thư viện preset">
+  <div class="phead">
+    <div class="ptitle"><h2>Thư viện preset</h2><span id="libCount"></span></div>
+    <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Tìm preset, ví dụ: neon, sepia" autocomplete="off" aria-label="Tìm preset"></label>
+    <div class="chips" id="moodChips" role="group" aria-label="Lọc theo cảm xúc"></div>
+  </div>
+  <div class="pscroll" id="libList"></div>
+</aside>
+
+<div id="center">
+  <header class="toolbar glass d-only" aria-label="Thanh công cụ">
+    <button class="ib" id="tLib" type="button" aria-label="Ẩn hoặc hiện thư viện preset" title="Thư viện preset (L)" aria-pressed="true"><svg class="i"><use href="#i-left"/></svg></button>
+    <span class="sep"></span>
+    <button class="ib" id="tOpen" type="button" aria-label="Mở ảnh" title="Mở ảnh (O)"><svg class="i"><use href="#i-open"/></svg></button>
+    <span class="sep"></span>
+    <button class="ib" id="tUndo" type="button" aria-label="Hoàn tác" title="Hoàn tác (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button>
+    <button class="ib" id="tRedo" type="button" aria-label="Làm lại" title="Làm lại (Ctrl+Shift+Z)"><svg class="i"><use href="#i-redo"/></svg></button>
+    <span class="sep"></span>
+    <button class="ib" id="tSplit" type="button" aria-label="So sánh trước và sau" title="So sánh chia đôi (C)" aria-pressed="false"><svg class="i"><use href="#i-split"/></svg></button>
+    <button class="ib" id="tZoom" type="button" aria-label="Phóng to" title="Phóng to / vừa khung (Z)" aria-pressed="false"><svg class="i"><use href="#i-zoom"/></svg></button>
+    <span class="sep"></span>
+    <button class="pbtn" id="tSave" type="button"><svg class="i"><use href="#i-save"/></svg>Lưu ảnh</button>
+    <span class="sep"></span>
+    <button class="ib" id="tHelp" type="button" aria-label="Phím tắt" title="Phím tắt (?)"><svg class="i"><use href="#i-help"/></svg></button>
+    <button class="ib" id="tInsp" type="button" aria-label="Ẩn hoặc hiện bảng chỉnh" title="Bảng chỉnh (I)" aria-pressed="true"><svg class="i"><use href="#i-right"/></svg></button>
   </header>
 
-  <section class="viewer" id="viewer" aria-label="Ảnh đang chỉnh">
-    <div class="stage"><canvas id="view" aria-label="Xem trước ảnh"></canvas></div>
-    <div class="badge" id="badge"><b>Ảnh mẫu</b> · kéo thả, dán hoặc bấm “Mở ảnh” để dùng ảnh của bạn</div>
-    <div class="vtools">
-      <button class="btn icon" id="undoBtn" type="button" title="Hoàn tác (Ctrl+Z)">↶</button>
-      <button class="btn icon" id="redoBtn" type="button" title="Làm lại (Ctrl+Shift+Z)">↷</button>
-      <button class="btn" id="cmpBtn" type="button" title="Nhấn giữ để xem ảnh gốc">Gốc</button>
+  <header class="mtop glass m-only" aria-label="Thanh công cụ">
+    <button class="ib" id="mOpen" type="button" aria-label="Mở ảnh"><svg class="i"><use href="#i-open"/></svg></button>
+    <button class="ib" id="mUndo" type="button" aria-label="Hoàn tác"><svg class="i"><use href="#i-undo"/></svg></button>
+    <button class="ib" id="mRedo" type="button" aria-label="Làm lại"><svg class="i"><use href="#i-redo"/></svg></button>
+    <button class="ib" id="mSplit" type="button" aria-label="So sánh chia đôi" aria-pressed="false"><svg class="i"><use href="#i-split"/></svg></button>
+    <button class="pbtn" id="mSave" type="button"><svg class="i"><use href="#i-save"/></svg>Lưu</button>
+  </header>
+
+  <main id="stage" aria-label="Ảnh đang chỉnh">
+    <div id="wrap"><div id="holder"><canvas id="view" aria-label="Xem trước ảnh"></canvas><div id="split" hidden role="slider" aria-label="Vị trí chia so sánh" tabindex="0"></div></div></div>
+    <div class="flag" id="cmpFlag" hidden>ẢNH GỐC</div>
+    <div class="badge" id="badge">Ảnh mẫu · kéo thả, dán hoặc bấm Mở để dùng ảnh của bạn</div>
+  </main>
+
+  <section class="mdock m-only" aria-label="Công cụ">
+    <div class="mpane" id="mp-presets">
+      <div class="mstrength glass" id="mStrength" hidden></div>
+      <div class="mchips" id="mFams" role="group" aria-label="Họ preset"></div>
+      <div class="strip" id="mStrip"></div>
     </div>
-    <div class="cmpflag" id="cmpFlag" hidden>ẢNH GỐC</div>
-    <div class="hint">Nhấn giữ ảnh để so với bản gốc</div>
+    <div class="mpane" id="mp-tools" hidden>
+      <div class="mslider glass" id="mSlider"></div>
+      <div class="tools" id="mTools" role="group" aria-label="Công cụ chỉnh"></div>
+    </div>
+    <nav class="tabbar glass" role="tablist" aria-label="Chế độ">
+      <button class="tab" role="tab" data-mt="presets" aria-selected="true"><svg class="i"><use href="#i-grid"/></svg>Preset</button>
+      <button class="tab" role="tab" data-mt="adjust" aria-selected="false"><svg class="i"><use href="#i-sliders"/></svg>Chỉnh</button>
+      <button class="tab" role="tab" data-mt="fx" aria-selected="false"><svg class="i"><use href="#i-spark"/></svg>Hiệu ứng</button>
+      <button class="tab" role="tab" data-mt="recipe" aria-selected="false"><svg class="i"><use href="#i-book"/></svg>Công thức</button>
+    </nav>
   </section>
-
-  <aside class="panel">
-    <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="t-presets" aria-selected="true" data-pane="p-presets">Preset</button>
-      <button class="tab" role="tab" id="t-adjust" aria-selected="false" data-pane="p-adjust">Chỉnh màu</button>
-      <button class="tab" role="tab" id="t-fx" aria-selected="false" data-pane="p-fx">Hiệu ứng film</button>
-    </div>
-
-    <div class="pane" id="p-presets" role="tabpanel">
-      <div class="chips" id="chips"></div>
-      <div class="tiles" id="tiles"></div>
-      <div class="info">
-        <h3><span id="pName">—</span><span class="edited" id="pEdited" hidden>đã chỉnh</span></h3>
-        <p id="pDesc"></p>
-        <div class="row" style="margin-top:6px">
-          <label for="strength">Độ mạnh preset</label><span class="val on" id="strengthVal">100</span>
-          <input type="range" id="strength" min="0" max="100" value="100">
-        </div>
-        <div class="inline"><button class="btn" id="resetBtn" type="button">Bỏ phần đã chỉnh</button></div>
-      </div>
-      <div class="mine">
-        <div class="group"><h4>Preset của bạn</h4></div>
-        <div class="inline">
-          <input class="field" id="saveName" placeholder="Đặt tên, ví dụ: Sài Gòn mưa" maxlength="28">
-          <button class="btn" id="savePreset" type="button">Lưu</button>
-        </div>
-        <p class="note">Mã preset: gửi cho bạn bè để họ dán vào và dùng đúng công thức của bạn.</p>
-        <div class="codebox" id="codeBox"></div>
-        <div class="inline">
-          <button class="btn" id="copyCode" type="button">Sao chép mã</button>
-        </div>
-        <div class="inline">
-          <input class="field" id="pasteCode" placeholder="Dán mã preset vào đây">
-          <button class="btn" id="applyCode" type="button">Áp dụng</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="pane" id="p-adjust" role="tabpanel" hidden></div>
-    <div class="pane" id="p-fx" role="tabpanel" hidden></div>
-  </aside>
 </div>
-<div class="toast" id="toast" hidden></div>
+
+<aside class="panel insp glass d-only" aria-label="Bảng chỉnh">
+  <div class="phead" style="padding-bottom:0">
+    <div class="ptitle"><h2>Bảng chỉnh</h2><span id="sizeInfo"></span></div>
+  </div>
+  <div class="card" id="pCard">
+    <h3><span id="pName">—</span><span class="edited" id="pEdited" hidden>đã chỉnh</span></h3>
+    <p id="pDesc"></p>
+    <div id="dQuick"></div>
+    <button class="linkbtn" id="resetBtn" type="button">Bỏ phần đã chỉnh</button>
+    <canvas id="hist" width="300" height="56" aria-label="Biểu đồ màu"></canvas>
+  </div>
+  <div class="seg" role="tablist" aria-label="Nhóm chỉnh">
+    <button role="tab" data-dt="adjust" aria-selected="true">Chỉnh màu</button>
+    <button role="tab" data-dt="fx" aria-selected="false">Hiệu ứng</button>
+    <button role="tab" data-dt="recipe" aria-selected="false">Công thức</button>
+  </div>
+  <div class="iscroll">
+    <div id="dt-adjust"></div>
+    <div id="dt-fx" hidden></div>
+    <div id="dt-recipe" hidden></div>
+  </div>
+</aside>
+
+<div class="scrim" id="scrim" hidden></div>
+<section class="sheet glass" id="sheet" aria-label="Công thức" aria-hidden="true">
+  <button class="grab" id="sheetGrab" type="button" aria-label="Mở rộng bảng"></button>
+  <div class="sheethead"><h2 style="margin:0;font-size:16px">Công thức</h2><button class="ib" id="sheetClose" type="button" aria-label="Đóng"><svg class="i"><use href="#i-close"/></svg></button></div>
+  <div class="sheetbody" id="sheetBody"></div>
+</section>
+
+<div class="recipe" id="recipe">
+  <p>Lưu bộ chỉnh hiện tại thành công thức để dùng lại cho ảnh khác.</p>
+  <div class="inline"><input class="field" id="saveName" placeholder="Đặt tên, ví dụ: Sài Gòn mưa" maxlength="28" aria-label="Tên công thức"><button class="tbtn" id="savePreset" type="button">Lưu</button></div>
+  <div class="minelist" id="mineList"></div>
+  <h4>Mã chia sẻ</h4>
+  <p>Gửi mã này cho bạn bè để họ dán vào và dùng đúng công thức của bạn.</p>
+  <div class="codebox" id="codeBox"></div>
+  <div class="inline"><button class="tbtn" id="copyCode" type="button">Sao chép mã</button></div>
+  <div class="inline"><input class="field" id="pasteCode" placeholder="Dán mã bắt đầu bằng TP1:" aria-label="Dán mã công thức"><button class="tbtn" id="applyCode" type="button">Áp dụng</button></div>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+<div class="toast" id="toast" hidden role="status"></div>
 <div class="overlay" id="overlay" hidden>
   <img id="outImg" alt="Ảnh đã xuất">
   <p>Nhấn giữ (điện thoại) hoặc chuột phải (máy tính) vào ảnh rồi chọn “Lưu ảnh”.</p>
-  <button class="btn" id="closeOverlay" type="button">Đóng</button>
+  <button class="tbtn" id="closeOverlay" type="button">Đóng</button>
+</div>
+<div class="overlay" id="helpBox" hidden>
+  <div class="help glass">
+    <h3>Phím tắt</h3>
+    <dl>
+      <dt>↑ ↓</dt><dd>Chuyển preset trước / sau</dd>
+      <dt>\</dt><dd>Giữ để xem ảnh gốc</dd>
+      <dt>C</dt><dd>Bật / tắt so sánh chia đôi</dd>
+      <dt>Z</dt><dd>Phóng to / vừa khung</dd>
+      <dt>O</dt><dd>Mở ảnh</dd>
+      <dt>Ctrl S</dt><dd>Lưu ảnh</dd>
+      <dt>Ctrl Z</dt><dd>Hoàn tác (thêm Shift để làm lại)</dd>
+      <dt>L · I</dt><dd>Ẩn / hiện thư viện, bảng chỉnh</dd>
+    </dl>
+    <p class="note" style="margin:0 0 14px">Cuộn chuột trên ảnh để phóng to, kéo để di chuyển. Nhấp đúp một thanh trượt để đưa về 0; bấm vào con số để gõ giá trị.</p>
+    <button class="tbtn" id="helpClose" type="button">Đóng</button>
+  </div>
 </div>
 
 <script>
 (function(){
 "use strict";
-
-/* ---------- Params ---------- */
+/* ---------- Params & presets ---------- */
 const NEUTRAL = {exposure:0,contrast:0,highlights:0,shadows:0,fade:0,temp:0,tint:0,saturation:0,vibrance:0,bw:0,
-  shHue:200,shAmt:0,hiHue:40,hiAmt:0,grain:0,grainSize:35,halation:0,bloom:0,aberration:0,vignette:0,leak:0,date:0};
+  shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0};
 const NOSCALE = new Set(["shHue","hiHue","grainSize","date"]);
 const Z9 = [0,0,0,0,0,0,0,0,0];
+const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
+const MOODS = [["warm","Ấm"],["cool","Lạnh"],["pastel","Pastel"],["vivid","Rực"],["faded","Phai"],["contrast","Tương phản"],["grainy","Nhiều hạt"],["atmo","Huyền ảo"],["natural","Tự nhiên"],["mono","Đơn sắc"]];
+function D(id,name,fam,moods,desc,p,mix){return {id,name,fam,moods:moods.split(" ").filter(Boolean),desc,params:Object.assign({},NEUTRAL,p),mix:mix||Z9};}
 
-const P = (o)=>Object.assign({},NEUTRAL,o);
 const PRESETS = [
- {id:"none",name:"Gốc",tags:[],desc:"Ảnh nguyên bản, không áp preset.",params:P({}),mix:Z9},
- {id:"tokyo400",name:"Tokyo 400",tags:["jp"],desc:"Sáng, trong, bóng đổ ngả xanh ngọc. Kiểu ảnh “airy” rất Nhật, hợp chân dung và góc phố ban ngày.",
-  params:P({exposure:18,contrast:-18,highlights:-25,shadows:30,fade:22,temp:-8,tint:-6,saturation:-15,vibrance:10,shHue:175,shAmt:30,hiHue:45,hiAmt:12,grain:18,grainSize:30,halation:5,bloom:15}),
-  mix:[0,0,0,-0.03,0.02,0.04,0,0.05,0]},
- {id:"shimokita",name:"Shimokita",tags:["jp","retro"],desc:"Phố nhỏ ở Tokyo: màu trầm, ngả xanh lá, hơi phai như cuộn film 400 rửa ở tiệm ảnh.",
-  params:P({contrast:10,highlights:-30,shadows:15,fade:28,temp:10,tint:-12,saturation:-25,shHue:150,shAmt:35,hiHue:40,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:5,aberration:5,vignette:20}),
-  mix:[0.04,0,-0.02,0,0,0,0,0,0]},
- {id:"natsu",name:"Natsu",tags:["jp"],desc:"Mùa hè Nhật Bản: nắng ấm, trời xanh pastel, có vệt lóa sáng ở góc ảnh.",
-  params:P({exposure:25,contrast:-10,highlights:-35,shadows:25,fade:15,temp:18,tint:4,saturation:5,vibrance:20,shHue:190,shAmt:25,hiHue:35,hiAmt:25,grain:15,grainSize:30,halation:15,bloom:25,leak:35}),mix:Z9},
- {id:"disposable98",name:"Disposable '98",tags:["jp","retro"],desc:"Máy film dùng một lần cuối thập niên 90: màu rực, tối góc, hạt thô và in ngày màu cam.",
-  params:P({exposure:5,contrast:35,highlights:10,shadows:-10,fade:8,temp:12,tint:6,saturation:25,vibrance:10,shHue:220,shAmt:15,hiHue:45,hiAmt:10,grain:45,grainSize:55,halation:12,bloom:10,aberration:25,vignette:45,leak:10,date:1}),mix:Z9},
- {id:"kissaten",name:"Kissaten",tags:["jp","vintage"],desc:"Quán cà phê kiểu Showa: ánh đèn vàng hổ phách, quầng sáng ấm quanh bóng đèn.",
-  params:P({exposure:-5,contrast:15,highlights:-20,shadows:10,fade:12,temp:35,tint:8,saturation:-10,shHue:25,shAmt:25,hiHue:40,hiAmt:30,grain:30,grainSize:40,halation:30,bloom:20,vignette:35}),mix:Z9},
- {id:"shinjuku",name:"Shinjuku Noir",tags:["jp","bw"],desc:"Đen trắng tương phản gắt, hạt thô. Gợi nhớ nhiếp ảnh đường phố Shinjuku thập niên 70.",
-  params:P({exposure:-5,contrast:70,highlights:10,shadows:-35,bw:100,grain:65,grainSize:60,bloom:10,vignette:40}),mix:Z9},
- {id:"kowloon",name:"Kowloon Neon",tags:["hk"],desc:"Đêm Cửu Long: bóng ngả xanh lục, vùng sáng đỏ son, quầng neon lan. Chất điện ảnh Hong Kong thập niên 90.",
-  params:P({exposure:-8,contrast:30,highlights:-15,shadows:-5,fade:10,temp:-5,tint:15,saturation:15,vibrance:10,shHue:165,shAmt:55,hiHue:15,hiAmt:35,grain:45,grainSize:50,halation:55,bloom:30,aberration:15,vignette:35}),
-  mix:[0.05,0,0,0,-0.05,0.05,0,0,0]},
- {id:"chungking",name:"Chungking",tags:["hk","retro"],desc:"Vàng lục gắt, nhòe sáng, lệch màu ở rìa ảnh. Như máy quay cầm tay chạy giữa phố đêm.",
-  params:P({exposure:5,contrast:40,shadows:-10,fade:5,temp:15,tint:-30,saturation:20,shHue:90,shAmt:40,hiHue:55,hiAmt:30,grain:55,grainSize:55,halation:35,bloom:35,aberration:45,vignette:30}),mix:Z9},
- {id:"mongkok",name:"Mong Kok 800",tags:["hk"],desc:"Film tungsten chụp đêm: tông xanh lạnh, đèn đường tỏa quầng đỏ rất mạnh.",
-  params:P({contrast:25,highlights:-20,shadows:5,fade:8,temp:-35,tint:10,saturation:10,vibrance:15,shHue:210,shAmt:35,hiHue:20,hiAmt:10,grain:35,grainSize:40,halation:75,bloom:25,aberration:5,vignette:25}),mix:Z9},
- {id:"hk97",name:"Hong Kong '97",tags:["hk","retro"],desc:"Phim truyền hình Hong Kong cuối thập niên 90: vàng ấm, phớt hồng, mềm và hơi mờ.",
-  params:P({exposure:5,contrast:-5,highlights:-25,shadows:15,fade:30,temp:25,tint:18,saturation:-15,vibrance:5,shHue:290,shAmt:20,hiHue:35,hiAmt:35,grain:30,grainSize:45,halation:20,bloom:30,aberration:10,vignette:20}),mix:Z9},
- {id:"gold200",name:"Gold 200",tags:["retro"],desc:"Film thường ngày giá bình dân: vàng óng, ấm áp, hợp nắng chiều.",
-  params:P({exposure:8,contrast:12,highlights:-15,shadows:10,fade:10,temp:28,tint:4,saturation:15,vibrance:10,shHue:30,shAmt:15,hiHue:45,hiAmt:25,grain:25,grainSize:35,halation:10,bloom:10,vignette:15}),mix:Z9},
- {id:"super8",name:"Super 8",tags:["retro"],desc:"Thước phim quay tay 8mm: hạt dày, tối góc mạnh, lóa sáng màu cam.",
-  params:P({contrast:25,highlights:-10,shadows:-5,fade:15,temp:30,tint:5,saturation:10,shHue:15,shAmt:25,hiHue:45,hiAmt:20,grain:75,grainSize:70,halation:25,bloom:15,aberration:20,vignette:65,leak:45}),mix:Z9},
- {id:"chrome64",name:"Chrome 64",tags:["vintage"],desc:"Film dương bản thập niên 60: đỏ đậm, xanh sâu, bóng tối dày.",
-  params:P({exposure:-8,contrast:45,highlights:-10,shadows:-25,temp:8,saturation:30,vibrance:5,shHue:220,shAmt:15,hiHue:40,hiAmt:10,grain:20,grainSize:25,halation:5,vignette:25}),
-  mix:[0.06,-0.03,0,0,0,0,0,-0.02,0.05]},
- {id:"faded70",name:"Faded 70s",tags:["vintage"],desc:"Ảnh gia đình bạc màu trong album cũ: phai, ngả cam, nhạt màu.",
-  params:P({exposure:5,contrast:-25,highlights:-30,shadows:20,fade:45,temp:30,tint:10,saturation:-35,shHue:30,shAmt:30,hiHue:35,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:15,vignette:30}),mix:Z9},
- {id:"polar",name:"Instant",tags:["vintage"],desc:"Ảnh chụp lấy liền: bóng ngả xanh ngọc, vùng sáng màu kem, mềm và tối góc nhẹ.",
-  params:P({exposure:10,contrast:-20,highlights:-35,shadows:25,fade:30,temp:5,tint:-10,saturation:-20,shHue:175,shAmt:40,hiHue:50,hiAmt:25,grain:15,grainSize:30,halation:5,bloom:20,vignette:30}),mix:Z9},
- {id:"sepia",name:"Sepia Book",tags:["vintage","bw"],desc:"Trang sách cũ, báo xưa: tông nâu sepia, tương phản mềm, hạt film rõ.",
-  params:P({exposure:5,contrast:10,highlights:-15,shadows:15,fade:25,bw:100,shHue:30,shAmt:35,hiHue:40,hiAmt:45,grain:40,grainSize:50,vignette:45}),mix:Z9},
+ D("none","Gốc","base","","Ảnh nguyên bản, không áp preset.",{}),
+ /* Nhật Bản */
+ D("tokyo400","Tokyo 400","jp","cool pastel natural","Sáng, trong, bóng đổ ngả xanh ngọc. Kiểu ảnh “airy” Nhật Bản, hợp chân dung và phố ban ngày.",
+  {exposure:18,contrast:-18,highlights:-25,shadows:30,fade:22,temp:-8,tint:-6,saturation:-15,vibrance:10,shHue:175,shAmt:30,hiHue:45,hiAmt:12,grain:18,grainSize:30,halation:5,bloom:15},[0,0,0,-0.03,0.02,0.04,0,0.05,0]),
+ D("shimokita","Shimokita","jp","faded cool grainy","Phố nhỏ Tokyo: màu trầm, ngả xanh lá, phai như cuộn film 400 rửa ở tiệm ảnh.",
+  {contrast:10,highlights:-30,shadows:15,fade:28,temp:10,tint:-12,saturation:-25,shHue:150,shAmt:35,hiHue:40,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:5,aberration:5,vignette:20},[0.04,0,-0.02,0,0,0,0,0,0]),
+ D("natsu","Natsu","jp","warm pastel atmo","Mùa hè Nhật Bản: nắng ấm, trời xanh pastel, vệt lóa sáng ở góc.",
+  {exposure:25,contrast:-10,highlights:-35,shadows:25,fade:15,temp:18,tint:4,saturation:5,vibrance:20,shHue:190,shAmt:25,hiHue:35,hiAmt:25,grain:15,grainSize:30,halation:15,bloom:25,leak:35}),
+ D("kissaten","Kissaten","jp","warm atmo grainy","Quán cà phê kiểu Showa: đèn vàng hổ phách, quầng sáng ấm quanh bóng đèn.",
+  {exposure:-5,contrast:15,highlights:-20,shadows:10,fade:12,temp:35,tint:8,saturation:-10,shHue:25,shAmt:25,hiHue:40,hiAmt:30,grain:30,grainSize:40,halation:30,bloom:20,vignette:35}),
+ D("kyoto","Kyoto Matcha","jp","faded cool natural","Xanh lá trầm, mềm, như chùa cổ và vườn rêu.",
+  {contrast:-5,highlights:-20,shadows:15,fade:20,temp:-5,tint:-18,saturation:-30,shHue:140,shAmt:30,hiHue:60,hiAmt:15,grain:25,grainSize:40,vignette:20},[0,0,0,0,0.04,0,0,0,0]),
+ D("sakura","Sakura","jp","pastel warm","Hồng pastel, vùng sáng trắng sữa, nhẹ như mùa hoa anh đào.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:5,tint:25,saturation:-10,vibrance:10,shHue:330,shAmt:20,hiHue:350,hiAmt:25,grain:12,grainSize:30,bloom:25}),
+ D("showa","Showa Diary","jp","faded warm grainy","Album gia đình Nhật thập niên 70: ngả vàng nâu, phai, có in ngày.",
+  {contrast:5,highlights:-25,shadows:10,fade:35,temp:32,tint:5,saturation:-25,shHue:35,shAmt:25,hiHue:40,hiAmt:30,grain:40,grainSize:50,vignette:35,date:1}),
+ D("harajuku","Harajuku Pop","jp","vivid pastel","Màu kẹo rực rỡ, tương phản vừa, rất đường phố Harajuku.",
+  {exposure:12,contrast:15,highlights:-10,shadows:10,fade:8,tint:12,saturation:30,vibrance:25,shHue:270,shAmt:20,hiHue:330,hiAmt:15,grain:10,grainSize:30,bloom:15}),
+ D("kamakura","Kamakura Sea","jp","cool natural","Biển xanh ngọc, nắng trưa trong vắt.",
+  {exposure:15,contrast:5,highlights:-30,shadows:15,fade:10,temp:-20,tint:-8,saturation:5,vibrance:20,shHue:185,shAmt:35,hiHue:50,hiAmt:10,grain:15,grainSize:30}),
+ D("yugure","Yūgure","jp","warm atmo","Hoàng hôn cam tím, quầng sáng nhẹ quanh nguồn sáng.",
+  {exposure:-5,contrast:15,highlights:-25,shadows:5,fade:10,temp:25,tint:20,saturation:10,vibrance:10,shHue:260,shAmt:35,hiHue:25,hiAmt:35,grain:25,grainSize:40,halation:25,bloom:30,vignette:25}),
+ /* Hong Kong */
+ D("kowloon","Kowloon Neon","hk","cool contrast atmo","Đêm Cửu Long: bóng ngả xanh lục, vùng sáng đỏ son, quầng neon lan. Chất điện ảnh Hong Kong thập niên 90.",
+  {exposure:-8,contrast:30,highlights:-15,shadows:-5,fade:10,temp:-5,tint:15,saturation:15,vibrance:10,shHue:165,shAmt:55,hiHue:15,hiAmt:35,grain:45,grainSize:50,halation:55,bloom:30,aberration:15,vignette:35},[0.05,0,0,0,-0.05,0.05,0,0,0]),
+ D("chungking","Chungking","hk","vivid contrast grainy","Vàng lục gắt, nhòe sáng, lệch màu ở rìa. Như máy quay cầm tay giữa phố đêm.",
+  {exposure:5,contrast:40,shadows:-10,fade:5,temp:15,tint:-30,saturation:20,shHue:90,shAmt:40,hiHue:55,hiAmt:30,grain:55,grainSize:55,halation:35,bloom:35,aberration:45,vignette:30}),
+ D("mongkok","Mong Kok 800","hk","cool atmo","Film tungsten chụp đêm: tông xanh lạnh, đèn đường tỏa quầng đỏ mạnh.",
+  {contrast:25,highlights:-20,shadows:5,fade:8,temp:-35,tint:10,saturation:10,vibrance:15,shHue:210,shAmt:35,hiHue:20,hiAmt:10,grain:35,grainSize:40,halation:75,bloom:25,aberration:5,vignette:25}),
+ D("hk97","Hong Kong '97","hk","warm faded","Phim truyền hình Hong Kong cuối thập niên 90: vàng ấm, phớt hồng, mềm và hơi mờ.",
+  {exposure:5,contrast:-5,highlights:-25,shadows:15,fade:30,temp:25,tint:18,saturation:-15,vibrance:5,shHue:290,shAmt:20,hiHue:35,hiAmt:35,grain:30,grainSize:45,halation:20,bloom:30,aberration:10,vignette:20}),
+ D("temple","Temple Street","hk","warm contrast atmo","Chợ đêm đỏ vàng, đèn lồng tỏa quầng mạnh.",
+  {exposure:-5,contrast:35,highlights:-15,shadows:-10,fade:5,temp:25,tint:10,saturation:25,shHue:10,shAmt:25,hiHue:40,hiAmt:25,grain:40,grainSize:45,halation:60,bloom:30,vignette:35}),
+ D("starferry","Star Ferry","hk","cool natural","Bến cảng xanh lơ, bóng đổ ngả xanh lục.",
+  {exposure:5,contrast:10,highlights:-20,shadows:10,fade:12,temp:-25,tint:-10,saturation:-5,vibrance:10,shHue:170,shAmt:40,hiHue:195,hiAmt:15,grain:25,grainSize:35,bloom:10,vignette:20}),
+ D("chachaan","Cha Chaan Teng","hk","warm faded","Quán trà kiểu Hong Kong dưới đèn huỳnh quang vàng xanh.",
+  {exposure:5,contrast:10,highlights:-20,shadows:15,fade:25,temp:15,tint:-25,saturation:-10,shHue:100,shAmt:30,hiHue:60,hiAmt:30,grain:30,grainSize:40,halation:15,bloom:15,vignette:20}),
+ D("rainykowloon","Rainy Kowloon","hk","cool atmo","Mưa đêm xanh dương, đèn đường nhòe sáng.",
+  {exposure:-10,contrast:20,highlights:-15,fade:10,temp:-30,tint:8,saturation:10,vibrance:15,shHue:215,shAmt:40,hiHue:200,hiAmt:15,grain:35,grainSize:45,halation:35,bloom:45,aberration:10,vignette:30}),
+ D("redlantern","Red Lantern","hk","vivid contrast mono","Gần như đơn sắc đỏ, chỉ còn tông đỏ cam như dưới đèn lồng.",
+  {exposure:-5,contrast:40,highlights:-10,shadows:-15,saturation:20,bw:85,shHue:0,shAmt:70,hiHue:15,hiAmt:60,grain:35,grainSize:45,halation:30,bloom:20,vignette:35}),
+ /* Film màu cổ điển */
+ D("gold200","Gold 200","color","warm natural","Film thường ngày giá bình dân: vàng óng, ấm, hợp nắng chiều.",
+  {exposure:8,contrast:12,highlights:-15,shadows:10,fade:10,temp:28,tint:4,saturation:15,vibrance:10,shHue:30,shAmt:15,hiHue:45,hiAmt:25,grain:25,grainSize:35,halation:10,bloom:10,vignette:15}),
+ D("chrome64","Chrome 64","color","vivid contrast","Film dương bản thập niên 60: đỏ đậm, xanh sâu, bóng tối dày.",
+  {exposure:-8,contrast:45,highlights:-10,shadows:-25,temp:8,saturation:30,vibrance:5,shHue:220,shAmt:15,hiHue:40,hiAmt:10,grain:20,grainSize:25,halation:5,vignette:25},[0.06,-0.03,0,0,0,0,0,-0.02,0.05]),
+ D("portrait160","Portrait 160","color","warm faded natural","Da mềm, màu tự nhiên, tương phản thấp. Hợp chân dung.",
+  {exposure:8,contrast:-15,highlights:-20,shadows:15,fade:10,temp:8,tint:4,saturation:-12,vibrance:5,shHue:200,shAmt:10,hiHue:35,hiAmt:12,grain:12,grainSize:25}),
+ D("portrait400","Portrait 400","color","warm natural","Sáng hơn, vùng sáng màu kem, hạt mịn.",
+  {exposure:15,contrast:-8,highlights:-25,shadows:15,fade:8,temp:10,tint:3,saturation:-5,vibrance:10,shHue:190,shAmt:12,hiHue:40,hiAmt:18,grain:18,grainSize:30,bloom:8}),
+ D("pastel400h","Pastel 400H","color","pastel cool","Xanh lá ngả cyan, pastel, kiểu ảnh cưới ngoài trời.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:-5,tint:-10,saturation:-15,vibrance:5,shHue:170,shAmt:30,hiHue:60,hiAmt:10,grain:15,grainSize:30,bloom:12},[0,0,0,0,0,0.03,0,0.06,-0.02]),
+ D("street200","Street 200","color","cool grainy","Xanh lá đặc trưng film bình dân, hơi lạnh, hạt rõ.",
+  {contrast:15,highlights:-15,shadows:5,fade:10,temp:-8,tint:-15,saturation:5,shHue:140,shAmt:25,hiHue:55,hiAmt:10,grain:35,grainSize:40,vignette:15}),
+ D("color400","Color 400","color","vivid warm","Rực, đậm, hợp ảnh du lịch và đường phố ban ngày.",
+  {exposure:5,contrast:20,highlights:-10,shadows:5,fade:5,temp:12,tint:2,saturation:25,vibrance:15,shHue:210,shAmt:10,hiHue:40,hiAmt:15,grain:25,grainSize:35,vignette:10}),
+ D("vivid100","Vivid 100","color","vivid natural","Bão hòa cao, hạt rất mịn, trời xanh đậm.",
+  {contrast:25,highlights:-15,shadows:-5,temp:5,saturation:35,vibrance:25,shHue:220,shAmt:10,hiHue:40,hiAmt:8,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,-0.02,0.04]),
+ D("slide50","Slide 50","color","vivid contrast","Dương bản phong cảnh: xanh lá và đỏ rất đậm.",
+  {exposure:-10,contrast:40,highlights:-10,shadows:-20,tint:-5,saturation:45,vibrance:15,shHue:230,shAmt:15,hiHue:50,hiAmt:5,grain:8,grainSize:20,vignette:20},[0.05,-0.03,0,-0.02,0.05,-0.02,0,-0.02,0.04]),
+ D("slide100","Slide 100","color","natural contrast","Dương bản cân bằng, trong và sạch.",
+  {exposure:-3,contrast:25,highlights:-15,shadows:-10,temp:-3,saturation:15,vibrance:10,shHue:210,shAmt:8,hiHue:50,hiAmt:5,grain:6,grainSize:20,vignette:8}),
+ /* Điện ảnh */
+ D("super8","Super 8","cine","warm grainy faded","Thước phim quay tay 8mm: hạt dày, tối góc mạnh, lóa sáng cam.",
+  {contrast:25,highlights:-10,shadows:-5,fade:15,temp:30,tint:5,saturation:10,shHue:15,shAmt:25,hiHue:45,hiAmt:20,grain:75,grainSize:70,halation:25,bloom:15,aberration:20,vignette:65,leak:45}),
+ D("tungsten500","Tungsten 500","cine","cool atmo","Film máy quay chụp dưới đèn: xanh lạnh, quầng đỏ quanh đèn.",
+  {contrast:15,highlights:-25,shadows:10,fade:8,temp:-40,tint:5,saturation:5,vibrance:10,shHue:210,shAmt:30,hiHue:30,hiAmt:10,grain:30,grainSize:35,halation:50,bloom:20}),
+ D("tealorange","Teal & Orange","cine","contrast warm","Da cam, bóng đổ xanh mòng két kiểu phim bom tấn.",
+  {contrast:30,highlights:-20,shadows:-5,fade:5,temp:10,saturation:15,shHue:185,shAmt:60,hiHue:30,hiAmt:45,grain:15,grainSize:30,vignette:25}),
+ D("bleach","Bleach Bypass","cine","faded contrast","Bạc màu, tương phản gắt, cảm giác kim loại.",
+  {contrast:55,highlights:5,shadows:-20,fade:5,temp:-5,saturation:-55,shHue:200,shAmt:10,grain:30,grainSize:35,vignette:30}),
+ D("nightdrive","Night Drive","cine","warm atmo contrast","Đèn đường natri cam, bóng đêm xanh đen.",
+  {exposure:-10,contrast:30,highlights:-10,shadows:-15,fade:5,temp:30,tint:5,saturation:10,shHue:205,shAmt:50,hiHue:30,hiAmt:40,grain:40,grainSize:45,halation:40,bloom:30,vignette:40}),
+ D("dayfornight","Day for Night","cine","cool atmo","Biến ảnh ban ngày thành đêm xanh, kỹ thuật cũ của điện ảnh.",
+  {exposure:-55,contrast:30,highlights:-30,shadows:-10,temp:-45,tint:5,saturation:-40,shHue:220,shAmt:40,hiHue:210,hiAmt:20,grain:25,grainSize:35,vignette:45}),
+ /* Retro / Y2K */
+ D("disposable98","Disposable '98","retro","vivid contrast grainy","Máy film dùng một lần cuối thập niên 90: màu rực, tối góc, hạt thô, in ngày màu cam.",
+  {exposure:5,contrast:35,highlights:10,shadows:-10,fade:8,temp:12,tint:6,saturation:25,vibrance:10,shHue:220,shAmt:15,hiHue:45,hiAmt:10,grain:45,grainSize:55,halation:12,bloom:10,aberration:25,vignette:45,leak:10,date:1}),
+ D("ccd2003","CCD 2003","retro","vivid cool","Máy ảnh số đời đầu: trời xanh gắt, viền sáng, in ngày ở góc.",
+  {exposure:10,contrast:25,highlights:15,shadows:-5,temp:-12,saturation:20,vibrance:15,shHue:220,shAmt:15,hiHue:200,hiAmt:10,bloom:20,aberration:15,chroma:20,lofi:10,date:1}),
+ D("dvcam","DV Cam","retro","faded grainy","Máy quay MiniDV: mềm, lệch màu nhẹ, in ngày giờ màu trắng.",
+  {exposure:5,contrast:5,highlights:-10,shadows:10,fade:15,temp:-5,tint:5,saturation:-5,shHue:210,shAmt:15,hiHue:50,hiAmt:10,bloom:20,aberration:30,chroma:35,lofi:20,vignette:15,date:2}),
+ D("flashparty","Flash Party","retro","contrast vivid","Đèn flash trực diện: nền tối, da sáng, góc tối.",
+  {exposure:10,contrast:45,highlights:5,shadows:-40,temp:5,saturation:15,vibrance:10,grain:25,grainSize:35,bloom:15,aberration:10,vignette:50,date:1}),
+ D("webcam2008","Webcam 2008","retro","cool grainy","Webcam laptop đời cũ: nhiễu màu, ngả xanh, độ phân giải thấp.",
+  {exposure:5,contrast:15,highlights:10,shadows:-10,fade:10,temp:-20,tint:-10,saturation:-20,shHue:190,shAmt:20,chroma:60,lofi:45,vignette:30}),
+ D("vhs","VHS Home","retro","faded warm","Băng video gia đình: mờ, tràn màu đỏ, in ngày giờ.",
+  {exposure:5,contrast:-10,highlights:-15,shadows:10,fade:25,temp:10,tint:10,saturation:15,shHue:300,shAmt:15,hiHue:20,hiAmt:20,bloom:35,aberration:55,chroma:40,lofi:30,vignette:25,date:2}),
+ /* Vintage */
+ D("faded70","Faded 70s","vintage","faded warm grainy","Ảnh gia đình bạc màu trong album cũ: phai, ngả cam, nhạt màu.",
+  {exposure:5,contrast:-25,highlights:-30,shadows:20,fade:45,temp:30,tint:10,saturation:-35,shHue:30,shAmt:30,hiHue:35,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:15,vignette:30}),
+ D("polar","Instant","vintage","faded pastel cool","Ảnh chụp lấy liền: bóng ngả xanh ngọc, vùng sáng màu kem, mềm.",
+  {exposure:10,contrast:-20,highlights:-35,shadows:25,fade:30,temp:5,tint:-10,saturation:-20,shHue:175,shAmt:40,hiHue:50,hiAmt:25,grain:15,grainSize:30,halation:5,bloom:20,vignette:30}),
+ D("sepia","Sepia Book","vintage","mono faded grainy","Trang sách cũ, báo xưa: tông nâu sepia, tương phản mềm.",
+  {exposure:5,contrast:10,highlights:-15,shadows:15,fade:25,bw:100,shHue:30,shAmt:35,hiHue:40,hiAmt:45,grain:40,grainSize:50,vignette:45}),
+ D("crossprocess","Cross Process","vintage","vivid contrast","Film tráng nhầm thuốc: vàng xanh gắt, da hồng.",
+  {exposure:5,contrast:35,highlights:-10,shadows:-10,temp:10,tint:-20,saturation:25,shHue:180,shAmt:40,hiHue:60,hiAmt:45,grain:25,grainSize:35,vignette:30},[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1]),
+ D("expired","Expired Film","vintage","faded grainy","Film hết hạn: ám tím đỏ, phai, hạt to, lóa sáng.",
+  {exposure:5,contrast:-10,highlights:-25,shadows:15,fade:35,temp:15,tint:30,saturation:-20,shHue:300,shAmt:35,hiHue:20,hiAmt:30,grain:55,grainSize:60,halation:15,leak:25,vignette:35}),
+ D("autochrome","Autochrome","vintage","pastel faded grainy","Ảnh màu thập niên 1910: pastel, chấm hạt màu li ti.",
+  {exposure:5,contrast:-15,highlights:-25,shadows:15,fade:30,temp:15,tint:5,saturation:-25,shHue:120,shAmt:20,hiHue:45,hiAmt:30,grain:70,grainSize:75,chroma:50,vignette:45}),
+ /* Đen trắng */
+ D("shinjuku","Shinjuku Noir","bw","mono contrast grainy","Đen trắng tương phản gắt, hạt thô, kiểu nhiếp ảnh đường phố Shinjuku thập niên 70.",
+  {exposure:-5,contrast:70,highlights:10,shadows:-35,bw:100,grain:65,grainSize:60,bloom:10,vignette:40}),
+ D("silver400","Silver 400","bw","mono natural","Đen trắng cổ điển, dải xám giàu sắc độ.",
+  {contrast:20,highlights:-10,shadows:5,bw:100,grain:30,grainSize:35,vignette:15}),
+ D("softmono","Soft Mono","bw","mono faded","Đen trắng mềm, màu đen được nâng nhẹ.",
+  {exposure:8,contrast:-20,highlights:-25,shadows:20,fade:25,bw:100,grain:20,grainSize:35,bloom:10,vignette:20}),
+ D("push3200","Push 3200","bw","mono contrast grainy","Film đẩy ISO: hạt rất to, đen sâu.",
+  {contrast:60,highlights:5,shadows:-40,bw:100,grain:85,grainSize:80,vignette:35}),
+ D("cyanotype","Cyanotype","bw","mono cool","Ảnh in xanh lam kiểu bản vẽ kỹ thuật cũ.",
+  {exposure:5,contrast:15,highlights:-15,shadows:10,fade:15,bw:100,duo:90,shHue:215,hiHue:195,grain:20,grainSize:35,vignette:25}),
+ D("selenium","Selenium","bw","mono cool contrast","Đen trắng ngả tím lạnh ở vùng tối.",
+  {contrast:30,highlights:-10,shadows:-10,bw:100,shHue:275,shAmt:30,hiHue:40,hiAmt:8,grain:30,grainSize:35,vignette:20}),
+ /* Đặc biệt */
+ D("irpink","Infrared Pink","special","vivid","Hồng ngoại: lá cây chuyển hồng đỏ, trời tím nhạt.",
+  {exposure:5,contrast:15,saturation:20,hiHue:330,hiAmt:15,grain:20,grainSize:35},[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0]),
+ D("irgold","Infrared Gold","special","vivid warm","Hồng ngoại vàng: lá cây chuyển vàng, trời xanh đậm.",
+  {contrast:20,temp:10,saturation:15,shHue:220,shAmt:20,grain:20,grainSize:35},[-0.3,0.7,0,0.3,0.1,-0.1,0,-0.3,0.2]),
+ D("duotone","Duotone","special","contrast vivid","Hai màu tím và cam cho vùng tối và vùng sáng. Đổi cặp màu ở mục Phủ màu.",
+  {contrast:20,duo:100,shHue:260,hiHue:30,grain:10,grainSize:30}),
+ D("lomo","Lomo","special","vivid contrast","Tối góc nặng, bão hòa cao, lệch màu kiểu máy đồ chơi.",
+  {contrast:40,shadows:-15,temp:5,saturation:40,vibrance:20,shHue:200,shAmt:25,hiHue:50,hiAmt:20,grain:25,grainSize:35,aberration:30,vignette:80}),
 ];
-const TAGS = [["all","Tất cả"],["jp","Nhật Bản"],["hk","Hong Kong"],["retro","Retro"],["vintage","Vintage"],["bw","Đen trắng"],["mine","Của tôi"]];
 
-const SLIDERS = {
-  "p-adjust":[
-    ["Ánh sáng",[["exposure","Phơi sáng",-100,100],["contrast","Tương phản",-100,100],["highlights","Vùng sáng",-100,100],["shadows","Vùng tối",-100,100],["fade","Phai màu",0,100]]],
-    ["Màu sắc",[["temp","Nhiệt độ màu",-100,100],["tint","Tint (xanh lá ↔ hồng)",-100,100],["saturation","Độ bão hòa",-100,100],["vibrance","Độ tươi",-100,100],["bw","Đen trắng",0,100]]],
-    ["Phủ màu (split tone)",[["shHue","Màu vùng tối",0,360,"hue"],["shAmt","Độ đậm vùng tối",0,100],["hiHue","Màu vùng sáng",0,360,"hue"],["hiAmt","Độ đậm vùng sáng",0,100]]],
-  ],
-  "p-fx":[
-    ["Hạt film",[["grain","Lượng hạt",0,100],["grainSize","Cỡ hạt",0,100]]],
-    ["Ánh sáng film",[["halation","Halation (quầng đỏ quanh đèn)",0,100],["bloom","Bloom (sáng lan mờ)",0,100],["leak","Light leak (vệt lóa cam)",0,100]]],
-    ["Ống kính",[["aberration","Lệch màu viền ảnh",0,100],["vignette","Tối góc",0,100]]],
-  ]
-};
+const GROUPS = [
+ {id:"light",tab:"adjust",title:"Ánh sáng",items:[["exposure","Phơi sáng",-100,100],["contrast","Tương phản",-100,100],["highlights","Vùng sáng",-100,100],["shadows","Vùng tối",-100,100],["fade","Phai màu",0,100]]},
+ {id:"color",tab:"adjust",title:"Màu sắc",items:[["temp","Nhiệt độ màu",-100,100],["tint","Tint",-100,100],["saturation","Độ bão hòa",-100,100],["vibrance","Độ tươi",-100,100],["bw","Đen trắng",0,100]]},
+ {id:"split",tab:"adjust",title:"Phủ màu",items:[["shHue","Màu vùng tối",0,360,"hue"],["shAmt","Độ đậm vùng tối",0,100],["hiHue","Màu vùng sáng",0,360,"hue"],["hiAmt","Độ đậm vùng sáng",0,100],["duo","Duotone",0,100]]},
+ {id:"grain",tab:"fx",title:"Hạt film",items:[["grain","Lượng hạt",0,100],["grainSize","Cỡ hạt",0,100]]},
+ {id:"glow",tab:"fx",title:"Ánh sáng film",items:[["halation","Halation",0,100],["bloom","Bloom",0,100],["leak","Light leak",0,100]]},
+ {id:"lens",tab:"fx",title:"Ống kính",items:[["aberration","Lệch màu viền",0,100],["vignette","Tối góc",0,100]]},
+ {id:"digital",tab:"fx",title:"Máy số đời đầu",items:[["lofi","Độ phân giải thấp",0,100],["chroma","Nhiễu màu",0,100]]},
+];
 
-/* ---------- State ---------- */
-const store = {
-  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
-  set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-};
-let custom = [];
-try{ custom = JSON.parse(store.get("tiemphim.custom")||"[]")||[]; }catch(e){ custom=[]; }
-const allPresets = ()=>PRESETS.concat(custom);
-const findPreset = id=>allPresets().find(p=>p.id===id)||PRESETS[0];
-
-const today = new Date();
-const state = {presetId:"kowloon",strength:100,params:Object.assign({},findPreset("kowloon").params),mix:findPreset("kowloon").mix.slice(),
-  dateISO: today.toISOString().slice(0,10)};
-let filterTag = "all";
-let history=[], hIdx=-1;
-
-/* ---------- WebGL ---------- */
+/* ---------- WebGL engine ---------- */
 const glc = document.createElement("canvas");
 const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
-const view = document.getElementById("view");
-const vctx = view.getContext("2d");
-
 const VS = "attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
 const HEAD = "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\nvarying vec2 v;float luma(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}\n";
 const FS_COLOR = HEAD+`
-uniform sampler2D u_src;uniform float u_exp,u_con,u_hl,u_sh,u_fade,u_temp,u_tint,u_sat,u_vib,u_bw,u_shAmt,u_hiAmt;
+uniform sampler2D u_src;uniform float u_exp,u_con,u_hl,u_sh,u_fade,u_temp,u_tint,u_sat,u_vib,u_bw,u_shAmt,u_hiAmt,u_duo;
 uniform vec3 u_shCol,u_hiCol;uniform mat3 u_mix;
 void main(){
   vec3 c=texture2D(u_src,v).rgb;
@@ -300,7 +553,7 @@ void main(){
   c*=exp2(u_exp);
   c*=vec3(1.0+u_temp*0.25+u_tint*0.04,1.0-u_tint*0.14,1.0-u_temp*0.25+u_tint*0.04);
   c=pow(max(c,0.0),vec3(1.0/2.2));
-  c=u_mix*c;
+  c=max(u_mix*c,0.0);
   float l=luma(c);
   c+=u_sh*0.32*(1.0-smoothstep(0.0,0.55,l));
   c+=u_hl*0.28*smoothstep(0.45,1.0,l);
@@ -314,6 +567,7 @@ void main(){
   l=luma(c);
   c+=(u_shCol-luma(u_shCol))*u_shAmt*0.4*(1.0-smoothstep(0.0,0.7,l));
   c+=(u_hiCol-luma(u_hiCol))*u_hiAmt*0.35*smoothstep(0.3,1.0,l);
+  if(u_duo>0.001){float ld=clamp(luma(c),0.0,1.0);vec3 dk=u_shCol*0.16+0.02;vec3 lt=mix(u_hiCol,vec3(1.0),0.72);c=mix(c,mix(dk,lt,smoothstep(0.02,0.98,ld)),u_duo);}
   c=u_fade*0.17+c*(1.0-u_fade*0.23);
   gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
 }`;
@@ -334,30 +588,33 @@ void main(){
   gl_FragColor=vec4(c,1.0);
 }`;
 const FS_COMP = HEAD+`
-uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed;uniform vec2 u_res;
+uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed,u_lofi,u_chroma;uniform vec2 u_res;
 float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   float a=hash(i+u_seed),b=hash(i+vec2(1.0,0.0)+u_seed),c=hash(i+vec2(0.0,1.0)+u_seed),d=hash(i+vec2(1.0,1.0)+u_seed);
   return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
 void main(){
-  vec2 d=v-0.5;
+  float L=max(u_res.x,u_res.y);float sc=max(L/1500.0,0.08);
+  vec2 uv=v;
+  if(u_lofi>0.001){vec2 cells=u_res/(mix(1.0,9.0,u_lofi)*sc);uv=(floor(v*cells)+0.5)/cells;}
+  vec2 d=uv-0.5;
   vec2 off=d*u_ab*0.014;
-  vec3 c=vec3(texture2D(u_a,v+off).r,texture2D(u_a,v).g,texture2D(u_a,v-off).b);
-  vec3 b=texture2D(u_b,v).rgb;
+  vec3 c=vec3(texture2D(u_a,uv+off).r,texture2D(u_a,uv).g,texture2D(u_a,uv-off).b);
+  vec3 b=texture2D(u_b,uv).rgb;
   c=1.0-(1.0-c)*(1.0-clamp(b*u_bloom*1.5,0.0,1.0));
   float hb=luma(b);
   c+=vec3(1.0,0.28,0.10)*hb*u_hal*1.7*(1.0-smoothstep(0.75,1.0,luma(c))*0.6);
   float lk=smoothstep(0.5,1.08,v.x)*(0.55+0.45*sin(v.y*4.0+1.3));
   vec3 lc=mix(vec3(1.0,0.22,0.08),vec3(1.0,0.62,0.22),v.y);
   c=1.0-(1.0-c)*(1.0-clamp(lc*lk*u_leak*1.1,0.0,1.0));
-  float r=length(d*vec2(u_aspect,1.0))/(0.5*sqrt(u_aspect*u_aspect+1.0));
+  float r=length((v-0.5)*vec2(u_aspect,1.0))/(0.5*sqrt(u_aspect*u_aspect+1.0));
   c*=1.0-u_vig*0.85*pow(r,2.3);
-  float L=max(u_res.x,u_res.y);
-  float cell=mix(0.8,3.6,u_gsize)*max(L/1500.0,0.08);
+  float cell=mix(0.8,3.6,u_gsize)*sc;
   vec2 px=v*u_res/cell;
   float n=(vn(px)+0.5*vn(px*2.13+17.0))/1.5-0.5;
   float l=luma(c);
   c+=n*u_grain*0.3*(0.35+0.65*(1.0-abs(l-0.5)*2.0));
+  if(u_chroma>0.001){vec2 q=v*u_res/(cell*1.6+sc);c+=(vec3(vn(q+31.0),vn(q+57.0),vn(q+91.0))-0.5)*u_chroma*0.32;}
   gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
 }`;
 
@@ -367,7 +624,6 @@ function program(fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VER
   gl.bindAttribLocation(p,0,"p");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
   const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}
   return {p,u};}
-
 let PR=null, maxTex=4096;
 function initGL(){
   if(!gl) throw new Error("no webgl");
@@ -396,7 +652,7 @@ function pass(prog,target,w,h,texs){
   gl.useProgram(prog.p);gl.bindFramebuffer(gl.FRAMEBUFFER,target?target.fb:null);gl.viewport(0,0,w,h);
   texs.forEach((t,i)=>{gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t[1]);gl.uniform1i(prog.u[t[0]],i);});
 }
-function hue2rgb(h){h=((h%360)+360)%360/60;const x=1-Math.abs(h%2-1);const t=[[1,x,0],[x,1,0],[0,1,x],[0,x,1],[x,0,1],[1,0,x]][Math.floor(h)%6];return t;}
+function hue2rgb(h){h=((h%360)+360)%360/60;const x=1-Math.abs(h%2-1);return [[1,x,0],[x,1,0],[0,1,x],[0,x,1],[x,0,1],[1,0,x]][Math.floor(h)%6];}
 let seed=Math.random()*100;
 
 function render(srcTex,W,H,e){
@@ -406,13 +662,12 @@ function render(srcTex,W,H,e){
   gl.uniform1f(c.u.u_exp,e.exposure/100*1.5);gl.uniform1f(c.u.u_con,e.contrast/100);
   gl.uniform1f(c.u.u_hl,e.highlights/100);gl.uniform1f(c.u.u_sh,e.shadows/100);gl.uniform1f(c.u.u_fade,e.fade/100);
   gl.uniform1f(c.u.u_temp,e.temp/100);gl.uniform1f(c.u.u_tint,e.tint/100);gl.uniform1f(c.u.u_sat,e.saturation/100);
-  gl.uniform1f(c.u.u_vib,e.vibrance/100);gl.uniform1f(c.u.u_bw,e.bw/100);
+  gl.uniform1f(c.u.u_vib,e.vibrance/100);gl.uniform1f(c.u.u_bw,e.bw/100);gl.uniform1f(c.u.u_duo,e.duo/100);
   gl.uniform1f(c.u.u_shAmt,e.shAmt/100);gl.uniform1f(c.u.u_hiAmt,e.hiAmt/100);
   gl.uniform3fv(c.u.u_shCol,hue2rgb(e.shHue));gl.uniform3fv(c.u.u_hiCol,hue2rgb(e.hiHue));
-  const m=e.mix; // row-major offsets -> column-major matrix
+  const m=e.mix;
   gl.uniformMatrix3fv(c.u.u_mix,false,new Float32Array([1+m[0],m[3],m[6],m[1],1+m[4],m[7],m[2],m[5],1+m[8]]));
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-
   const needGlow=e.bloom>0.5||e.halation>0.5;
   if(needGlow){
     const sw=TB1.w,sh=TB1.h,b=PR.bright;
@@ -425,51 +680,76 @@ function render(srcTex,W,H,e){
   gl.uniform1f(k.u.u_bloom,needGlow?e.bloom/100:0);gl.uniform1f(k.u.u_hal,needGlow?e.halation/100:0);
   gl.uniform1f(k.u.u_ab,e.aberration/100);gl.uniform1f(k.u.u_vig,e.vignette/100);gl.uniform1f(k.u.u_grain,e.grain/100);
   gl.uniform1f(k.u.u_gsize,e.grainSize/100);gl.uniform1f(k.u.u_leak,e.leak/100);gl.uniform1f(k.u.u_aspect,W/H);
+  gl.uniform1f(k.u.u_lofi,e.lofi/100);gl.uniform1f(k.u.u_chroma,e.chroma/100);
   gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 }
 
-function effective(st){
-  st=st||state;const s=st.strength/100,e={};
-  for(const k in NEUTRAL) e[k]=NOSCALE.has(k)?st.params[k]:NEUTRAL[k]+(st.params[k]-NEUTRAL[k])*s;
-  e.mix=st.mix.map(x=>x*s);return e;
-}
+/* ---------- App ---------- */
+const $=id=>document.getElementById(id);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const jget=(k,d)=>{try{return JSON.parse(store.get(k))||d}catch(e){return d}};
+const GMAP={};GROUPS.forEach(g=>GMAP[g.id]=g.items.map(i=>i[0]));
+const KEYINFO={};GROUPS.forEach(g=>g.items.forEach(i=>KEYINFO[i[0]]={label:i[1],min:i[2],max:i[3],kind:i[4],group:g.id}));
+KEYINFO.strength={label:"Độ mạnh preset",min:0,max:100};
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d");
+
+let custom=jget("tiemphim.custom",[]).filter(p=>p&&p.id&&p.params).map(p=>({id:p.id,name:p.name,fam:"mine",moods:[],desc:p.desc||"Công thức bạn tự lưu.",params:Object.assign({},NEUTRAL,p.params),mix:Array.isArray(p.mix)&&p.mix.length===9?p.mix:Z9.slice()}));
+let uses=jget("tiemphim.uses",{});
+let collapsed=new Set(jget("tiemphim.collapsed",[]));
+const allPresets=()=>PRESETS.concat(custom);
+const findPreset=id=>allPresets().find(p=>p.id===id)||PRESETS[0];
+const now=new Date();
+const pad2=n=>String(n).padStart(2,"0");
+const state={presetId:"kowloon",strength:100,params:Object.assign({},findPreset("kowloon").params),mix:findPreset("kowloon").mix.slice(),
+  dateISO:now.getFullYear()+"-"+pad2(now.getMonth()+1)+"-"+pad2(now.getDate()),timeStr:pad2(now.getHours())+":"+pad2(now.getMinutes())};
+const disabled=new Set();
+let hoverId=null,moodSel=null,mFam="all",mTab="presets",mKey="exposure",dTab="adjust";
+let history=[],hIdx=-1,comparing=false,split=false,splitX=0.5,dragging=false,queued=false,desk=true;
+
+const view=$("view"),vctx=view.getContext("2d"),bgc=$("bgc"),bctx=bgc.getContext("2d");
+
+function getV(k){return k==="strength"?state.strength:state.params[k];}
+function setV(k,v){if(k==="strength")state.strength=v;else state.params[k]=v;syncKey(k);markEdited();schedule();}
+function effective(st,useDis){const s=st.strength/100,e={};
+  for(const k in NEUTRAL){const v=st.params[k]==null?NEUTRAL[k]:st.params[k];e[k]=NOSCALE.has(k)?v:NEUTRAL[k]+(v-NEUTRAL[k])*s;}
+  if(useDis)disabled.forEach(g=>GMAP[g].forEach(k=>{e[k]=NEUTRAL[k];}));
+  if(useDis&&disabled.has("split"))e.duo=0;
+  e.mix=(st.mix||Z9).map(x=>x*s);return e;}
 
 /* ---------- Images ---------- */
 let fullSrc=null,prevSrc=null,thumbSrc=null,prevTex=null,thumbTex=null,isSample=true;
 function scaled(src,maxL){
-  let w=src.width,h=src.height;const r=Math.min(1,maxL/Math.max(w,h));
+  const w=src.width,h=src.height,r=Math.min(1,maxL/Math.max(w,h));
   const tw=Math.max(1,Math.round(w*r)),th=Math.max(1,Math.round(h*r));
   let cur=src,cw=w,ch=h;
   while(cw/2>tw&&ch/2>th){const c=document.createElement("canvas");c.width=Math.round(cw/2);c.height=Math.round(ch/2);
     const x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(cur,0,0,c.width,c.height);cur=c;cw=c.width;ch=c.height;}
   const out=document.createElement("canvas");out.width=tw;out.height=th;const o=out.getContext("2d");o.imageSmoothingQuality="high";o.drawImage(cur,0,0,tw,th);return out;
 }
-function setSource(srcCanvas,sample){
+function setSource(src,sample){
   isSample=sample;
-  const small=window.innerWidth<700;
-  const fullCap=Math.min(maxTex,small?4096:6000);
-  fullSrc=scaled(srcCanvas,fullCap);
+  const small=Math.min(screen.width,screen.height)<700;
+  fullSrc=scaled(src,Math.min(maxTex,small?4096:6000));
   prevSrc=scaled(fullSrc,small?1200:1600);
   const s=Math.min(prevSrc.width,prevSrc.height),t=document.createElement("canvas");t.width=t.height=128;
   t.getContext("2d").drawImage(prevSrc,(prevSrc.width-s)/2,(prevSrc.height-s)/2,s,s,0,0,128,128);thumbSrc=t;
   if(prevTex)gl.deleteTexture(prevTex);if(thumbTex)gl.deleteTexture(thumbTex);
   prevTex=makeTex(0,0,prevSrc);thumbTex=makeTex(0,0,thumbSrc);
   view.width=prevSrc.width;view.height=prevSrc.height;
+  bgc.height=Math.max(1,Math.round(96*prevSrc.height/prevSrc.width));
   seed=Math.random()*100;
-  document.getElementById("badge").hidden=!sample;
-  renderThumbs();draw();
+  $("badge").hidden=!sample;$("sizeInfo").textContent=fullSrc.width+"×"+fullSrc.height;
+  resetZoom();thumbCache.clear();queueAllThumbs();draw();
 }
 function loadFile(f){
-  if(!f||!/^image\//.test(f.type)){toast("Hãy chọn một file ảnh (JPG, PNG, WEBP…)");return;}
+  if(!f||!/^image\//.test(f.type)){toast("Hãy chọn một file ảnh (JPG, PNG, WEBP, HEIC…)");return;}
   const url=URL.createObjectURL(f),img=new Image();
   img.onload=()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);
-    URL.revokeObjectURL(url);setSource(c,false);toast("Đã mở ảnh");};
+    URL.revokeObjectURL(url);setSource(c,false);toast("Đã mở ảnh "+img.naturalWidth+"×"+img.naturalHeight);};
   img.onerror=()=>{URL.revokeObjectURL(url);toast("Không đọc được ảnh này. Thử ảnh JPG hoặc PNG khác.");};
   img.src=url;
 }
-
-/* Sample: dusk street with neon signs, drawn locally so the app opens in a working state */
 function makeSample(){
   const W=1500,H=1000,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   let s=7;const rnd=()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
@@ -480,12 +760,12 @@ function makeSample(){
   for(let px=-20;px<W;){const w=60+rnd()*110,h=220+rnd()*240;x.fillStyle="rgba(70,58,92,.85)";x.fillRect(px,H*0.72-h,w,h);px+=w+4;}
   const cols=["#ff3b55","#38ecff","#86ff7a","#ffcf4a","#ff5fd2"];const words=["酒","冰室","麻雀","珈琲","茶餐廳","旅館","ラーメン","押"];
   for(let px=-10;px<W;){
-    const w=110+rnd()*150,h=380+rnd()*330,top=H*0.8-h;
-    x.fillStyle="#17151f";x.fillRect(px,top,w,h+H*0.2);
-    for(let wy=top+16;wy<H*0.78;wy+=26)for(let wx=px+10;wx<px+w-14;wx+=22){const r=rnd();
+    const w=110+rnd()*150,h=380+rnd()*330,y0=H*0.8-h;
+    x.fillStyle="#17151f";x.fillRect(px,y0,w,h+H*0.2);
+    for(let wy=y0+16;wy<H*0.78;wy+=26)for(let wx=px+10;wx<px+w-14;wx+=22){const r=rnd();
       if(r<0.33){x.fillStyle=r<0.07?"#9fe7ff":"#ffd38a";x.globalAlpha=0.55+rnd()*0.45;x.fillRect(wx,wy,12,14);x.globalAlpha=1;}}
     if(rnd()<0.85){const col=cols[Math.floor(rnd()*cols.length)],wd=words[Math.floor(rnd()*words.length)];
-      const vertical=rnd()<0.6,bx=px+w*0.25,by=top+60+rnd()*140;
+      const vertical=rnd()<0.6,bx=px+w*0.25,by=y0+60+rnd()*140;
       x.save();x.shadowColor=col;x.shadowBlur=28;x.fillStyle=col;x.strokeStyle=col;x.lineWidth=4;
       x.font="700 46px 'Hiragino Sans','Noto Sans CJK JP','Microsoft YaHei',sans-serif";x.textBaseline="top";
       if(vertical){const bh=wd.length*52+24;x.strokeRect(bx,by,66,bh);[...wd].forEach((ch,i)=>x.fillText(ch,bx+10,by+12+i*52));}
@@ -504,180 +784,407 @@ function makeSample(){
 }
 
 /* ---------- Drawing ---------- */
-let comparing=false,queued=false;
-function stampText(){const d=state.dateISO.split("-");if(d.length<3)return "";return "'"+d[0].slice(2)+" "+d[1]+" "+d[2];}
-function drawStamp(ctx,w,h){
-  const t=stampText();if(!t)return;const fs=Math.round(Math.min(w,h)*0.046);
-  ctx.save();ctx.font=fs+'px "DotGothic16","Courier New",monospace';ctx.textAlign="right";ctx.textBaseline="bottom";
-  ctx.shadowColor="rgba(255,90,20,.85)";ctx.shadowBlur=fs*0.55;ctx.fillStyle="#ff9a3c";ctx.globalAlpha=0.92;
-  ctx.fillText(t,w-fs*1.6,h-fs*1.1);ctx.shadowBlur=fs*0.15;ctx.fillText(t,w-fs*1.6,h-fs*1.1);ctx.restore();
+const MONS=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+function filmDate(){const d=state.dateISO.split("-");return d.length<3?"":"'"+d[0].slice(2)+" "+d[1]+" "+d[2];}
+function drawStamp(ctx,w,h,mode){
+  ctx.save();
+  if(mode>=1.5){const fs=Math.round(Math.min(w,h)*0.042),d=state.dateISO.split("-"),t=(state.timeStr||"12:00").split(":"),H=+t[0]||0;
+    ctx.font=fs+'px "DotGothic16","Courier New",monospace';ctx.fillStyle="#f6f6f0";ctx.textAlign="left";ctx.textBaseline="bottom";
+    ctx.shadowColor="rgba(0,0,0,.65)";ctx.shadowBlur=fs*0.12;ctx.shadowOffsetX=fs*0.06;ctx.shadowOffsetY=fs*0.06;
+    ctx.fillText((H<12?"AM ":"PM ")+((H%12)||12)+":"+(t[1]||"00"),fs*1.4,h-fs*2.35);
+    ctx.fillText((MONS[(+d[1]||1)-1])+". "+(+d[2]||1)+" "+d[0],fs*1.4,h-fs*1.1);
+  }else{const fs=Math.round(Math.min(w,h)*0.046),txt=filmDate();
+    ctx.font=fs+'px "DotGothic16","Courier New",monospace';ctx.textAlign="right";ctx.textBaseline="bottom";
+    ctx.shadowColor="rgba(255,90,20,.85)";ctx.shadowBlur=fs*0.55;ctx.fillStyle="#ff9a3c";ctx.globalAlpha=0.92;
+    ctx.fillText(txt,w-fs*1.6,h-fs*1.1);ctx.shadowBlur=fs*0.15;ctx.fillText(txt,w-fs*1.6,h-fs*1.1);}
+  ctx.restore();
 }
-function draw(){queued=false;if(!prevTex)return;
+function hoverState(){const p=findPreset(hoverId);return {strength:100,params:p.params,mix:p.mix};}
+function draw(){
+  queued=false;if(!prevTex)return;
+  const W=view.width,H=view.height;
   if(comparing){vctx.drawImage(prevSrc,0,0);return;}
-  const e=effective();render(prevTex,view.width,view.height,e);vctx.drawImage(glc,0,0);
-  if(e.date>0.5)drawStamp(vctx,view.width,view.height);
+  const e=hoverId?effective(hoverState(),false):effective(state,true);
+  if(dragging&&W*H>700000){render(prevTex,W>>1,H>>1,e);vctx.drawImage(glc,0,0,W,H);}
+  else{render(prevTex,W,H,e);vctx.drawImage(glc,0,0);}
+  if(e.date>0.5)drawStamp(vctx,W,H,e.date);
+  if(split){const sx=Math.round(W*splitX);vctx.save();vctx.beginPath();vctx.rect(0,0,sx,H);vctx.clip();vctx.drawImage(prevSrc,0,0);vctx.restore();}
+  afterDraw();
 }
 function schedule(){if(!queued){queued=true;requestAnimationFrame(draw);}}
-
-function renderThumbs(){
-  const tiles=document.querySelectorAll(".tile");
-  tiles.forEach(t=>{const p=findPreset(t.dataset.id);const cv=t.querySelector("canvas");
-    render(thumbTex,128,128,effective({strength:100,params:p.params,mix:p.mix}));cv.getContext("2d").drawImage(glc,0,0);});
+let adT=null;
+function afterDraw(){clearTimeout(adT);adT=setTimeout(()=>{
+  bctx.drawImage(view,0,0,bgc.width,bgc.height);
+  if(desk&&!dragging)drawHist();
+},140);}
+const hs=document.createElement("canvas");hs.width=120;const hsx=hs.getContext("2d",{willReadFrequently:true});
+function drawHist(){
+  const hc=$("hist");if(!hc||!hc.offsetParent)return;
+  hs.height=Math.max(1,Math.round(120*view.height/view.width));hsx.drawImage(view,0,0,hs.width,hs.height);
+  let d;try{d=hsx.getImageData(0,0,hs.width,hs.height).data;}catch(e){return;}
+  const B=64,r=new Float32Array(B),g=new Float32Array(B),b=new Float32Array(B);
+  for(let i=0;i<d.length;i+=4){r[d[i]>>2]++;g[d[i+1]>>2]++;b[d[i+2]>>2]++;}
+  let mx=1;for(let i=1;i<B-1;i++)mx=Math.max(mx,r[i],g[i],b[i]);
+  const ctx=hc.getContext("2d"),W=hc.width,Hh=hc.height,bw=W/B;ctx.clearRect(0,0,W,Hh);ctx.globalCompositeOperation="lighter";
+  [[r,"rgba(255,90,80,.55)"],[g,"rgba(90,230,120,.5)"],[b,"rgba(90,140,255,.55)"]].forEach(([a,col])=>{ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,Hh);
+    for(let i=0;i<B;i++)ctx.lineTo(i*bw+bw/2,Hh-Math.min(1,a[i]/mx)*(Hh-4));ctx.lineTo(W,Hh);ctx.closePath();ctx.fill();});
+  ctx.globalCompositeOperation="source-over";
 }
 
-/* ---------- UI: presets ---------- */
-const $=id=>document.getElementById(id);
-function buildChips(){
-  $("chips").innerHTML="";
-  TAGS.forEach(([k,label])=>{if(k==="mine"&&!custom.length)return;const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=label;
-    b.setAttribute("aria-pressed",String(k===filterTag));b.onclick=()=>{filterTag=k;buildChips();buildTiles();};$("chips").appendChild(b);});
+/* ---------- Thumbnails ---------- */
+const thumbCache=new Map();let thumbQ=[],pumping=false;
+function queueAllThumbs(){thumbQ=["none"].concat(custom.map(p=>p.id),PRESETS.slice(1).map(p=>p.id));if(!pumping){pumping=true;requestAnimationFrame(pump);}}
+function pump(){let n=0;while(thumbQ.length&&n<5){renderThumb(thumbQ.shift());n++;}if(thumbQ.length)requestAnimationFrame(pump);else{pumping=false;schedule();}}
+function renderThumb(id){if(!thumbTex)return;const p=findPreset(id);
+  render(thumbTex,128,128,effective({strength:100,params:p.params,mix:p.mix},false));
+  let c=thumbCache.get(id);if(!c){c=document.createElement("canvas");c.width=c.height=128;thumbCache.set(id,c);}
+  c.getContext("2d").drawImage(glc,0,0);paintThumb(id);}
+function paintThumb(id){const c=thumbCache.get(id);if(!c)return;document.querySelectorAll('canvas[data-thumb="'+id+'"]').forEach(t=>t.getContext("2d").drawImage(c,0,0));}
+
+/* ---------- Preset lists ---------- */
+function tile(p){
+  const b=document.createElement("button");b.type="button";b.className="tile";b.dataset.id=p.id;b.title=p.desc||"";
+  b.setAttribute("aria-pressed",String(p.id===state.presetId));
+  const cv=document.createElement("canvas");cv.width=cv.height=128;cv.dataset.thumb=p.id;
+  const n=document.createElement("span");n.className="tname";n.textContent=p.name;b.append(cv,n);
+  b.addEventListener("click",()=>onTile(p.id));
+  b.addEventListener("pointerenter",e=>{if(desk&&e.pointerType==="mouse"&&p.id!==state.presetId){hoverId=p.id;schedule();}});
+  b.addEventListener("pointerleave",()=>{if(hoverId){hoverId=null;schedule();}});
+  if(thumbCache.has(p.id))requestAnimationFrame(()=>paintThumb(p.id));
+  return b;
 }
-function buildTiles(){
-  const box=$("tiles");box.innerHTML="";
-  allPresets().filter(p=>filterTag==="all"||p.id==="none"||p.tags.includes(filterTag)).forEach(p=>{
-    const b=document.createElement("button");b.type="button";b.className="tile";b.dataset.id=p.id;b.setAttribute("aria-pressed",String(p.id===state.presetId));
-    const cv=document.createElement("canvas");cv.width=cv.height=128;const n=document.createElement("span");n.className="tname";n.textContent=p.name;
-    b.append(cv,n);b.onclick=()=>selectPreset(p.id);box.appendChild(b);});
-  if(thumbTex)renderThumbs();
-  if(prevTex)draw();
+function favorites(){return Object.keys(uses).filter(id=>id!=="none"&&allPresets().some(p=>p.id===id)).sort((a,b)=>uses[b]-uses[a]).slice(0,6).map(findPreset);}
+function buildMood(){const box=$("moodChips");box.innerHTML="";
+  MOODS.forEach(([k,l])=>{const c=document.createElement("button");c.type="button";c.className="chip";c.textContent=l;c.setAttribute("aria-pressed",String(moodSel===k));
+    c.onclick=()=>{moodSel=moodSel===k?null:k;buildMood();buildLib();};box.appendChild(c);});}
+function buildLib(){
+  const q=norm($("search").value.trim()),box=$("libList");box.innerHTML="";hoverId=null;
+  const match=p=>(!moodSel||p.moods.includes(moodSel))&&(!q||norm(p.name+" "+p.desc+" "+(FAMS.find(f=>f[0]===p.fam)||["",""])[1]).includes(q));
+  const secs=[];
+  if(!q&&!moodSel){const g=document.createElement("div");g.className="grid";g.style.marginTop="4px";g.appendChild(tile(PRESETS[0]));box.appendChild(g);
+    const f=favorites();if(f.length)secs.push(["fav","Hay dùng",f]);}
+  if(custom.length)secs.push(["mine","Công thức của bạn",custom.filter(match)]);
+  FAMS.forEach(([k,l])=>secs.push([k,l,PRESETS.filter(p=>p.fam===k&&match(p))]));
+  let total=0;
+  secs.forEach(([k,l,list])=>{if(!list.length)return;total+=k==="fav"?0:list.length;
+    const s=document.createElement("section");s.className="fam";const open=!collapsed.has(k)||!!q||!!moodSel;
+    const h=document.createElement("button");h.type="button";h.className="famhead";h.setAttribute("aria-expanded",String(open));
+    h.innerHTML='<svg class="i"><use href="#i-chev"/></svg>';const t=document.createElement("span");t.textContent=l;const n=document.createElement("span");n.className="n";n.textContent=list.length;h.append(t,n);
+    const g=document.createElement("div");g.className="grid";g.hidden=!open;list.forEach(p=>g.appendChild(tile(p)));
+    h.onclick=()=>{const o=h.getAttribute("aria-expanded")!=="true";h.setAttribute("aria-expanded",String(o));g.hidden=!o;if(o)collapsed.delete(k);else collapsed.add(k);store.set("tiemphim.collapsed",JSON.stringify([...collapsed]));};
+    s.append(h,g);box.appendChild(s);});
+  if(!total){const e=document.createElement("p");e.className="empty";e.textContent="Không có preset nào khớp. Thử từ khác hoặc bỏ lọc cảm xúc.";box.appendChild(e);}
+  $("libCount").textContent=(PRESETS.length-1+custom.length)+" preset";
+}
+function mList(){
+  if(mFam==="fav")return favorites();if(mFam==="mine")return custom;
+  if(mFam==="all")return [PRESETS[0]].concat(custom,PRESETS.slice(1));
+  return PRESETS.filter(p=>p.fam===mFam);
+}
+function buildMobilePresets(){
+  const fb=$("mFams");fb.innerHTML="";
+  const fams=[["all","Tất cả"]];if(favorites().length)fams.push(["fav","Hay dùng"]);if(custom.length)fams.push(["mine","Của tôi"]);
+  FAMS.forEach(f=>fams.push(f));
+  fams.forEach(([k,l])=>{const c=document.createElement("button");c.type="button";c.className="chip";c.textContent=l;c.setAttribute("aria-pressed",String(mFam===k));
+    c.onclick=()=>{mFam=k;buildMobilePresets();$("mStrip").scrollLeft=0;};fb.appendChild(c);});
+  const st=$("mStrip");st.innerHTML="";mList().forEach(p=>st.appendChild(tile(p)));
+  const cur=st.querySelector('.tile[data-id="'+state.presetId+'"]');if(cur)requestAnimationFrame(()=>{st.scrollLeft=Math.max(0,cur.offsetLeft-st.clientWidth/2+cur.clientWidth/2);});
+}
+function rebuildLists(){if(desk)buildLib();else buildMobilePresets();}
+function onTile(id){
+  if(!desk&&id===state.presetId&&id!=="none"){const ms=$("mStrength");ms.hidden=!ms.hidden;return;}
+  selectPreset(id);
 }
 function selectPreset(id){
-  const p=findPreset(id);state.presetId=id;state.params=Object.assign({},NEUTRAL,p.params);state.mix=(p.mix||Z9).slice();state.strength=100;
+  const p=findPreset(id);hoverId=null;state.presetId=id;state.params=Object.assign({},NEUTRAL,p.params);state.mix=(p.mix||Z9).slice();state.strength=100;
+  if(id!=="none"){uses[id]=(uses[id]||0)+1;store.set("tiemphim.uses",JSON.stringify(uses));}
   document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id===id)));
   syncAll();pushHistory();schedule();
+  const t=document.querySelector('.tile[data-id="'+id+'"]');if(t&&!desk)t.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"});
 }
+function stepPreset(dir){
+  const ids=desk?[...new Set([...document.querySelectorAll("#libList .tile")].map(t=>t.dataset.id))]:mList().map(p=>p.id);
+  if(!ids.length)return;let i=ids.indexOf(state.presetId);i=i<0?0:(i+dir+ids.length)%ids.length;selectPreset(ids[i]);
+  const t=document.querySelector((desk?"#libList":"#mStrip")+' .tile[data-id="'+ids[i]+'"]');if(t)t.scrollIntoView({block:"nearest",inline:"nearest"});
+  if(!desk)toast(findPreset(ids[i]).name);
+}
+
+/* ---------- Sliders ---------- */
+const binds={};
+function fmtVal(k,v){const info=KEYINFO[k];v=Math.round(v);
+  if(info&&info.kind==="hue"){const c=hue2rgb(v).map(x=>Math.round(x*255));return '<span class="sw" style="background:rgb('+c.join(",")+')"></span>'+v+"°";}
+  return (info&&info.min<0&&v>0?"+":"")+v;}
+function isSet(k){return k==="strength"?state.strength!==100:Math.round(state.params[k])!==NEUTRAL[k];}
+function sliderRow(k,label,prefix){
+  const info=KEYINFO[k],row=document.createElement("div");row.className="row";const id=prefix+k;
+  const lb=document.createElement("label");lb.htmlFor=id;lb.textContent=label||info.label;
+  const val=document.createElement("button");val.type="button";val.className="val";val.setAttribute("aria-label","Nhập giá trị "+(label||info.label));
+  const inp=document.createElement("input");inp.type="range";inp.id=id;inp.min=info.min;inp.max=info.max;inp.step=1;if(info.kind==="hue")inp.className="hue";
+  wireRange(inp,k);
+  row.addEventListener("dblclick",e=>{if(e.target===val||e.target.tagName==="INPUT"&&e.target.type==="number")return;setV(k,k==="strength"?100:NEUTRAL[k]);pushHistory();});
+  val.addEventListener("click",()=>editVal(val,k));
+  row.append(lb,val,inp);(binds[k]=binds[k]||[]).push({inp,val});syncKey(k);return row;
+}
+function wireRange(inp,k){
+  inp.addEventListener("input",()=>setV(k,+inp.value));
+  inp.addEventListener("pointerdown",()=>{dragging=true;document.body.classList.add("dragging");});
+  const end=()=>{if(!dragging)return;dragging=false;document.body.classList.remove("dragging");schedule();};
+  inp.addEventListener("pointerup",end);inp.addEventListener("pointercancel",end);
+  inp.addEventListener("change",()=>{end();pushHistory();syncCard();});
+}
+function editVal(val,k){
+  if(val.querySelector("input"))return;const info=KEYINFO[k];const inp=document.createElement("input");inp.type="number";inp.min=info.min;inp.max=info.max;inp.value=Math.round(getV(k));
+  val.innerHTML="";val.appendChild(inp);inp.focus();inp.select();
+  const done=ok=>{if(ok){let v=Number(inp.value);if(isFinite(v)){v=Math.max(info.min,Math.min(info.max,Math.round(v)));setV(k,v);pushHistory();}}syncKey(k);};
+  inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter"){done(true);}else if(e.key==="Escape"){done(false);}});
+  inp.addEventListener("blur",()=>done(true));inp.addEventListener("click",e=>e.stopPropagation());
+}
+function syncKey(k){const v=getV(k);(binds[k]||[]).forEach(b=>{if(document.activeElement!==b.inp)b.inp.value=v;if(!b.val.querySelector("input")){b.val.innerHTML=fmtVal(k,v);b.val.classList.toggle("on",isSet(k));}});
+  if(k===mKey||k==="strength")syncBig();updateToolDots();}
+function buildDesktopGroups(){
+  ["adjust","fx"].forEach(tab=>{const root=$("dt-"+tab);root.innerHTML="";
+    GROUPS.filter(g=>g.tab===tab).forEach(g=>{const box=document.createElement("div");box.className="group";box.dataset.g=g.id;
+      const h=document.createElement("div");h.className="ghead";const t=document.createElement("h4");t.textContent=g.title;
+      const eye=document.createElement("button");eye.type="button";eye.className="eye";eye.setAttribute("aria-pressed","true");eye.setAttribute("aria-label","Tạm tắt nhóm "+g.title);eye.title="Tạm tắt nhóm để so sánh";
+      eye.innerHTML='<svg class="i"><use href="#i-eye"/></svg>';
+      eye.onclick=()=>{const off=!disabled.has(g.id);if(off)disabled.add(g.id);else disabled.delete(g.id);eye.setAttribute("aria-pressed",String(!off));
+        eye.innerHTML='<svg class="i"><use href="'+(off?"#i-eyeoff":"#i-eye")+'"/></svg>';box.classList.toggle("off",off);schedule();};
+      h.append(t,eye);box.appendChild(h);g.items.forEach(it=>box.appendChild(sliderRow(it[0],it[1],"d-")));root.appendChild(box);});
+    if(tab==="fx")root.appendChild(dateGroup("d-"));
+    const n=document.createElement("p");n.className="note";n.textContent="Nhấp đúp một dòng để đưa về 0. Bấm vào con số để gõ giá trị.";root.appendChild(n);});
+  const q=$("dQuick");q.innerHTML="";
+  q.appendChild(sliderRow("strength","Độ mạnh preset","q-"));
+  q.appendChild(sliderRow("temp","Ấm ↔ Lạnh","q-"));
+  q.appendChild(sliderRow("fade","Phai","q-"));
+  q.appendChild(sliderRow("grain","Hạt film","q-"));
+}
+const dateBinds=[];
+function dateGroup(prefix){
+  const box=document.createElement("div");box.className="group";
+  box.innerHTML='<div class="ghead"><h4>In ngày giờ</h4></div>';
+  const o=document.createElement("div");o.className="dateopts";
+  const seg=document.createElement("div");seg.className="seg";seg.setAttribute("role","group");seg.setAttribute("aria-label","Kiểu in ngày");
+  [["0","Tắt"],["1","Film (cam)"],["2","Máy quay DV"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.textContent=l;b.dataset.v=v;
+    b.onclick=()=>{state.params.date=+v;syncDate();markEdited();pushHistory();schedule();};seg.appendChild(b);});
+  const r=document.createElement("div");r.className="inline";
+  const di=document.createElement("input");di.type="date";di.className="field";di.id=prefix+"dateval";di.setAttribute("aria-label","Ngày in trên ảnh");
+  const ti=document.createElement("input");ti.type="time";ti.className="field";ti.id=prefix+"timeval";ti.setAttribute("aria-label","Giờ in trên ảnh");
+  di.addEventListener("change",()=>{if(di.value)state.dateISO=di.value;syncDate();schedule();});
+  ti.addEventListener("change",()=>{if(ti.value)state.timeStr=ti.value;syncDate();schedule();});
+  const pv=document.createElement("span");pv.className="stampprev";
+  r.append(di,ti);o.append(seg,r,pv);box.appendChild(o);dateBinds.push({seg,di,ti,pv});syncDate();return box;
+}
+function syncDate(){const m=Math.round(state.params.date||0);dateBinds.forEach(b=>{[...b.seg.children].forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.v===m)));
+  b.di.value=state.dateISO;b.ti.value=state.timeStr;b.ti.hidden=m!==2;b.pv.textContent=m===1?filmDate():"";});updateToolDots();}
+
+/* Mobile one-big-slider tools */
+let bigInp=null,bigLabel=null,bigVal=null,mDateBox=null;
+function buildMobileTools(){
+  const tools=$("mTools");tools.innerHTML="";
+  const keys=GROUPS.filter(g=>g.tab===mTab).flatMap(g=>g.items.map(i=>i[0]));
+  if(mTab==="fx")keys.push("date");
+  if(!keys.includes(mKey))mKey=keys[0];
+  keys.forEach(k=>{const b=document.createElement("button");b.type="button";b.className="tool";b.dataset.k=k;b.textContent=k==="date"?"In ngày":KEYINFO[k].label;
+    b.setAttribute("aria-pressed",String(k===mKey));b.onclick=()=>{mKey=k;tools.querySelectorAll(".tool").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.k===k)));showBig();};tools.appendChild(b);});
+  showBig();updateToolDots();
+}
+function showBig(){
+  const box=$("mSlider");box.innerHTML="";bigInp=null;
+  if(mKey==="date"){if(!mDateBox)mDateBox=dateGroup("m-");box.appendChild(mDateBox);return;}
+  const info=KEYINFO[mKey],top=document.createElement("div");top.className="bigrow";bigLabel=document.createElement("b");bigVal=document.createElement("span");
+  bigLabel.textContent=info.label;top.append(bigLabel,bigVal);
+  const inp=document.createElement("input");inp.type="range";inp.min=info.min;inp.max=info.max;inp.step=1;inp.setAttribute("aria-label",info.label);if(info.kind==="hue")inp.className="hue";
+  const k=mKey;wireRange(inp,k);inp.addEventListener("dblclick",()=>{setV(k,NEUTRAL[k]);pushHistory();});
+  box.append(top,inp);bigInp=inp;syncBig();
+}
+function syncBig(){if(bigInp&&KEYINFO[mKey]){bigInp.value=getV(mKey);bigVal.innerHTML=fmtVal(mKey,getV(mKey));}}
+function updateToolDots(){document.querySelectorAll(".tool").forEach(b=>{const k=b.dataset.k;b.classList.toggle("set",k==="date"?state.params.date>0.5:isSet(k));});}
+
+/* ---------- Card, history ---------- */
 function isEdited(){const p=findPreset(state.presetId);for(const k in NEUTRAL)if(Math.round(p.params[k])!==Math.round(state.params[k]))return true;return false;}
-function syncInfo(){const p=findPreset(state.presetId);$("pName").textContent=p.name;$("pDesc").textContent=p.desc||"Preset bạn tự lưu.";
-  $("pEdited").hidden=!isEdited();$("strength").value=state.strength;$("strengthVal").textContent=state.strength;$("codeBox").textContent=encodeCode();}
-
-/* ---------- UI: sliders ---------- */
-const sliderEls={};
-function fmt(k,v,min){v=Math.round(v);if(min<0&&v>0)return "+"+v;return String(v);}
-function buildSliders(){
-  for(const pane in SLIDERS){const root=$(pane);root.innerHTML="";
-    SLIDERS[pane].forEach(([title,list])=>{const g=document.createElement("div");g.className="group";const h=document.createElement("h4");h.textContent=title;g.appendChild(h);
-      list.forEach(([k,label,min,max,kind])=>{
-        const row=document.createElement("div");row.className="row";const id="s-"+k;
-        const lb=document.createElement("label");lb.htmlFor=id;lb.textContent=label;
-        const val=document.createElement("span");val.className="val";
-        const inp=document.createElement("input");inp.type="range";inp.id=id;inp.min=min;inp.max=max;inp.step=1;if(kind==="hue")inp.className="hue";
-        inp.addEventListener("input",()=>{state.params[k]=+inp.value;syncSlider(k);$("pEdited").hidden=!isEdited();schedule();});
-        inp.addEventListener("change",()=>{pushHistory();syncInfo();});
-        row.addEventListener("dblclick",()=>{state.params[k]=NEUTRAL[k];syncSlider(k);syncInfo();pushHistory();schedule();});
-        row.append(lb,val,inp);g.appendChild(row);sliderEls[k]={inp,val,min,kind};});
-      root.appendChild(g);});
-    if(pane==="p-adjust"){const n=document.createElement("p");n.className="note";n.textContent="Nhấp đúp vào một dòng để đưa thanh trượt về 0.";root.appendChild(n);}
-  }
-  const fx=$("p-fx"),g=document.createElement("div");g.className="group";
-  g.innerHTML='<h4>In ngày kiểu máy film</h4><div class="toggle"><label for="s-date">Hiện ngày ở góc ảnh</label><input type="checkbox" id="s-date"></div>'+
-    '<div class="daterow"><input type="date" id="s-dateval" aria-label="Ngày in trên ảnh"><span class="stampprev" id="stampPrev"></span></div>';
-  fx.appendChild(g);
-  $("s-date").addEventListener("change",e=>{state.params.date=e.target.checked?1:0;syncInfo();pushHistory();schedule();});
-  $("s-dateval").addEventListener("change",e=>{state.dateISO=e.target.value||state.dateISO;$("stampPrev").textContent=stampText();schedule();});
-}
-function syncSlider(k){const s=sliderEls[k];if(!s)return;const v=state.params[k];s.inp.value=v;
-  if(s.kind==="hue"){const c=hue2rgb(v).map(x=>Math.round(x*255));s.val.innerHTML='<span class="sw" style="background:rgb('+c.join(",")+')"></span>'+Math.round(v)+"°";s.val.classList.add("on");}
-  else{s.val.textContent=fmt(k,v,s.min);s.val.classList.toggle("on",Math.round(v)!==NEUTRAL[k]);}}
-function syncAll(){for(const k in sliderEls)syncSlider(k);$("s-date").checked=state.params.date>0.5;$("s-dateval").value=state.dateISO;$("stampPrev").textContent=stampText();syncInfo();}
-
-/* ---------- History ---------- */
+function markEdited(){$("pEdited").hidden=!isEdited();}
+function syncCard(){const p=findPreset(state.presetId);$("pName").textContent=p.name;$("pDesc").textContent=p.desc||"";markEdited();$("codeBox").textContent=encodeCode();}
+function syncAll(){Object.keys(binds).forEach(syncKey);syncDate();syncCard();syncBig();}
 function snap(){return JSON.stringify({presetId:state.presetId,strength:state.strength,params:state.params,mix:state.mix});}
-function pushHistory(){const s=snap();if(history[hIdx]===s)return;history=history.slice(0,hIdx+1);history.push(s);if(history.length>80)history.shift();hIdx=history.length-1;updUndo();}
-function restore(i){const o=JSON.parse(history[i]);Object.assign(state,o);
+function pushHistory(){const s=snap();if(history[hIdx]===s){syncCard();return;}history=history.slice(0,hIdx+1);history.push(s);if(history.length>100)history.shift();hIdx=history.length-1;updUndo();syncCard();}
+function restore(i){const o=JSON.parse(history[i]);state.presetId=o.presetId;state.strength=o.strength;state.params=o.params;state.mix=o.mix;
   document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id===state.presetId)));syncAll();schedule();updUndo();}
 function undo(){if(hIdx>0){hIdx--;restore(hIdx);}}
 function redo(){if(hIdx<history.length-1){hIdx++;restore(hIdx);}}
-function updUndo(){$("undoBtn").disabled=hIdx<=0;$("redoBtn").disabled=hIdx>=history.length-1;}
+function updUndo(){["tUndo","mUndo"].forEach(i=>$(i).disabled=hIdx<=0);["tRedo","mRedo"].forEach(i=>$(i).disabled=hIdx>=history.length-1);}
 
-/* ---------- Preset codes & custom presets ---------- */
+/* ---------- Recipes & codes ---------- */
 function encodeCode(){const p={};for(const k in NEUTRAL)p[k]=Math.round(state.params[k]);
   const o={n:findPreset(state.presetId).name+(isEdited()?" (chỉnh)":""),p,m:state.mix.map(v=>Math.round(v*1000)/1000),s:state.strength};
   try{return "TP1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))));}catch(e){return "";}}
 function decodeCode(str){str=(str||"").trim();if(!str.startsWith("TP1:"))throw new Error("bad");
   const o=JSON.parse(decodeURIComponent(escape(atob(str.slice(4)))));const params=Object.assign({},NEUTRAL);
   for(const k in NEUTRAL){const v=Number(o.p&&o.p[k]);if(isFinite(v))params[k]=v;}
-  const mix=Array.isArray(o.m)&&o.m.length===9?o.m.map(v=>Math.max(-0.3,Math.min(0.3,Number(v)||0))):Z9.slice();
-  return {name:String(o.n||"Preset được chia sẻ").slice(0,28),params,mix};}
-function addCustom(name,params,mix){const p={id:"u"+Date.now(),name,tags:["mine"],desc:"Preset bạn tự lưu.",params:Object.assign({},params),mix:mix.slice()};
-  custom.push(p);store.set("tiemphim.custom",JSON.stringify(custom));buildChips();buildTiles();selectPreset(p.id);}
+  const mix=Array.isArray(o.m)&&o.m.length===9?o.m.map(v=>Math.max(-1,Math.min(1,Number(v)||0))):Z9.slice();
+  return {name:String(o.n||"Công thức được chia sẻ").slice(0,28),params,mix};}
+function saveCustom(){store.set("tiemphim.custom",JSON.stringify(custom.map(p=>({id:p.id,name:p.name,params:p.params,mix:p.mix}))));}
+function addCustom(name,params,mix){const p={id:"u"+Date.now(),name,fam:"mine",moods:[],desc:"Công thức bạn tự lưu.",params:Object.assign({},params),mix:mix.slice()};
+  custom.push(p);saveCustom();renderThumb(p.id);buildMine();rebuildLists();selectPreset(p.id);}
+function buildMine(){const box=$("mineList");box.innerHTML="";
+  if(!custom.length){const e=document.createElement("p");e.textContent="Chưa có công thức nào.";box.appendChild(e);return;}
+  custom.forEach(p=>{const r=document.createElement("div");r.className="mine";const n=document.createElement("span");n.textContent=p.name;
+    const use=document.createElement("button");use.type="button";use.textContent="Dùng";use.onclick=()=>{selectPreset(p.id);if(!desk)closeSheet();};
+    const del=document.createElement("button");del.type="button";del.textContent="Xoá";
+    del.onclick=()=>{if(!del.classList.contains("warn")){del.classList.add("warn");del.textContent="Bấm lần nữa để xoá";setTimeout(()=>{del.classList.remove("warn");del.textContent="Xoá";},2600);return;}
+      custom=custom.filter(x=>x.id!==p.id);saveCustom();thumbCache.delete(p.id);if(state.presetId===p.id)state.presetId="none";buildMine();rebuildLists();syncCard();toast("Đã xoá “"+p.name+"”");};
+    r.append(n,use,del);box.appendChild(r);});}
+
+/* ---------- Zoom, pan, gestures ---------- */
+const stage=$("stage"),wrapEl=$("wrap");let Z=1,PX=0,PY=0;
+function applyT(){wrapEl.style.transform="translate("+PX+"px,"+PY+"px) scale("+Z+")";["tZoom"].forEach(i=>$(i).setAttribute("aria-pressed",String(Z>1)));}
+function clampPan(){const r=stage.getBoundingClientRect(),cw=view.clientWidth*Z,ch=view.clientHeight*Z,mx=Math.max(0,(cw-r.width)/2),my=Math.max(0,(ch-r.height)/2);
+  PX=Math.max(-mx,Math.min(mx,PX));PY=Math.max(-my,Math.min(my,PY));}
+function zoomAt(nz,cx,cy){nz=Math.max(1,Math.min(6,nz));const k=nz/Z;PX=cx-(cx-PX)*k;PY=cy-(cy-PY)*k;Z=nz;if(Z<=1.001){Z=1;PX=PY=0;}clampPan();applyT();}
+function resetZoom(){Z=1;PX=PY=0;applyT();}
+function toggleZoom(cx,cy){if(Z>1)resetZoom();else zoomAt(2.5,cx||0,cy||0);}
+function rel(x,y){const r=stage.getBoundingClientRect();return [x-(r.left+r.width/2),y-(r.top+r.height/2)];}
+const pts=new Map();let g0=null,pinch=null,holdT=null,lastTap=0,cmpByHold=false;
+function startCmp(){comparing=true;$("cmpFlag").hidden=false;draw();}
+function endCmp(){if(!comparing)return;comparing=false;$("cmpFlag").hidden=true;draw();}
+stage.addEventListener("pointerdown",e=>{
+  if(e.target.id==="split")return;
+  stage.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===1){g0={x:e.clientX,y:e.clientY,px:PX,py:PY,moved:false,t:Date.now()};cmpByHold=false;
+    holdT=setTimeout(()=>{if(g0&&!g0.moved&&pts.size===1){cmpByHold=true;startCmp();}},180);}
+  else if(pts.size===2){clearTimeout(holdT);endCmp();const [a,b]=[...pts.values()];const m=rel((a.x+b.x)/2,(a.y+b.y)/2);
+    pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:Z,px:PX,py:PY,cx:m[0],cy:m[1]};}
+});
+stage.addEventListener("pointermove",e=>{
+  if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);
+    const nz=Math.max(1,Math.min(6,pinch.z*d/pinch.d)),k=nz/pinch.z;PX=pinch.cx-(pinch.cx-pinch.px)*k;PY=pinch.cy-(pinch.cy-pinch.py)*k;Z=nz;if(Z<=1.001){Z=1;PX=PY=0;}clampPan();applyT();return;}
+  if(g0&&pts.size===1){const dx=e.clientX-g0.x,dy=e.clientY-g0.y;
+    if(!g0.moved&&Math.hypot(dx,dy)>8){g0.moved=true;clearTimeout(holdT);if(cmpByHold){endCmp();cmpByHold=false;}}
+    if(g0.moved&&Z>1){PX=g0.px+dx;PY=g0.py+dy;clampPan();applyT();}}
+});
+function pEnd(e){
+  if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);clearTimeout(holdT);
+  if(pts.size<2)pinch=null;
+  if(pts.size===0&&g0){
+    if(cmpByHold){endCmp();cmpByHold=false;}
+    else if(!g0.moved){const t=Date.now();if(t-lastTap<300){const m=rel(e.clientX,e.clientY);toggleZoom(m[0],m[1]);lastTap=0;}else lastTap=t;}
+    else if(Z===1&&!desk){const dx=e.clientX-g0.x,dy=e.clientY-g0.y;if(Math.abs(dx)>60&&Math.abs(dy)<70)stepPreset(dx<0?1:-1);}
+    g0=null;}
+}
+stage.addEventListener("pointerup",pEnd);stage.addEventListener("pointercancel",pEnd);
+stage.addEventListener("wheel",e=>{e.preventDefault();const m=rel(e.clientX,e.clientY);zoomAt(Z*Math.exp(-e.deltaY*0.0015),m[0],m[1]);},{passive:false});
+view.addEventListener("contextmenu",e=>e.preventDefault());
+const sp=$("split");
+function setSplit(on){split=on;sp.hidden=!on;["tSplit","mSplit"].forEach(i=>$(i).setAttribute("aria-pressed",String(on)));placeSplit();schedule();}
+function placeSplit(){sp.style.left=(splitX*100)+"%";sp.setAttribute("aria-valuenow",String(Math.round(splitX*100)));}
+sp.addEventListener("pointerdown",e=>{e.stopPropagation();sp.setPointerCapture(e.pointerId);});
+sp.addEventListener("pointermove",e=>{if(!sp.hasPointerCapture(e.pointerId))return;const r=view.getBoundingClientRect();splitX=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));placeSplit();schedule();});
+sp.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();e.stopPropagation();splitX=Math.max(0.02,Math.min(0.98,splitX+(e.key==="ArrowLeft"?-0.05:0.05)));placeSplit();schedule();}});
 
 /* ---------- Export ---------- */
 let dlPromise=null;
 function getDownloads(){if(!dlPromise){try{dlPromise=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads").catch(()=>null):Promise.resolve(null);}catch(e){dlPromise=Promise.resolve(null);}}return dlPromise;}
+let saving=false;
 async function exportImage(){
-  const btn=$("saveBtn");if(btn.disabled)return;btn.disabled=true;btn.textContent="Đang xuất…";
-  await new Promise(r=>setTimeout(r,30));
+  if(saving||!fullSrc)return;saving=true;["tSave","mSave"].forEach(i=>{$(i).disabled=true;});toast("Đang xuất ảnh…");
+  await new Promise(r=>setTimeout(r,40));
   try{
     try{await document.fonts.load('40px "DotGothic16"');}catch(e){}
-    const e=effective(),fw=fullSrc.width,fh=fullSrc.height,tex=makeTex(0,0,fullSrc);
+    const e=effective(state,true),fw=fullSrc.width,fh=fullSrc.height,tex=makeTex(0,0,fullSrc);
     render(tex,fw,fh,e);const out=document.createElement("canvas");out.width=fw;out.height=fh;const o=out.getContext("2d");o.drawImage(glc,0,0);
-    if(e.date>0.5)drawStamp(o,fw,fh);gl.deleteTexture(tex);draw();
+    if(e.date>0.5)drawStamp(o,fw,fh,e.date);gl.deleteTexture(tex);draw();
     const blob=await new Promise(r=>out.toBlob(r,"image/jpeg",0.93));if(!blob)throw new Error("encode");
-    const name="tiemphim-"+findPreset(state.presetId).name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+".jpg";
+    const name="tiemphim-"+norm(findPreset(state.presetId).name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+".jpg";
     const dl=await getDownloads();
-    if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+fw+"×"+fh);}
-      catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}}
-    else{
-      const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(u),4000);
-      if(/iPhone|iPad|iPod/.test(navigator.userAgent))showOverlay(blob);else toast("Đã lưu ảnh "+fw+"×"+fh);
-    }
+    if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+fw+"×"+fh);}catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}return;}
+    const file=new File([blob],name,{type:"image/jpeg"});
+    if(!desk&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});toast("Đã mở bảng chia sẻ. Chọn “Lưu hình ảnh”.");}catch(err){if(err&&err.name==="AbortError")toast("Đã huỷ");else showOverlay(blob);}return;}
+    const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);
+    if(/iPhone|iPad|iPod/.test(navigator.userAgent))showOverlay(blob);else toast("Đã lưu ảnh "+fw+"×"+fh);
   }catch(err){toast("Không xuất được ảnh. Thử lại với ảnh nhỏ hơn.");draw();}
-  finally{btn.disabled=false;btn.textContent="Lưu ảnh";}
+  finally{saving=false;["tSave","mSave"].forEach(i=>{$(i).disabled=false;});}
 }
 let outURL=null;
 function showOverlay(blob){if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(blob);$("outImg").src=outURL;$("overlay").hidden=false;}
 
-/* ---------- Toast ---------- */
-let tt=null;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400);}
+let tt=null;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200);}
 
-/* ---------- Wire up ---------- */
+/* ---------- Mode, tabs, sheet ---------- */
+const mq=window.matchMedia("(min-width: 900px)");
+function applyMode(){
+  desk=mq.matches;document.body.classList.toggle("desk",desk);document.body.classList.toggle("mob",!desk);
+  const rec=$("recipe");(desk?$("dt-recipe"):$("sheetBody")).appendChild(rec);
+  if(!desk)closeSheet();hoverId=null;resetZoom();rebuildLists();if(!desk){if(mTab!=="presets")buildMobileTools();}else drawHist();
+}
+function setDTab(t){dTab=t;document.querySelectorAll("[data-dt]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.dt===t)));
+  ["adjust","fx","recipe"].forEach(x=>$("dt-"+x).hidden=x!==t);}
+function setMTab(t){
+  if(t==="recipe"){openSheet();return;}
+  mTab=t;document.querySelectorAll("[data-mt]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mt===t)));
+  $("mp-presets").hidden=t!=="presets";$("mp-tools").hidden=t==="presets";if(t!=="presets")buildMobileTools();
+}
+function openSheet(){const s=$("sheet");s.classList.add("open");s.setAttribute("aria-hidden","false");$("scrim").hidden=false;syncCard();}
+function closeSheet(){const s=$("sheet");s.classList.remove("open","full");s.setAttribute("aria-hidden","true");$("scrim").hidden=true;}
+
 function wire(){
-  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(x=>{x.setAttribute("aria-selected",String(x===t));$(x.dataset.pane).hidden=x!==t;});}));
-  $("openBtn").onclick=()=>$("file").click();
+  mq.addEventListener?mq.addEventListener("change",applyMode):mq.addListener(applyMode);
+  ["tOpen","mOpen"].forEach(i=>$(i).onclick=()=>$("file").click());
   $("file").onchange=e=>{loadFile(e.target.files[0]);e.target.value="";};
-  $("saveBtn").onclick=exportImage;
+  ["tSave","mSave"].forEach(i=>$(i).onclick=exportImage);
+  ["tUndo","mUndo"].forEach(i=>$(i).onclick=undo);["tRedo","mRedo"].forEach(i=>$(i).onclick=redo);
+  ["tSplit","mSplit"].forEach(i=>$(i).onclick=()=>setSplit(!split));
+  $("tZoom").onclick=()=>toggleZoom(0,0);
+  $("tLib").onclick=()=>{const h=document.body.classList.toggle("no-lib");$("tLib").setAttribute("aria-pressed",String(!h));setTimeout(()=>{clampPan();applyT();},300);};
+  $("tInsp").onclick=()=>{const h=document.body.classList.toggle("no-insp");$("tInsp").setAttribute("aria-pressed",String(!h));setTimeout(()=>{clampPan();applyT();},300);};
+  $("tHelp").onclick=()=>{$("helpBox").hidden=false;$("helpClose").focus();};
+  $("helpClose").onclick=()=>{$("helpBox").hidden=true;};
   $("closeOverlay").onclick=()=>{$("overlay").hidden=true;};
-  $("strength").addEventListener("input",e=>{state.strength=+e.target.value;$("strengthVal").textContent=state.strength;schedule();});
-  $("strength").addEventListener("change",()=>{pushHistory();syncInfo();});
   $("resetBtn").onclick=()=>selectPreset(state.presetId);
-  $("undoBtn").onclick=undo;$("redoBtn").onclick=redo;
-  $("savePreset").onclick=()=>{const n=$("saveName").value.trim();if(!n){toast("Đặt tên cho preset trước đã");$("saveName").focus();return;}
-    addCustom(n.slice(0,28),state.params,state.mix);$("saveName").value="";toast("Đã lưu preset “"+n+"”");};
-  $("copyCode").onclick=()=>{const c=encodeCode();
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(c).then(()=>toast("Đã sao chép mã preset"),()=>selectCode());}else selectCode();};
-  function selectCode(){const r=document.createRange();r.selectNodeContents($("codeBox"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Đã chọn mã. Nhấn Ctrl+C để sao chép.");}
-  $("applyCode").onclick=()=>{try{const o=decodeCode($("pasteCode").value);addCustom(o.name,o.params,o.mix);$("pasteCode").value="";toast("Đã thêm “"+o.name+"” vào Preset của bạn");}
+  $("search").addEventListener("input",buildLib);
+  document.querySelectorAll("[data-dt]").forEach(b=>b.onclick=()=>setDTab(b.dataset.dt));
+  document.querySelectorAll("[data-mt]").forEach(b=>b.onclick=()=>setMTab(b.dataset.mt));
+  $("sheetClose").onclick=closeSheet;$("scrim").onclick=closeSheet;$("sheetGrab").onclick=()=>$("sheet").classList.toggle("full");
+  $("savePreset").onclick=()=>{const n=$("saveName").value.trim();if(!n){toast("Đặt tên cho công thức trước đã");$("saveName").focus();return;}
+    addCustom(n.slice(0,28),state.params,state.mix);$("saveName").value="";toast("Đã lưu công thức “"+n+"”");};
+  $("copyCode").onclick=()=>{const c=encodeCode();const sel=()=>{const r=document.createRange();r.selectNodeContents($("codeBox"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Đã chọn mã. Nhấn Ctrl+C để sao chép.");};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(c).then(()=>toast("Đã sao chép mã"),sel);else sel();};
+  $("applyCode").onclick=()=>{try{const o=decodeCode($("pasteCode").value);addCustom(o.name,o.params,o.mix);$("pasteCode").value="";toast("Đã thêm “"+o.name+"”");}
     catch(e){toast("Mã không hợp lệ. Mã đúng bắt đầu bằng TP1:");}};
-
-  const startCmp=e=>{if(e)e.preventDefault();comparing=true;$("cmpFlag").hidden=false;draw();};
-  const endCmp=()=>{if(!comparing)return;comparing=false;$("cmpFlag").hidden=true;draw();};
-  [view,$("cmpBtn")].forEach(el=>{el.addEventListener("pointerdown",startCmp);el.addEventListener("pointerup",endCmp);el.addEventListener("pointerleave",endCmp);el.addEventListener("pointercancel",endCmp);
-    el.addEventListener("contextmenu",e=>e.preventDefault());});
-
-  const vw=$("viewer");
-  vw.addEventListener("dragover",e=>{e.preventDefault();vw.classList.add("drag");});
-  vw.addEventListener("dragleave",()=>vw.classList.remove("drag"));
-  vw.addEventListener("drop",e=>{e.preventDefault();vw.classList.remove("drag");const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f);});
-  document.addEventListener("paste",e=>{if(e.target&&e.target.tagName==="INPUT")return;const items=e.clipboardData&&e.clipboardData.files;if(items&&items[0])loadFile(items[0]);});
+  document.body.addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("drag");});
+  document.body.addEventListener("dragleave",e=>{if(e.target===document.body||e.relatedTarget===null)document.body.classList.remove("drag");});
+  document.body.addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("drag");const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f);});
+  document.addEventListener("paste",e=>{if(e.target&&e.target.tagName==="INPUT")return;const f=e.clipboardData&&e.clipboardData.files;if(f&&f[0])loadFile(f[0]);});
   document.addEventListener("keydown",e=>{
-    if(e.target&&e.target.tagName==="INPUT"&&e.target.type!=="range")return;
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redo():undo();}
-    if(e.key==="\\"&&!comparing)startCmp();});
+    const tg=e.target,typing=tg&&(tg.tagName==="INPUT"&&tg.type!=="range"||tg.tagName==="TEXTAREA");
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!typing){e.preventDefault();e.shiftKey?redo():undo();return;}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();exportImage();return;}
+    if(e.key==="Escape"){$("helpBox").hidden=true;$("overlay").hidden=true;closeSheet();return;}
+    if(typing||e.ctrlKey||e.metaKey||e.altKey)return;
+    if(e.key==="\\"&&!comparing){startCmp();return;}
+    if(tg&&tg.type==="range")return;
+    const k=e.key.toLowerCase();
+    if(e.key==="ArrowDown"){e.preventDefault();stepPreset(1);}else if(e.key==="ArrowUp"){e.preventDefault();stepPreset(-1);}
+    else if(k==="c")setSplit(!split);else if(k==="z")toggleZoom(0,0);else if(k==="o")$("file").click();
+    else if(k==="l"&&desk)$("tLib").click();else if(k==="i"&&desk)$("tInsp").click();else if(e.key==="?"){$("helpBox").hidden=false;}
+  });
   document.addEventListener("keyup",e=>{if(e.key==="\\")endCmp();});
+  window.addEventListener("resize",()=>{clampPan();applyT();});
 }
 
 /* ---------- Boot ---------- */
 try{
-  initGL();buildChips();buildTiles();buildSliders();wire();syncAll();pushHistory();
+  initGL();wire();buildMood();buildDesktopGroups();$("mStrength").appendChild(sliderRow("strength","Độ mạnh preset","m-"));buildMine();applyMode();setDTab("adjust");syncAll();pushHistory();
   setSource(makeSample(),true);
   if(document.fonts&&document.fonts.load)document.fonts.load('40px "DotGothic16"').then(()=>schedule()).catch(()=>{});
   getDownloads();
+  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 }catch(err){
-  const v=$("viewer");v.innerHTML='<div class="errbox">Trình duyệt này chưa bật WebGL nên app không xử lý ảnh được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';
-  $("saveBtn").disabled=true;
+  $("stage").innerHTML='<div class="errbox">Trình duyệt này chưa bật WebGL nên app không xử lý ảnh được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';
+  ["tSave","mSave"].forEach(i=>{$(i).disabled=true;});
+  if(window.console)console.error(err);
 }
+
 })();
 </script>
 
