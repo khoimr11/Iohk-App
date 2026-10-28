@@ -407,7 +407,7 @@ const NEUTRAL = {exposure:0,contrast:0,highlights:0,shadows:0,fade:0,temp:0,tint
   shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0};
 const NOSCALE = new Set(["shHue","hiHue","grainSize","date"]);
 const Z9 = [0,0,0,0,0,0,0,0,0];
-const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
+const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["fuji","Fujifilm"],["nikon","Nikon"],["leica","Leica"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
 const MOODS = [["warm","Ấm"],["cool","Lạnh"],["pastel","Pastel"],["vivid","Rực"],["faded","Phai"],["contrast","Tương phản"],["grainy","Nhiều hạt"],["atmo","Huyền ảo"],["natural","Tự nhiên"],["mono","Đơn sắc"]];
 function D(id,name,fam,moods,desc,p,mix){return {id,name,fam,moods:moods.split(" ").filter(Boolean),desc,params:Object.assign({},NEUTRAL,p),mix:mix||Z9};}
 
@@ -453,6 +453,63 @@ const PRESETS = [
   {exposure:-10,contrast:20,highlights:-15,fade:10,temp:-30,tint:8,saturation:10,vibrance:15,shHue:215,shAmt:40,hiHue:200,hiAmt:15,grain:35,grainSize:45,halation:35,bloom:45,aberration:10,vignette:30}),
  D("redlantern","Red Lantern","hk","vivid contrast mono","Gần như đơn sắc đỏ, chỉ còn tông đỏ cam như dưới đèn lồng.",
   {exposure:-5,contrast:40,highlights:-10,shadows:-15,saturation:20,bw:85,shHue:0,shAmt:70,hiHue:15,hiAmt:60,grain:35,grainSize:45,halation:30,bloom:20,vignette:35}),
+ /* Fujifilm */
+ D("f1","F1 Chuẩn","fuji","natural","Cảm hứng từ Provia của Fujifilm: màu trung thực, tương phản vừa, dùng được cho mọi cảnh.",{contrast:10,saturation:8,vibrance:5}),
+ D("f2","F2 Rực","fuji","vivid contrast","Cảm hứng từ Velvia: bão hòa cao, trời xanh và lá cây rất đậm. Hợp phong cảnh.",{contrast:30,shadows:-10,saturation:40,vibrance:20,vignette:5},[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05]),
+ D("f3","F3 Mềm","fuji","pastel natural","Cảm hứng từ Astia: tương phản mềm, da đẹp, màu dịu.",{contrast:-10,highlights:-15,shadows:10,saturation:5,vibrance:10,temp:3,tint:3}),
+ D("f4","F4 Chrome","fuji","faded contrast","Cảm hứng từ Classic Chrome: màu trầm, bóng đổ đậm, xanh ngả cyan. Rất hợp ảnh đường phố.",
+  {contrast:15,highlights:-15,shadows:-15,saturation:-30,vibrance:-5,temp:5,tint:-3,shHue:200,shAmt:20,hiHue:45,hiAmt:10,grain:15,grainSize:30},[-0.02,0.02,0,0,0,0,0,0.04,-0.02]),
+ D("f5","F5 Neg Cổ","fuji","cool contrast faded","Cảm hứng từ Classic Negative: tương phản gắt, bóng ngả xanh lục, đỏ đậm, như film màu bình dân.",
+  {contrast:30,highlights:-10,shadows:-5,fade:8,temp:-3,tint:8,saturation:5,shHue:175,shAmt:35,hiHue:340,hiAmt:15,grain:25,grainSize:35},[0.05,-0.02,0,0,0,0.03,0,0.04,0]),
+ D("f6","F6 Hoài niệm","fuji","warm faded","Cảm hứng từ Nostalgic Neg: vùng sáng hổ phách, bóng đổ mềm, như ảnh in thập niên 70.",
+  {highlights:-20,shadows:10,fade:10,temp:15,tint:5,saturation:5,shHue:20,shAmt:10,hiHue:38,hiAmt:35,grain:15,grainSize:30}),
+ D("f7","F7 Real","fuji","natural","Cảm hứng từ Reala Ace: trung thực, trong, tương phản rõ hơn một chút.",{contrast:12,highlights:-10,saturation:8,vibrance:10,temp:2,grain:5,grainSize:20}),
+ D("f8","F8 Pro Neg","fuji","natural faded","Cảm hứng từ Pro Neg: mềm, ít bão hòa, dành cho chân dung studio.",{contrast:-12,highlights:-15,shadows:10,saturation:-12,temp:4,grain:8,grainSize:20}),
+ D("f9","F9 Cine","fuji","cool faded atmo","Cảm hứng từ Eterna: phẳng, ít màu, bóng ngả xanh mòng két như film điện ảnh.",
+  {contrast:-30,highlights:-25,shadows:20,fade:10,saturation:-30,shHue:185,shAmt:30,hiHue:40,hiAmt:10,grain:15,grainSize:30}),
+ D("f10","F10 Cine Bạc","fuji","faded contrast","Cảm hứng từ Eterna Bleach Bypass: bạc màu, tương phản cao.",{contrast:40,shadows:-15,fade:5,saturation:-60,shHue:190,shAmt:20,grain:20,grainSize:30}),
+ D("f11","F11 Acr","fuji","mono natural","Cảm hứng từ Acros: đen trắng hạt mịn, dải xám giàu, đen sâu.",{bw:100,contrast:25,highlights:-5,shadows:-10,grain:25,grainSize:20}),
+ D("f12","F12 Acr Đỏ","fuji","mono contrast","Đen trắng kèm kính lọc đỏ: trời tối hẳn, da sáng, tương phản mạnh.",{bw:100,contrast:35,shadows:-15,grain:25,grainSize:20},[0,0,0,0.5,-0.4,0,0.6,0,-0.6]),
+ D("f13","F13 Sepia","fuji","mono warm","Đen trắng tông nâu sepia nhẹ.",{bw:100,contrast:5,fade:10,shHue:30,shAmt:40,hiHue:38,hiAmt:45,grain:15,grainSize:30}),
+ /* Nikon */
+ D("n1","N1 Chuẩn","nikon","natural","Cảm hứng từ Picture Control Standard của Nikon: cân bằng, hơi tươi.",{contrast:10,saturation:10,vibrance:5}),
+ D("n2","N2 Rực","nikon","vivid","Cảm hứng từ Picture Control Vivid: màu rực, tương phản rõ.",{contrast:22,saturation:30,vibrance:15}),
+ D("n3","N3 Chân dung","nikon","natural warm","Cảm hứng từ Picture Control Portrait: da mịn, ấm nhẹ, tương phản thấp.",{contrast:-8,highlights:-10,shadows:8,saturation:-5,temp:4,tint:4}),
+ D("n4","N4 Phong cảnh","nikon","vivid natural","Cảm hứng từ Picture Control Landscape: lá xanh và trời xanh đậm hơn.",{contrast:18,saturation:20,vibrance:25},[0,0,0,0,0.04,0,0,0,0.04]),
+ D("n5","N5 Mộng","nikon","pastel atmo","Cảm hứng từ Creative Picture Control Dream: sáng, mềm, phớt hồng, lan sáng.",{exposure:15,contrast:-25,highlights:-20,shadows:20,fade:15,saturation:-5,tint:6,hiHue:330,hiAmt:15,bloom:25}),
+ D("n6","N6 Ban mai","nikon","cool pastel","Cảm hứng từ Morning: lạnh, trong, nhẹ như sáng sớm.",{exposure:12,contrast:-15,fade:12,temp:-18,tint:-4,saturation:-15,shHue:190,shAmt:25}),
+ D("n7","N7 Pop","nikon","vivid","Cảm hứng từ Pop: màu đậm và tươi, nhất là hồng và đỏ.",{contrast:25,saturation:40,vibrance:25,tint:8}),
+ D("n8","N8 Chủ nhật","nikon","warm faded","Cảm hứng từ Sunday: ấm, mềm, thư thả.",{exposure:8,contrast:-10,fade:10,temp:22,tint:6,hiHue:40,hiAmt:25,bloom:10}),
+ D("n9","N9 U trầm","nikon","contrast vivid","Cảm hứng từ Somber: tối hơn, tương phản và bão hòa tăng.",{exposure:-12,contrast:30,shadows:-15,saturation:20,temp:-5,vignette:30}),
+ D("n10","N10 Kịch tính","nikon","contrast","Cảm hứng từ Dramatic: trời tối hẳn, tương phản mạnh, màu giảm.",{contrast:45,highlights:-40,shadows:-20,saturation:-15,grain:15,grainSize:30,vignette:35},[0,0,0,0,0,0,0,0,-0.15]),
+ D("n11","N11 Tĩnh lặng","nikon","faded cool","Cảm hứng từ Silence: trầm, lạnh, ít màu.",{contrast:-20,fade:20,saturation:-35,temp:-10,shHue:210,shAmt:15}),
+ D("n12","N12 Tẩy màu","nikon","faded contrast","Cảm hứng từ Bleached: bạc màu, tương phản cao.",{contrast:35,highlights:5,fade:8,saturation:-50}),
+ D("n13","N13 Sầu","nikon","cool faded","Cảm hứng từ Melancholic: ít màu, ngả xanh, buồn.",{exposure:-5,contrast:10,fade:12,saturation:-40,temp:-15,shHue:220,shAmt:30,vignette:20}),
+ D("n14","N14 Trong","nikon","faded pastel","Cảm hứng từ Pure: phai, nhạt màu, sạch.",{exposure:10,contrast:-15,fade:25,saturation:-30}),
+ D("n15","N15 Denim","nikon","cool mono","Cảm hứng từ Denim: gần đơn sắc, phủ xanh vải jean.",{contrast:10,bw:70,shHue:215,shAmt:55,hiHue:205,hiAmt:25}),
+ D("n16","N16 Đồ chơi","nikon","faded","Cảm hứng từ Toy: màu phai, tối góc nặng như máy ảnh đồ chơi.",{contrast:15,fade:20,temp:8,saturation:-15,grain:20,grainSize:40,vignette:70}),
+ D("n17","N17 Than","nikon","mono grainy","Cảm hứng từ Charcoal: đen trắng mềm, hạt thô như vẽ than.",{bw:100,contrast:-5,fade:15,grain:55,grainSize:55}),
+ D("n18","N18 Chì","nikon","mono contrast","Cảm hứng từ Graphite: đen trắng tương phản mạnh.",{bw:100,contrast:55,shadows:-20,grain:20,grainSize:30}),
+ D("n19","N19 Nhị phân","nikon","mono contrast","Cảm hứng từ Binary: gần như chỉ còn đen và trắng.",{exposure:5,bw:100,contrast:100,highlights:20,shadows:-50}),
+ /* Leica */
+ D("l1","L1 Chuẩn","leica","natural","Cảm hứng từ Leica Standard: đen sâu, màu cân bằng, tương phản vi mô rõ.",{contrast:15,shadows:-8,saturation:8,vignette:8}),
+ D("l2","L2 Tự nhiên","leica","natural","Cảm hứng từ Leica Natural: trung thực, nhẹ nhàng.",{contrast:8,shadows:-5,saturation:-5,vignette:6}),
+ D("l3","L3 Rực","leica","vivid","Cảm hứng từ Leica Vivid: màu đậm, đen sâu.",{contrast:25,shadows:-10,saturation:28,vibrance:10,vignette:10}),
+ D("l4","L4 Chrome","leica","contrast faded","Cảm hứng từ Leica Chrome: tinh tế, màu hơi trầm, khó nhận ra là đã chỉnh.",{contrast:18,shadows:-12,saturation:-18,temp:3,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,0,0]),
+ D("l5","L5 Cổ điển","leica","warm contrast","Cảm hứng từ Leica Classic: như film âm bản màu, đỏ đậm nhưng không gắt.",
+  {contrast:20,highlights:-10,shadows:-10,fade:6,temp:6,saturation:5,shHue:190,shAmt:15,hiHue:40,hiAmt:15,grain:15,grainSize:30,vignette:12},[0.06,-0.03,0,0,0,0,0,0,0]),
+ D("l6","L6 Đương đại","leica","cool natural","Cảm hứng từ Leica Contemporary: sạch, hiện đại, hơi lạnh.",{contrast:12,highlights:-15,temp:-8,saturation:-10,vibrance:10,shHue:205,shAmt:15}),
+ D("l7","L7 Vĩnh cửu","leica","atmo faded","Cảm hứng từ Leica Eternal: điện ảnh, ít màu, bóng ngả xanh, vùng sáng ấm.",
+  {contrast:-10,highlights:-20,shadows:5,fade:10,temp:8,saturation:-25,shHue:185,shAmt:25,hiHue:35,hiAmt:20,grain:12,grainSize:30}),
+ D("l8","L8 Đồng thau","leica","warm","Cảm hứng từ Leica Brass: ấm áp, hợp nhiều chủ đề.",{contrast:12,temp:22,tint:4,saturation:-5,shHue:30,shAmt:15,hiHue:40,hiAmt:30}),
+ D("l9","L9 Mòng két","leica","cool atmo","Cảm hứng từ Leica Teal: bóng xanh mòng két, vùng sáng ấm, hợp cảnh tối và đèn flash.",
+  {contrast:20,shadows:-10,temp:-10,saturation:-5,shHue:182,shAmt:50,hiHue:32,hiAmt:30,vignette:15}),
+ D("l10","L10 Cine","leica","atmo","Cảm hứng từ Leica Cine: tông điện ảnh, vùng sáng mềm, quầng nhẹ.",
+  {contrast:15,highlights:-25,shadows:-5,fade:8,saturation:-15,shHue:195,shAmt:30,hiHue:35,hiAmt:25,grain:18,grainSize:30,halation:10,vignette:15}),
+ D("l11","L11 Bạc","leica","faded cool","Cảm hứng từ Leica Silver: gần như hết màu, ánh bạc lạnh.",{contrast:10,highlights:-10,fade:10,saturation:-45,temp:-6}),
+ D("l12","L12 Mono","leica","mono","Cảm hứng từ Leica Monochrome: đen trắng sạch, đen sâu.",{bw:100,contrast:20,shadows:-10,grain:10,grainSize:20,vignette:10}),
+ D("l13","L13 Mono HC","leica","mono contrast","Cảm hứng từ Leica Monochrome High Contrast: đen trắng gắt, đen đặc.",{bw:100,contrast:60,highlights:10,shadows:-30,grain:12,grainSize:25,vignette:15}),
+ D("l14","L14 Xanh lam","leica","mono cool","Cảm hứng từ Leica Blue: đen trắng phủ xanh lam.",{bw:100,contrast:15,shHue:220,shAmt:45,hiHue:210,hiAmt:20}),
  /* Film màu cổ điển */
  D("gold200","Gold 200","color","warm natural","Film thường ngày giá bình dân: vàng óng, ấm, hợp nắng chiều.",
   {exposure:8,contrast:12,highlights:-15,shadows:10,fade:10,temp:28,tint:4,saturation:15,vibrance:10,shHue:30,shAmt:15,hiHue:45,hiAmt:25,grain:25,grainSize:35,halation:10,bloom:10,vignette:15}),
