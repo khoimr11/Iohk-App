@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ánh Bạc</title>
+<title>IOHK Film Lab</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ánh Bạc">
+<meta name="apple-mobile-web-app-title" content="IOHK">
 <meta name="theme-color" content="#0c0d0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,9 +101,10 @@ body.no-lib .lib{transform:translateX(calc(-100% - 24px));opacity:0;pointer-even
 body.no-insp .insp{transform:translateX(calc(100% + 24px));opacity:0;pointer-events:none}
 .phead{padding:16px 16px 10px;display:flex;flex-direction:column;gap:10px}
 .brand{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.wm{display:flex;flex-direction:column;line-height:1}
-.wm-name{font-family:var(--font-brand);font-weight:600;font-size:23px;letter-spacing:.02em}
-.wm-sub{font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.wm{display:flex;flex-direction:column;line-height:1;padding:2px 0 2px 2px}
+.wm-name{font-family:var(--font-brand);font-weight:500;font-size:30px;letter-spacing:.16em;display:flex;align-items:center}
+.wm-o{width:.74em;height:.74em;margin:0 .16em 0 .02em;display:block}
+.wm-sub{font-size:9.5px;font-weight:600;letter-spacing:.5em;text-transform:uppercase;color:var(--faint);margin-top:7px;padding-left:2px}
 .logo{width:40px;height:40px;border-radius:11px;display:block;flex:none;box-shadow:0 4px 14px rgba(0,0,0,.45)}
 .logo.sm{width:36px;height:36px;border-radius:18px;margin:0 4px 0 2px}
 .ptitle{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
@@ -276,7 +277,7 @@ body.mob .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 
 <aside class="panel lib glass d-only" aria-label="Thư viện preset">
   <div class="phead">
-    <div class="brand"><img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSIwLjM1IiBjeT0iMC4yOCIgcj0iMC45NSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjYyZCIvPjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMTIxNDE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwYjBkIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE0IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjEwNCIgZmlsbD0idXJsKCNhZykiIG1hc2s9InVybCgjY3V0KSIvPgogIDxjaXJjbGUgY3g9IjM0NiIgY3k9IjE3MCIgcj0iMTMiIGZpbGw9IiNmMmEzM2EiLz4KPC9zdmc+Cg==" alt="" width="40" height="40"><div class="wm"><span class="wm-name">Ánh Bạc</span><span class="wm-sub">Film Lab</span></div></div>
+    <div class="brand" role="img" aria-label="IOHK Film Lab"><div class="wm"><span class="wm-name" aria-hidden="true">I<img class="wm-o" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ijg4IDg4IDMzNiAzMzYiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjE0Ii8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxMDQiIGZpbGw9InVybCgjYWcpIiBtYXNrPSJ1cmwoI2N1dCkiLz4KICA8Y2lyY2xlIGN4PSIzNDYiIGN5PSIxNzAiIHI9IjE2IiBmaWxsPSIjZjJhMzNhIi8+Cjwvc3ZnPgo=" alt="">HK</span><span class="wm-sub" aria-hidden="true">Film Lab</span></div></div>
     <div class="ptitle"><h2>Thư viện preset</h2><span id="libCount"></span></div>
     <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Tìm preset, ví dụ: neon, sepia" autocomplete="off" aria-label="Tìm preset"></label>
     <div class="chips" id="moodChips" role="group" aria-label="Lọc theo cảm xúc"></div>
@@ -303,7 +304,7 @@ body.mob .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   </header>
 
   <header class="mtop glass m-only" aria-label="Thanh công cụ">
-    <img class="logo sm" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSIwLjM1IiBjeT0iMC4yOCIgcj0iMC45NSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjYyZCIvPjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMTIxNDE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwYjBkIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE0IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjEwNCIgZmlsbD0idXJsKCNhZykiIG1hc2s9InVybCgjY3V0KSIvPgogIDxjaXJjbGUgY3g9IjM0NiIgY3k9IjE3MCIgcj0iMTMiIGZpbGw9IiNmMmEzM2EiLz4KPC9zdmc+Cg==" alt="Ánh Bạc" width="36" height="36">
+    <img class="logo sm" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSIwLjM1IiBjeT0iMC4yOCIgcj0iMC45NSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjYyZCIvPjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMTIxNDE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwYjBkIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE0IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjEwNCIgZmlsbD0idXJsKCNhZykiIG1hc2s9InVybCgjY3V0KSIvPgogIDxjaXJjbGUgY3g9IjM0NiIgY3k9IjE3MCIgcj0iMTMiIGZpbGw9IiNmMmEzM2EiLz4KPC9zdmc+Cg==" alt="IOHK Film Lab" width="36" height="36">
     <button class="ib" id="mOpen" type="button" aria-label="Mở ảnh"><svg class="i"><use href="#i-open"/></svg></button>
     <button class="ib" id="mUndo" type="button" aria-label="Hoàn tác"><svg class="i"><use href="#i-undo"/></svg></button>
     <button class="ib" id="mRedo" type="button" aria-label="Làm lại"><svg class="i"><use href="#i-redo"/></svg></button>
@@ -1162,7 +1163,7 @@ async function exportImage(){
     render(tex,fw,fh,e);const out=document.createElement("canvas");out.width=fw;out.height=fh;const o=out.getContext("2d");o.drawImage(glc,0,0);
     if(e.date>0.5)drawStamp(o,fw,fh,e.date);gl.deleteTexture(tex);draw();
     const blob=await new Promise(r=>out.toBlob(r,"image/jpeg",0.93));if(!blob)throw new Error("encode");
-    const name="anhbac-"+norm(findPreset(state.presetId).name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+".jpg";
+    const name="iohk-"+norm(findPreset(state.presetId).name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+".jpg";
     const dl=await getDownloads();
     if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+fw+"×"+fh);}catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}return;}
     const file=new File([blob],name,{type:"image/jpeg"});
