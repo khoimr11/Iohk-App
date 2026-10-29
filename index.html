@@ -43,6 +43,7 @@ img{max-width:100%}
   color-scheme:dark;
 }
 @media (max-width:1240px){:root{--libw:256px;--inspw:300px}}
+[hidden]{display:none!important}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 button,input{font:inherit;color:inherit}
@@ -664,6 +665,308 @@ const GROUPS = [
  {id:"digital",tab:"fx",title:"Máy số đời đầu",items:[["lofi","Độ phân giải thấp",0,100],["chroma","Nhiễu màu",0,100]]},
 ];
 
+/* ---------- VSCO-inspired presets (approximations; codes follow VSCO's official preset guide) ---------- */
+(function(){
+const SER={
+ LG:["vsco","Legacy","bộ màu gốc thời VSCO Cam 2012, đơn giản, bền"],
+ AR:["vsco","Archetype","pastel nhẹ, nâng trung tông, hơi dư sáng; hợp chân dung, nội thất, đồ ăn"],
+ AE:["vsco","Aesthetic","màu tự nhiên, lệch màu tinh tế, phai nhẹ"],
+ AN:["vsco","Analog","chất film analog phai và ấm"],
+ BC:["vsco","B&W Classic","đen trắng tinh tế, giữ chi tiết vùng tối"],
+ BM:["vsco","B&W Moody","đen trắng tương phản cao, u buồn; hợp chân dung"],
+ CV:["vsco","Vibrant Classic","tăng màu có kiểm soát, đa dụng"],
+ CC:["vsco","Chromatic","màu film giữa thế kỷ 20: màu cơ bản đậm, màu trung tính trầm"],
+ ES:["vsco","Essence","vùng sáng vàng óng, bóng đổ sâu"],
+ ME:["vsco","Mellow","nhạt màu, nhẹ nhàng, da đẹp; cho khoảnh khắc thường ngày"],
+ PO:["vsco","Portrait","chân dung tươi, da đều màu"],
+ PS:["vsco","Portrait","chân dung cho nhiều bối cảnh, sắc ấm, lạnh hoặc trung tính"],
+ PC:["vsco","Polychrome","đa dụng, phớt hồng, vàng hoặc tím"],
+ MI:["vsco","Minimalist","tĩnh lặng; hợp chân dung, kiến trúc"],
+ KC:["vsco","Analog Classic","tươi, rực, cảm hứng từ film Kodachrome"],
+ MU:["vsco","Mood","hơi thiếu sáng, phai nhẹ, tông nâu và xanh lá cho thiên nhiên"],
+ SF:["vsco","Subtle Fade","nhạt màu, êm, tông vintage thập niên 70"],
+ NM:["vsco","New Modern","đậm, hiện đại; hợp đèn flash hoặc nắng gắt"],
+ IW:["vsco","Instant + Warm","ảnh lấy liền ấm, mịn như kem"],
+ IC:["vsco","Instant + Cool","ảnh lấy liền lạnh, phai xanh"],
+ IK:["vsco","Instant Classic","ảnh lấy liền cổ điển ngả vàng hoặc xanh"],
+ AY:["vsco","Alchemy","kiểu tráng chéo: lệch màu mạnh, tương phản cao"],
+ BR:["vsco","Bright + Clean","sáng, sạch, da đẹp"],
+ BW:["vsco","Bright + Warm","sáng ấm mùa hè, tông cam vàng"],
+ HF:["vsco","Heavy Fade","phai đậm, sắc màu kịch tính cho cảnh tối"],
+ UR:["vsco","Urban","đời sống thành phố, mọi thời tiết"],
+ LC:["vsco","Low-Contrast","tương phản thấp, dải tông rộng, màu trầm"],
+ XF:["vsco","B&W Fade","đen trắng phai đậm, xám, kịch tính"],
+ FX:["vscofilm","Film X","mô phỏng film"],
+ CG:["vscolab","Color Grading","chỉnh màu kiểu điện ảnh"],
+ IR:["vscolab","Infrared","hiệu ứng hồng ngoại"],
+ AL:["vscolab","Artificial Light","xử lý ánh sáng nhân tạo: LED, huỳnh quang, đèn hỗn hợp"],
+ LS:["vscolab","Landscape","phong cảnh thiên nhiên"],
+ CO:["vscolab","Bộ cộng tác","bộ màu từ các chiến dịch cộng tác"],
+ WE:["vscolab","We The Creators","bộ màu cộng tác với nhiếp ảnh gia, chất analog"]
+};
+const MIX={red:[0.06,-0.03,0,0,0,0,0,-0.02,0.05],vivid:[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05],cyan:[0,0,0,0,0,0.03,0,0.06,-0.02],green:[0,0,0,0,0.04,0,0,0,0],
+ cross:[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1],q2:[-0.05,0.08,0,0,0,0.06,0.06,0,-0.08],q3:[0.08,0,0,-0.04,0.06,0,0,0.06,-0.12],
+ irp:[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0],irp2:[-0.2,0.5,0,0.25,-0.3,0.05,0,0,0],irw:[-0.3,0.9,0,-0.3,0.9,0,-0.3,0.9,0],irb:[0,0.25,0,0,-0.15,0,0,0.8,-0.1],irb2:[0,0.15,0,0,-0.1,0,0,0.5,-0.05],
+ d1:[-0.3,0.3,0,0,-0.3,0.3,0.3,0,-0.3],d2:[-0.2,0,0.2,0.2,-0.2,0,0,0.2,-0.2]};
+const K={e:"exposure",c:"contrast",h:"highlights",s:"shadows",f:"fade",t:"temp",n:"tint",sa:"saturation",v:"vibrance",bw:"bw",du:"duo",ha:"halation",bl:"bloom",lk:"leak",ab:"aberration",vg:"vignette",lo:"lofi",ch:"chroma"};
+const DATA=`01 LG bw100 c8 g10:30
+02 LG bw100 c30 s-10 g15:30
+03 LG bw100 f25 c-5 g20:35
+04 LG t10 f10 sa-5 hi40:15
+05 LG t-12 sh210:20 sa-8
+06 LG n-12 sh170:25 f8
+07 LG n12 hi340:20 f10 e5
+08 LG c30 sa10 vg15
+09 LG t15 f22 sa-15 hi35:20
+10 LG sa25 v15 c12
+A1 AR e15 c-10 s15 f12 t4 sa-5 hi40:10
+A2 AR e14 c-12 s15 f14 n8 sa-8 hi340:15
+A3 AR e12 c-10 s12 f14 t-8 sa-10 sh190:20
+A4 AE f12 t8 sa-10 c5 sh30:12 hi50:10
+A5 AE f12 t-3 n-5 sa-12 sh170:12
+A6 AN f25 t15 n6 sa-15 hi30:20 e5
+A7 AN f20 t-8 sa-20 sh200:20 e6
+A8 AN f15 t8 n10 sa-5 hi10:25 c8
+A9 AN f18 n-12 sa-15 sh160:25
+A10 AN e10 f15 c-8 sa-18
+B1 BC bw100 c10 s5
+B2 BC bw100 c20
+B3 BC bw100 c5 e8 f5
+B4 BM bw100 c40 e-8
+B5 BM bw100 c50 s-20
+B6 BM bw100 c35 vg25 f5
+C1 CV sa25 c15 v10
+C2 CV sa20 t8 c10
+C3 CV sa20 v20 n5
+C4 CC sa15 xred c12 hi45:10
+C5 CC sa10 t-6 c10 xred
+C6 CC n-8 sa12 xgreen c10
+C7 CC t5 sh210:25 hi35:20 sa10 c10
+C8 CC n12 sa15 hi330:15 c10
+C9 CC f15 sa5 xred c5
+E1 ES t12 hi40:30 s-10 c15 g15:30
+E2 ES t20 hi38:35 s-8 c12 g15:30
+E3 ES t10 n-10 hi45:25 s-10 c12 g15:30
+E4 ES t10 n10 hi30:30 s-10 c12 g15:30
+E5 ES t12 hi40:30 s-18 c25 g15:30
+E6 ES t12 hi40:25 f15 c8 g18:30
+E7 ES t12 hi40:30 sa15 c15 g15:30
+E8 ES t8 hi40:25 sh210:25 c15 g15:30
+F1 ME sa-25 f10 c-5
+F2 ME sa-22 f15 e10 c-8
+F3 ME sa-22 f10 t10
+G1 PO t15 n-5 v10 e5
+G2 PO e8 v15 c5
+G3 PO n6 v20 e6 c5
+G4 PS t12 v10 e5 f5
+G5 PS t-10 v10 e5
+G6 PS n-10 t8 v15 sa5 hi60:15
+G7 PS t10 f15 sa-10 e6
+G8 PS t-8 f15 sa-10 e6
+G9 PS e18 c-10 s10 sa-5
+H1 PC hi340:25 f8 e5
+H2 PC hi55:25 f8 e5
+H3 PC sh270:25 f8
+H4 PC hi340:25 c15
+H5 PC hi50:25 f18 sa-10
+H6 PC sh275:30 sa15 c10
+J1 MI c-12 sa-15 f8
+J2 MI c-12 sa-15 t-10 f8
+J3 MI c-12 sa-15 t10 f8
+J4 MI e12 c-15 f15 sa-20
+J5 MI c-10 sa-15 n-10 sh160:15
+J6 MI c-10 sa-15 n10 hi340:15
+K1 KC c25 sa25 xred s-5
+K2 KC c22 sa22 t10 xred
+K3 KC c32 sa25 s-12 xred
+M1 MU e-12 f12 sa-10 t8 sh30:20
+M2 MU e-12 f12 sa-10 n-10 sh150:20
+M3 MU e-10 f12 sa-12 sh180:15
+M4 SF f20 sa-25 t8
+M5 SF e6 t10 n5 sa-20 f15 hi25:15
+M6 SF f20 sa-25 t-6 sh200:15
+N1 NM c25 s-15 sa20
+N2 NM c25 s-12 sa15 t-10
+N3 NM c25 s-12 sa15 t12
+P1 IW e10 f20 t15 c-10 hi40:25
+P2 IW e12 f22 t18 n5 c-12 hi35:25
+P3 IW e8 f18 t12 c-8 hi45:20 sa-10
+P4 IC f22 t-15 sh200:30 c-10 e5
+P5 IC f20 t-12 c-15 sh210:30 sa-10
+P6 IC f25 t-18 sh190:35 e8
+P7 IK f15 t10 hi55:30 c5
+P8 IK f15 t-10 sh210:30 c5
+P9 IK f15 n-8 hi65:25 sh170:15
+Q1 AY c30 sa15 xcross sh180:30
+Q2 AY c30 sa10 xq2 hi60:20
+Q3 AY c28 sa15 xq3 sh220:25
+Q4 AY c32 sa10 n15 sh280:25 hi50:20
+Q5 AY c30 sa20 xcross hi30:25 t10
+Q6 AY c30 sa5 n-20 sh160:30 hi60:25
+Q7 AY c35 sa15 xq2 t-10
+Q8 AY c30 sa15 sh300:30 hi45:30
+Q9 AY c28 sa10 xq3 f8
+Q10 AY c35 sa20 t15 sh200:35 hi20:20
+S1 BR e12 c-5 sa-5 n3
+S2 BR e15 c-8 sa-8 f5
+S3 BR e10 c-3 sa-3 t-5
+S4 BW e10 t20 hi35:25
+S5 BW e12 t25 hi40:30 sa5
+S6 BW e8 t18 hi30:25 f8
+T1 HF f35 c10 e-5 sa-15 t-6
+T2 HF f35 c10 e-5 sa-15 t10
+T3 HF f35 c10 e-5 sa-15 n-10
+U1 UR c15 sa-5
+U2 UR t-20 sh220:25 c10 e-5
+U3 UR t-10 n-10 sh180:30 f8
+U4 UR t25 c15 sh210:30 e-8 ha20
+U5 UR f18 sa-25 c5
+U6 UR n18 sa15 hi320:25 bl15
+V1 LC c-20 t-6 sa-8 e5
+V2 LC c-20 t20 g25:40
+V3 LC c-20 t12 sa-5
+V4 LC c-15 n10 hi5:30 xred
+V5 LC c-20 t12 e10
+V6 LC c-22 sa-25
+V7 LC c-18 n-10 sh150:20
+V8 LC c-25 f15 sa-10
+X1 XF bw100 f30 c15
+X2 XF bw100 f35 c15 e-8
+X3 XF bw100 f25 c10 g30:40
+X4 XF bw100 f15 e8 c-10
+X5 XF bw100 f12 e10 c-5 g15:30
+X6 XF bw100 f18 c-12 e5
+AU1 FX sa30 v15 c15 xvivid t4 #Agfa Ultra 100: màu rất đậm, xanh dương, vàng, xanh lá nổi, da ấm
+AU5 FX sa40 c30 xvivid s-10 #Agfa Ultra 50: màu dày, tương phản sâu
+AV4 FX t12 c8 s8 sa10 hi40:15 g20:35 #Agfa Vista 400: ấm, hoài niệm, trời xanh đậm hơn
+AV8 FX f25 sa-20 bl10 ha10 g25:40 #Agfa Vista 800: phai, nhạt, nhẹ nhàng
+FN16 FX bw100 e-10 c30 g45:45 #Fuji Neopan 1600: đen trắng tối, hạt rõ
+FP1 FX c-15 sa-5 h-10 e5 #Fuji 160S: tương phản thấp, màu tự nhiên
+FP2 FX c-8 sa3 h-10 e5 g8:20 #Fuji 160S: giống FP1, tương phản nhỉnh hơn
+FP4 FX e15 h-25 n-6 c-8 xcyan #Fuji Pro 400H: vùng sáng mềm, thoáng, ngả xanh mát
+FP8 FX e8 c18 sa-10 xred #Fuji Pro 800Z: sáng, tương phản, đỏ nổi
+FR4 FX n8 s15 f8 c10 sa10 g15:30 #Fuji Provia 400X: phớt hồng, bóng đổ nâng
+FS1 FX t-3 n-6 c10 g10:25 #Fuji Superia 100: tự nhiên, hơi xanh lá
+FS4 FX n-12 sh150:20 c10 g20:35 #Fuji Superia 400: xanh lá thập niên 90
+FS16 FX n-10 g50:50 c20 f8 #Fuji Superia 1600: hạt to, tương phản
+FT6 FX t-30 c15 sh210:20 #film cân bằng đèn tungsten: lạnh
+FV5 FX sa45 c30 xvivid #Fuji Velvia 50: rực, đậm
+IH5 FX bw100 c25 s-10 g30:35 #Ilford HP5: tương phản vừa, đen sâu
+KA1 FX c20 sa15 t-5 sh210:20 #Kodak Ektachrome: chất thập niên 80
+KA3 FX c22 sa22 t-8 xcyan #Kodak Ektachrome: rực, ngả cyan
+KC25 FX c30 sa25 t5 xred s-10 #Kodachrome 25: đỏ sâu, tương phản
+KCP2 FX t15 sa10 f5 g25:40 #Kodak ColorPlus 200: ấm, bình dân
+KE1 FX sa35 c20 xred #Kodak Ektar 100: rực, đỏ mạnh
+KG1 FX t15 sa15 g20:35 #Kodak Gold 100: màu đậm, ấm
+KG2 FX t25 sa12 hi40:25 g22:35 #Kodak Gold 200: vàng ấm
+KP1 FX t8 e8 c10 g18:30 #Kodak Portra 160: ấm, sáng, dịu với da
+KP2 FX t8 e8 c8 sa-10 g15:30 #Kodak Portra 160 NC: ít bão hòa
+KP3 FX t8 e8 c12 sa12 g15:30 #Kodak Portra 160 VC: tươi hơn
+KP4 FX t10 h5 s-5 g18:30 #Kodak Portra 400: ấm, đa dụng
+KP5 FX t10 sa-10 g18:30 #Kodak Portra 400 NC: nhạt màu
+KP6 FX t10 sa20 c12 g18:30 #Kodak Portra 400 UC: rất tươi
+KP7 FX t10 sa12 c6 g18:30 #Kodak Portra 400 VC: tươi
+KP8 FX t8 c18 sa10 sh210:15 g25:35 #Kodak Portra 800: ấm, tương phản vừa, ánh xanh nhẹ
+KP9 FX t8 c25 sa10 g25:35 #Kodak Portra 800 HC: tương phản cao
+KT32 FX bw100 e10 s15 c30 g70:60 #Kodak T-Max 3200: sáng, hạt rất dày
+KU1 FX t12 sa15 g20:30 #Kodak UltraMax 100: ấm, tiêu dùng
+KU4 FX t15 sa15 g25:35 #Kodak UltraMax 400: ấm, có hạt
+KU8 FX t15 c10 sa12 g40:45 #Kodak UltraMax 800: hạt to
+KX4 FX bw100 s20 c5 g40:40 #Kodak Tri-X 400: bóng đổ nâng, mềm
+CG1 CG c-15 sh210:45 hi35:35 #duotone mềm, bóng lạnh, vùng sáng ấm
+CG2 CG c15 sa15 sh210:60 hi35:50 #duotone đậm, tương phản hơn
+CG3 CG t-15 c-10 sa-10 sh220:40 hi200:15 #xanh dương tĩnh lặng
+CG4 CG c20 sa10 sh220:55 hi195:20 #xanh dương mạnh mẽ
+CG5 CG t15 sa-20 f10 sh35:20 hi40:40 #vàng trầm, hoài niệm
+CG6 CG t20 sa10 hi40:50 bl20 #vàng rực rỡ
+CG7 CG n-15 sa-10 sh150:35 #xanh lá dịu
+CG8 CG n-30 c20 sh140:55 hi80:25 #xanh lá cường độ cao
+IR1 IR xirp sa20 c15 #phong cảnh: lá cây hồng và đỏ thẫm
+IR2 IR xirp2 sa10 c10 #chân dung: lá hồng, giữ màu da
+IR3 IR xirw bw100 bl30 c15 #đen trắng, lá phát sáng
+IR4 IR xirp sa10 e8 f8 #phong cảnh hồng
+IR5 IR xirp2 e5 f5 #chân dung hồng
+IR6 IR xirb e8 t-10 #phong cảnh xanh lạnh
+IR7 IR xirb2 c10 #chân dung xanh
+AL1 AL t-25 c8 #giảm ám vàng đèn sợi đốt
+AL2 AL t15 n12 #cân lại đèn huỳnh quang
+AL3 AL c20 s-5 sa10 #cảnh đêm, tăng tương phản
+AL4 AL t-12 sh180:30 c12 #đêm ngả mòng két
+AL5 AL n15 sa15 hi320:20 bl10 #làm nổi đèn neon
+AL6 AL t10 f8 c-5 #trong nhà ấm, mềm
+L1 LS sa15 xvivid t-5 #bầu trời
+L2 LS t-10 sa12 sh190:20 #biển
+L3 LS n-12 sa15 xgreen #rừng
+L4 LS c15 t-5 sa8 h-15 #núi
+L5 LS t25 sa15 hi30:25 #sa mạc
+L6 LS e10 t-15 sa-10 #tuyết
+L7 LS t20 n10 hi20:30 sa10 #hoàng hôn
+L8 LS f25 c-15 sa-15 #sương mù
+L9 LS c15 sa-5 sh210:15 #thành phố
+L10 LS n-6 t12 sa15 #đồng cỏ
+L11 LS n-8 t-8 sh180:25 sa10 #hồ nước
+L12 LS t20 sa15 hi25:25 xred #mùa thu
+ACG CO c25 sa-10 t-10 #phố thị, thời tiết khắc nghiệt
+AGA1 CO sa20 v15 f10 sh180:25 hi340:20 #màu ngọc, pastel đậm
+AGA2 CO sa20 v15 f10 sh270:25 #ngọc tím
+AGA3 CO sa20 v15 f10 n-10 sh150:25 #ngọc lục bảo
+BBMA CO t-25 n4 sh215:30 c10 #xanh lạnh cho chân dung
+D1 CO sa20 xd1 #màu khác thường
+D2 CO sa15 xd2 c15 #màu đảo lạ
+DOG1 CO t15 sa-15 f10 hi40:20 #hổ phách trầm
+DOG2 CO t-10 sa-20 f10 sh210:20 #xám xanh
+DOG3 CO n-10 t10 sa-10 hi60:25 #vàng lục
+HB1 CO e-8 t-12 sa-15 vg20 c10 #lạnh, tối nhẹ, góc tối
+HB2 CO e-5 t-20 sa-20 vg15 c12 #rất lạnh, hợp cảnh tuyết
+HB3 CO e-10 sa-15 vg25 c15 #trung tính, tối
+IND1 CO t-30 sh230:40 #xanh chàm
+IND2 CO t-35 sh230:55 c10 #chàm đậm
+INF CO t10 sa20 v15 e6 c10 #món ăn
+JM1 CO c35 sa20 e5 #đậm, tương phản, nắng gắt
+KK1 CO sa20 t15 #rực, ấm
+KK2 CO sa15 t20 f10 #ấm, phai
+LV1 CO sa20 c15 #rực cho đường phố
+LV2 CO bw100 c20 #đen trắng cổ điển
+LV3 CO t10 sa-12 #ấm tự nhiên, nhạt nhẹ
+MTV CO sa35 v20 c15 n10 #vui, rực, retro thập niên 90
+NC CO t12 sa8 hi30:15 #đỏ, cam, vàng ấm nhẹ
+OAK1 CO c25 sa15 t8 xvivid #rõ nét, ấm
+OAK2 CO c25 sa10 t-10 #rõ nét, lạnh
+OAK3 CO c25 sa15 sh200:20 xvivid #rõ nét, cảnh nước
+OC CO sa-35 c15 e-6 vg20 #nhạt màu, u trầm
+SE1 CO e-10 c25 sa-5 f8 #tối, gai góc, retro
+SE2 CO e-10 c25 sa20 #tối, màu đậm nhất bộ
+SE3 CO e-8 c20 sa-8 f10 t6 #tối, retro
+SS1 CO sa-15 v30 #điểm màu trên nền trầm
+SS2 CO sa-20 v35 c10 #điểm màu, tương phản
+SS3 CO sa-10 v25 t8 #điểm màu ấm
+SUM1 CO t18 xred sa10 #đỏ sâu, cam cháy
+SUM2 CO t22 xred sa5 f10 #cam cháy phai
+TECH CO bw100 hi0:80 c40 #đen và đỏ
+TK CO sa-15 c20 sh215:40 hi345:30 #vùng sáng hồng, bóng xanh
+WE1 WE t10 e6 g18:30 f6 #ấm kiểu Portra
+WE2 WE t-10 f8 g18:30 #lạnh, analog
+WE3 WE n-10 sh150:20 g20:35 #xanh lá kiểu Superia
+WE4 WE t15 hi40:30 c10 g18:30 #vàng óng
+WE5 WE f18 n10 hi340:20 e6 g15:30 #hồng phai
+WE6 WE c25 s-10 sa10 g20:35 #tương phản
+WE7 WE sh185:40 hi30:30 c15 #mòng két và cam
+WE8 WE bw100 c20 g30:35 #đen trắng analog`;
+function moods(p){const m=[];if(p.bw>=80)m.push("mono");
+  const warm=p.temp>=8||(p.hiAmt>=20&&(p.hiHue<70||p.hiHue>330)),cool=p.temp<=-8||(p.shAmt>=25&&p.shHue>=170&&p.shHue<=250);
+  if(warm&&p.bw<80)m.push("warm");if(cool&&p.bw<80)m.push("cool");if(p.fade>=15)m.push("faded");if(p.saturation>=20||p.vibrance>=25)m.push("vivid");
+  if(p.contrast>=25)m.push("contrast");if(p.grain>=35)m.push("grainy");if(p.bloom>=20||p.halation>=30)m.push("atmo");
+  if(p.exposure>=8&&p.contrast<=0&&p.saturation<=0&&p.bw<80)m.push("pastel");if(!m.length)m.push("natural");return m;}
+DATA.split("\n").forEach(line=>{
+  const [spec,note]=line.split("#"),tk=spec.trim().split(/\s+/),code=tk[0],ser=SER[tk[1]],p=Object.assign({},NEUTRAL);let mix=Z9;
+  tk.slice(2).forEach(t=>{if(t[0]==="x"&&MIX[t.slice(1)]){mix=MIX[t.slice(1)];return;}const m=t.match(/^([a-z]+?)(-?\d+)(?::(-?\d+))?$/);if(!m)return;const k=m[1],a=+m[2],b=m[3]!=null?+m[3]:null;
+    if(k==="sh"){p.shHue=a;p.shAmt=b;}else if(k==="hi"){p.hiHue=a;p.hiAmt=b;}else if(k==="g"){p.grain=a;if(b!=null)p.grainSize=b;}else if(K[k])p[K[k]]=a;});
+  const desc="Mô phỏng "+code+" của VSCO ("+ser[1]+"): "+(note?note.trim():ser[2])+".";
+  PRESETS.push({id:"v_"+code,name:code,fam:ser[0],moods:moods(p),desc,params:p,mix});
+});
+FAMS.push(["vsco","VSCO Cổ điển"],["vscofilm","VSCO Film X"],["vscolab","VSCO Đặc biệt"]);
+})();
+
 /* ---------- WebGL engine ---------- */
 const glc = document.createElement("canvas");
 const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
@@ -1020,7 +1323,7 @@ function onTile(id){
   if(!desk&&id===state.presetId&&id!=="none"){const ms=$("mStrength");ms.hidden=!ms.hidden;return;}
   selectPreset(id);
 }
-function selectPreset(id){
+function selectPreset(id,auto){if(!auto)presetTouched=true;
   const p=findPreset(id);hoverId=null;state.presetId=id;state.params=Object.assign({},NEUTRAL,p.params);state.mix=(p.mix||Z9).slice();state.strength=100;
   if(id!=="none"){uses[id]=(uses[id]||0)+1;store.set("tiemphim.uses",JSON.stringify(uses));}
   document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id===id)));
@@ -1161,7 +1464,7 @@ function buildMine(){const box=$("mineList");box.innerHTML="";
 
 /* ---------- Zoom, pan, gestures ---------- */
 const stage=$("stage"),wrapEl=$("wrap");let Z=1,PX=0,PY=0;
-function applyT(){wrapEl.style.transform="translate("+PX+"px,"+PY+"px) scale("+Z+")";["tZoom"].forEach(i=>$(i).setAttribute("aria-pressed",String(Z>1)));}
+function applyT(){wrapEl.style.transform="translate("+PX+"px,"+PY+"px) scale("+Z+")";if(typeof onViewChange==="function")onViewChange();["tZoom"].forEach(i=>$(i).setAttribute("aria-pressed",String(Z>1)));}
 function clampPan(){const r=stage.getBoundingClientRect(),cw=view.clientWidth*Z,ch=view.clientHeight*Z,mx=Math.max(0,(cw-r.width)/2),my=Math.max(0,(ch-r.height)/2);
   PX=Math.max(-mx,Math.min(mx,PX));PY=Math.max(-my,Math.min(my,PY));}
 function zoomAt(nz,cx,cy){nz=Math.max(1,Math.min(6,nz));const k=nz/Z;PX=cx-(cx-PX)*k;PY=cy-(cy-PY)*k;Z=nz;if(Z<=1.001){Z=1;PX=PY=0;}clampPan();applyT();}
@@ -1295,6 +1598,7 @@ function wire(){
   });
   document.addEventListener("keyup",e=>{if(e.key==="\\")endCmp();});
   window.addEventListener("resize",()=>{clampPan();applyT();});
+  const relDrag=()=>{if(dragging){dragging=false;document.body.classList.remove("dragging");schedule();}};window.addEventListener("pointerup",relDrag);window.addEventListener("pointercancel",relDrag);window.addEventListener("blur",relDrag);
 }
 
 
@@ -1304,35 +1608,53 @@ const AI0={bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,
 const OPS=[];
 Object.assign(state,{geo:Object.assign({},GEO0),opsLen:0,overlays:[],frame:"none",ai:Object.assign({},AI0)});
 let tool=null,origPrev=null,retPrev=null,geoPrev=null,geoOrig=null,geoInfo=null,imgRect={x:0,y:0,w:1,h:1},selId=null,cropDraft=null,handMode=false;
-let retDirty=true,geoDirty=true,aiData=null,AIM=null,aiBusy=false,aiFailed=false,colorSkin=null;
+let retDirty=true,geoDirty=true,aiData=null,AIM=null,aiBusy=false,aiFailed=false,act=null;
 const bboxes=new Map();
-const brush={beauty:"smooth",reshape:"push",blur:"mosaic",size:30,strength:60,lip:"#c2334d",color:"#ffffff",pen:"pen",penSize:12};
+const brush={beauty:"heal",reshape:"push",blur:"mosaic",size:10,strength:60,lip:"#c2334d",color:"#ffffff",pen:"pen",penSize:12};
 function mk(w,h){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w));c.height=Math.max(1,Math.round(h));return {c,x:c.getContext("2d",{willReadFrequently:true})};}
 
+let presetTouched=false,RC={};
+function srcCaps(){const small=Math.min(screen.width,screen.height)<700;return small?{long:Math.min(maxTex,4096),area:16.7e6}:{long:Math.min(maxTex,8192),area:40e6};}
+function capSize(src){const c=srcCaps(),w=src.width,h=src.height;let s=Math.min(1,c.long/Math.max(w,h));if(w*h*s*s>c.area)s=Math.sqrt(c.area/(w*h));return Math.round(Math.max(w,h)*s);}
+function prevTarget(){if(!fullSrc)return 1600;const r=stage.getBoundingClientRect(),dpr=Math.min(3,window.devicePixelRatio||1),W=fullSrc.width,H=fullSrc.height;
+  const s=r.width&&r.height?Math.min(r.width/W,r.height/H):1600/Math.max(W,H),want=Math.max(W,H)*s*dpr*Math.max(1,Z)*1.05,cap=desk?4096:2560;
+  return Math.round(Math.min(Math.max(W,H),Math.max(1200,Math.min(cap,want))));}
+function setPrevRes(t){origPrev=scaled(fullSrc,t);prevSrc=origPrev;RC={};retDirty=geoDirty=true;}
+let resT=null;function ensurePrevRes(force){if(!fullSrc)return;const t=prevTarget(),cur=origPrev?Math.max(origPrev.width,origPrev.height):0;
+  if(force||t>cur*1.2||t<cur*0.66){setPrevRes(t);schedule();}}
+function onViewChange(){clearTimeout(resT);resT=setTimeout(()=>ensurePrevRes(false),280);}
 function setSource(src,sample){
   isSample=sample;
-  const small=Math.min(screen.width,screen.height)<700;
-  fullSrc=scaled(src,Math.min(maxTex,small?4096:6000));
-  origPrev=scaled(fullSrc,small?1200:1600);prevSrc=origPrev;
+  if(!sample&&!presetTouched&&state.presetId==="kowloon"){state.presetId="none";state.params=Object.assign({},NEUTRAL);state.mix=Z9.slice();state.strength=100;
+    document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id==="none")));}
+  fullSrc=scaled(src,capSize(src));srcStamp++;
+  skinBase=scaled(fullSrc,800);aiSrc=scaled(fullSrc,1280);
+  resetZoom();setPrevRes(prevTarget());
   const s=Math.min(origPrev.width,origPrev.height),t=document.createElement("canvas");t.width=t.height=128;
   t.getContext("2d").drawImage(origPrev,(origPrev.width-s)/2,(origPrev.height-s)/2,s,s,0,0,128,128);thumbSrc=t;
   if(thumbTex)gl.deleteTexture(thumbTex);thumbTex=makeTex(0,0,thumbSrc);
   OPS.length=0;state.opsLen=0;state.overlays=[];state.geo=Object.assign({},GEO0);state.ai=Object.assign({},AI0);state.frame="none";
-  aiData=null;colorSkin=null;selId=null;cropDraft=null;bboxes.clear();
+  aiData=null;aiFailed=false;selId=null;cropDraft=null;bboxes.clear();
   seed=Math.random()*100;
   $("badge").hidden=!sample;$("sizeInfo").textContent=fullSrc.width+"×"+fullSrc.height;
-  history=[];hIdx=-1;pushHistory();
-  retDirty=geoDirty=true;resetZoom();thumbCache.clear();queueAllThumbs();
+  history=[];hIdx=-1;syncAll();pushHistory();
+  thumbCache.clear();queueAllThumbs();
   if(tool==="crop")cropDraft={x:0,y:0,w:1,h:1};
   renderToolUI();draw();
+  if((tool==="beauty"||tool==="ai")&&!aiBusy)analyzeAI(true);
 }
 
-function buildRet(src){
-  const m=mk(src.width,src.height);m.x.drawImage(src,0,0);
-  applyAIFace(m.x,m.c.width,m.c.height);
-  for(let i=0;i<state.opsLen&&i<OPS.length;i++)applyOp(m.x,OPS[i],m.c.width,m.c.height);
-  applyAIBg(m.x,m.c.width,m.c.height);
-  return m.c;
+function beautyKey(){const A=state.ai;return [A.acne,A.skin,A.bright,A.eyes,A.slim,A.lips,A.lipColor,aiStamp,srcStamp].join("|");}
+function bgKey(){const A=state.ai;return [A.bg,A.bgColor,A.bgBlur,aiStamp].join("|");}
+function buildRet(src,c){
+  c=c||{};
+  if(c.src!==src||c.bKey!==beautyKey()){c.src=src;c.bKey=beautyKey();c.base=beautyStage(src);c.ops=null;c.opsArr=[];c.out=null;}
+  let n0=0;
+  if(c.ops){n0=c.opsArr.length;for(let i=0;i<n0;i++)if(i>=state.opsLen||OPS[i]!==c.opsArr[i]){c.ops=null;n0=0;break;}}
+  if(!c.ops){c.ops=c.base;c.opsArr=[];n0=0;c.out=null;}
+  if(n0<state.opsLen){if(c.ops===c.base||c.ops===src)c.ops=cloneCanvas(c.ops);for(let i=n0;i<state.opsLen;i++){applyOp(c.ops,OPS[i]);c.opsArr.push(OPS[i]);}c.out=null;}
+  const bk=bgKey();if(!c.out||c.bgK!==bk){c.out=bgStage(c.ops);c.bgK=bk;}
+  return c.out;
 }
 function applyGeo(src,g){
   const W0=src.width,H0=src.height,sw=g.rot%2?H0:W0,sh=g.rot%2?W0:H0;
@@ -1348,46 +1670,14 @@ function applyGeo(src,g){
 function outToSrc(u,v,f){const X=f.cx+u*f.cw-f.sw/2,Y=f.cy+v*f.ch-f.sh/2,c=Math.cos(-f.a),s=Math.sin(-f.a);
   let x=X*c-Y*s,y=X*s+Y*c;x/=f.s*(f.flipH?-1:1);y/=f.s*(f.flipV?-1:1);return [(x+f.W0/2)/f.W0,(y+f.H0/2)/f.H0];}
 function rebuildPrev(){
-  if(retDirty){retPrev=buildRet(origPrev);retDirty=false;geoDirty=true;}
+  if(retDirty){retPrev=buildRet(origPrev,RC);retDirty=false;geoDirty=true;}
   if(geoDirty){const g=tool==="crop"?Object.assign({},state.geo,{crop:null}):state.geo;
     const r=applyGeo(retPrev,g);geoPrev=r.canvas;geoInfo=r.info;geoOrig=applyGeo(origPrev,g).canvas;
     if(prevTex)gl.deleteTexture(prevTex);prevTex=makeTex(0,0,geoPrev);geoDirty=false;}
 }
 
-/* ---------- Retouch ops ---------- */
-function blurRegion(src,bx,by,bw,bh,rad){
-  const k=Math.max(1,rad/1.6),sw=Math.max(1,Math.round(bw/k)),sh=Math.max(1,Math.round(bh/k));
-  const a=mk(sw,sh);a.x.imageSmoothingQuality="high";a.x.drawImage(src,bx,by,bw,bh,0,0,sw,sh);
-  const m=mk(Math.max(1,Math.round(bw/Math.sqrt(k))),Math.max(1,Math.round(bh/Math.sqrt(k))));m.x.imageSmoothingQuality="high";m.x.drawImage(a.c,0,0,m.c.width,m.c.height);
-  const b=mk(bw,bh);b.x.imageSmoothingQuality="high";b.x.drawImage(m.c,0,0,bw,bh);return b.c;
-}
-function effectFor(kind,canvas,bx,by,bw,bh,r,op){
-  if(kind==="smooth")return blurRegion(canvas,bx,by,bw,bh,r*0.22);
-  if(kind==="heal")return blurRegion(canvas,bx,by,bw,bh,r*1.1);
-  if(kind==="blur")return blurRegion(canvas,bx,by,bw,bh,r*0.45);
-  if(kind==="mosaic"){const cell=Math.max(3,r*0.32),sw=Math.max(1,Math.round(bw/cell)),sh=Math.max(1,Math.round(bh/cell));
-    const a=mk(sw,sh);a.x.drawImage(canvas,bx,by,bw,bh,0,0,sw,sh);const b=mk(bw,bh);b.x.imageSmoothingEnabled=false;b.x.drawImage(a.c,0,0,bw,bh);return b.c;}
-  const e=mk(bw,bh);e.x.drawImage(canvas,bx,by,bw,bh,0,0,bw,bh);
-  if(kind==="teeth"){const d=e.x.getImageData(0,0,bw,bh),p=d.data;for(let i=0;i<p.length;i+=4){const l=(p[i]*0.3+p[i+1]*0.59+p[i+2]*0.11);
-      p[i]=Math.min(255,(p[i]*0.35+l*0.65)*1.14);p[i+1]=Math.min(255,(p[i+1]*0.35+l*0.65)*1.15);p[i+2]=Math.min(255,(p[i+2]*0.35+l*0.65)*1.2+6);}e.x.putImageData(d,0,0);}
-  else if(kind==="lips"){e.x.globalCompositeOperation="color";e.x.fillStyle=op.c||"#c2334d";e.x.fillRect(0,0,bw,bh);e.x.globalCompositeOperation="source-over";}
-  return e.c;
-}
+/* ---------- Live preview helpers (final result is rebuilt from ops) ---------- */
 const MASKK=new Set(["smooth","heal","blur","mosaic","teeth","lips"]);
-function segDabs(a,b,r,first){const out=[];const d=Math.hypot(b[0]-a[0],b[1]-a[1]),step=Math.max(1,r*0.3),n=Math.max(1,Math.ceil(d/step));
-  for(let i=first?0:1;i<=n;i++){const t=i/n;out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);}return out;}
-function maskedApply(x,dabs,r,kind,op){
-  const W=x.canvas.width,H=x.canvas.height;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
-  dabs.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
-  const pad=r*(kind==="heal"?2.4:1.6)+4,bx=Math.max(0,Math.floor(x0-pad)),by=Math.max(0,Math.floor(y0-pad)),bw=Math.min(W,Math.ceil(x1+pad))-bx,bh=Math.min(H,Math.ceil(y1+pad))-by;
-  if(bw<2||bh<2)return;
-  const e=effectFor(kind,x.canvas,bx,by,bw,bh,r,op),m=mk(bw,bh);
-  dabs.forEach(p=>{const g=m.x.createRadialGradient(p[0]-bx,p[1]-by,0,p[0]-bx,p[1]-by,r);
-    g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(kind==="mosaic"?0.85:0.55,"rgba(255,255,255,.85)");g.addColorStop(1,"rgba(255,255,255,0)");
-    m.x.fillStyle=g;m.x.beginPath();m.x.arc(p[0]-bx,p[1]-by,r,0,Math.PI*2);m.x.fill();});
-  const ex=e.getContext("2d");ex.globalCompositeOperation="destination-in";ex.drawImage(m.c,0,0);
-  x.save();x.globalAlpha=Math.max(0,Math.min(1,op.s*(kind==="lips"?0.75:kind==="mosaic"?1:0.95)));x.drawImage(e,bx,by);x.restore();
-}
 function warp(x,cx,cy,r,fn){
   const W=x.canvas.width,H=x.canvas.height,bx=Math.max(0,Math.floor(cx-r-2)),by=Math.max(0,Math.floor(cy-r-2)),bw=Math.min(W,Math.ceil(cx+r+2))-bx,bh=Math.min(H,Math.ceil(cy+r+2))-by;
   if(bw<3||bh<3)return;const img=x.getImageData(bx,by,bw,bh),d=img.data,src=new Uint8ClampedArray(d),r2=r*r;
@@ -1400,93 +1690,40 @@ function warp(x,cx,cy,r,fn){
 function pushWarp(x,p0,p1,r,s){const ddx=p1[0]-p0[0],ddy=p1[1]-p0[1];if(!ddx&&!ddy)return;
   warp(x,p1[0],p1[1],r,(dx,dy,t2)=>{const f=(1-t2)*(1-t2)*s;return [dx-ddx*f,dy-ddy*f];});}
 function radialWarp(x,c,r,s,bloat){warp(x,c[0],c[1],r,(dx,dy,t2)=>{const f=(1-t2)*(1-t2)*s;const k=bloat?1-f*0.5:1+f*0.4;return [dx*k,dy*k];});}
-function applyOp(x,op,W,H){
-  const pts=[];for(let i=0;i<op.p.length;i+=2)pts.push([op.p[i]*W,op.p[i+1]*H]);const r=Math.max(1,op.r*W);
-  if(MASKK.has(op.k)){for(let i=0;i<pts.length;i++)maskedApply(x,i===0?[pts[0]]:segDabs(pts[i-1],pts[i],r,false),r,op.k,op);}
-  else if(op.k==="push"){for(let i=1;i<pts.length;i++)pushWarp(x,pts[i-1],pts[i],r,op.s);}
-  else if(op.k==="bloat"||op.k==="pinch"){pts.forEach(p=>radialWarp(x,p,r,op.s*0.6,op.k==="bloat"));}
-}
 
 /* ---------- AI (MediaPipe, loaded on demand) ---------- */
 const MP="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35";
-const SEG_URL="https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite";
-const FACE_URL="https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task";
+const SEG_URLS=["https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite"];
+const FACE_URLS=["models/face_landmarker.task","https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"];
+async function tryCreate(fn,urls){let err;for(const u of urls){try{return await fn(u);}catch(e){err=e;}}throw err;}
 async function loadAI(){
   if(AIM)return AIM;
-  const m=await import(MP+"/vision_bundle.mjs");const fs=await m.FilesetResolver.forVisionTasks(MP+"/wasm");
-  const seg=await m.ImageSegmenter.createFromOptions(fs,{baseOptions:{modelAssetPath:SEG_URL,delegate:"CPU"},runningMode:"IMAGE",outputConfidenceMasks:true,outputCategoryMask:false});
-  const face=await m.FaceLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:FACE_URL,delegate:"CPU"},runningMode:"IMAGE",numFaces:6});
+  const m=await import(MP+"/vision_bundle.mjs");const fs=await m.FilesetResolver.forVisionTasks(MP+"/wasm");let face=null,seg=null;
+  try{face=await tryCreate(u=>m.FaceLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:u,delegate:"CPU"},runningMode:"IMAGE",numFaces:6}),FACE_URLS);}catch(e){if(window.console)console.warn(e);}
+  try{seg=await tryCreate(u=>m.ImageSegmenter.createFromOptions(fs,{baseOptions:{modelAssetPath:u,delegate:"CPU"},runningMode:"IMAGE",outputConfidenceMasks:true,outputCategoryMask:false}),SEG_URLS);}catch(e){if(window.console)console.warn(e);}
+  if(!face&&!seg)throw new Error("no AI models");
   AIM={seg,face};return AIM;
 }
 function maskCanvas(arr,w,h,fn){const m=mk(w,h),d=m.x.createImageData(w,h),p=d.data;for(let i=0;i<w*h;i++){p[i*4]=p[i*4+1]=p[i*4+2]=255;p[i*4+3]=Math.round(255*fn(i));}m.x.putImageData(d,0,0);return m.c;}
 const sstep=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
 async function analyzeAI(silent){
-  if(aiBusy||!origPrev)return;aiBusy=true;renderToolUI();
+  if(aiBusy||!aiSrc)return;aiBusy=true;const stamp=srcStamp;renderToolUI();
   try{
-    const a=await loadAI();let res=null;
-    a.seg.segment(origPrev,r=>{const cm=r.confidenceMasks;if(!cm||!cm.length)return;const w=cm[0].width,h=cm[0].height;
-      const bg=new Float32Array(cm[0].getAsFloat32Array()),body=cm[2]?new Float32Array(cm[2].getAsFloat32Array()):null,face=cm[3]?new Float32Array(cm[3].getAsFloat32Array()):null;res={w,h,bg,body,face};});
-    if(!res)throw new Error("seg");
-    const bgC=maskCanvas(res.bg,res.w,res.h,i=>sstep(0.3,0.7,res.bg[i]));
-    const skinC=maskCanvas(res.bg,res.w,res.h,i=>Math.min(1,(res.face?res.face[i]:0)+(res.body?res.body[i]:0)));
-    const fr=a.face.detect(origPrev);aiData={bgC,skinC,faces:(fr&&fr.faceLandmarks)||[]};
-    aiFailed=false;retDirty=true;if(!silent)toast(aiData.faces.length?"Đã nhận diện "+aiData.faces.length+" khuôn mặt":"Không thấy khuôn mặt; vẫn dùng được phần nền");
+    const a=await loadAI();let res=null,faces=[];
+    if(a.seg)a.seg.segment(aiSrc,r=>{const cm=r.confidenceMasks;if(!cm||!cm.length)return;const w=cm[0].width,h=cm[0].height,n=w*h;let bg,skin=null;
+      if(cm.length>=4){bg=new Float32Array(cm[0].getAsFloat32Array());const body=cm[2].getAsFloat32Array(),face=cm[3].getAsFloat32Array();skin=new Float32Array(n);for(let i=0;i<n;i++)skin[i]=Math.min(1,body[i]+face[i]);}
+      else{const p=cm[0].getAsFloat32Array();bg=new Float32Array(n);for(let i=0;i<n;i++)bg[i]=1-p[i];}
+      res={w,h,bg,skin};});
+    if(a.face){const fr=a.face.detect(aiSrc);faces=(fr&&fr.faceLandmarks)||[];}
+    if(stamp!==srcStamp)return;
+    aiData={w:res?res.w:1,h:res?res.h:1,bg:res?res.bg:null,skin:res?res.skin:null,faces};aiStamp++;
+    if(state.ai.level>0)setLevel(state.ai.level);
+    aiFailed=false;retDirty=true;if(!silent)toast(faces.length?"Đã nhận diện "+faces.length+" khuôn mặt":"Không thấy khuôn mặt; vẫn dùng được phần nền");
   }catch(err){aiData=null;aiFailed=true;if(!silent)toast("Không tải được AI. Tính năng này cần bản web GitHub và mạng internet.");if(window.console)console.warn(err);}
   finally{aiBusy=false;renderToolUI();schedule();}
 }
 const LIP_OUT=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185],LIP_IN=[78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,13,82,81,80,191];
 const JAW_L=[132,58,172,136,150,149],JAW_R=[361,288,397,365,379,378];
-function skinMaskCanvas(){
-  if(aiData)return aiData.skinC;
-  if(!colorSkin&&origPrev){const s=scaled(origPrev,800),d=s.getContext("2d",{willReadFrequently:true}).getImageData(0,0,s.width,s.height).data,n=s.width*s.height,a=new Float32Array(n);
-    for(let i=0;i<n;i++){const r=d[i*4],g=d[i*4+1],b=d[i*4+2],y=0.299*r+0.587*g+0.114*b,cb=128-0.1687*r-0.3313*g+0.5*b,cr=128+0.5*r-0.4187*g-0.0813*b;
-      a[i]=y>45&&r>g&&r>b?sstep(0,1,Math.min((cb-74)/6,(130-cb)/6))*sstep(0,1,Math.min((cr-132)/5,(176-cr)/5)):0;}
-    const m=maskCanvas(a,s.width,s.height,i=>a[i]);colorSkin=blurRegion(m,0,0,m.width,m.height,3);}
-  return colorSkin;
-}
-function autoAcne(x,W,H,mask,amt){
-  const s=Math.min(1,1800/Math.max(W,H)),w=Math.max(1,Math.round(W*s)),h=Math.max(1,Math.round(H*s));
-  const sm=mk(w,h);sm.x.drawImage(x.canvas,0,0,w,h);const I=sm.x.getImageData(0,0,w,h).data;
-  const B=blurRegion(sm.c,0,0,w,h,Math.max(2,w*0.009)).getContext("2d").getImageData(0,0,w,h).data;
-  const mm=mk(w,h);mm.x.drawImage(mask,0,0,w,h);const M=mm.x.getImageData(0,0,w,h).data;
-  const out=mm.x.createImageData(w,h),o=out.data,t0=15-amt*7;
-  for(let i=0;i<w*h;i++){const k=i*4,li=I[k]*0.3+I[k+1]*0.59+I[k+2]*0.11,lb=B[k]*0.3+B[k+1]*0.59+B[k+2]*0.11,red=(I[k]-I[k+1])-(B[k]-B[k+1]);
-    const sc=Math.max(lb-li,red*0.7),a=Math.max(0,Math.min(1,(sc-t0)/10))*(M[k+3]/255);o[k]=o[k+1]=o[k+2]=255;o[k+3]=a*255;}
-  const sp=mk(w,h);sp.x.putImageData(out,0,0);
-  const grow=blurRegion(sp.c,0,0,w,h,Math.max(2,w*0.004)),gd=grow.getContext("2d"),gi=gd.getImageData(0,0,w,h);
-  for(let k=3;k<gi.data.length;k+=4)gi.data[k]=Math.min(255,gi.data[k]*2.6);gd.putImageData(gi,0,0);
-  const P=mk(w,h);P.x.drawImage(sm.c,0,0);P.x.globalCompositeOperation="destination-out";P.x.drawImage(grow,0,0);
-  const fill=blurRegion(P.c,0,0,w,h,Math.max(3,w*0.02)),fx=fill.getContext("2d"),fi=fx.getImageData(0,0,w,h);
-  for(let k=3;k<fi.data.length;k+=4)fi.data[k]=255;fx.putImageData(fi,0,0);
-  fx.globalCompositeOperation="destination-in";fx.drawImage(grow,0,0);
-  x.save();x.globalAlpha=Math.min(1,0.7+amt*0.3);x.drawImage(fill,0,0,W,H);x.restore();
-}
-function applyAIFace(x,W,H){
-  const A=state.ai;if(!origPrev)return;
-  if(A.acne>0||A.skin>0||A.bright>0){const mask=skinMaskCanvas();if(mask){
-    if(A.acne>0){autoAcne(x,W,H,mask,A.acne/100);if(A.acne>=60)autoAcne(x,W,H,mask,A.acne/100);}
-    if(A.skin>0){const e=blurRegion(x.canvas,0,0,W,H,Math.max(2,W*0.006)),ex=e.getContext("2d");ex.globalCompositeOperation="destination-in";ex.drawImage(mask,0,0,W,H);
-      x.save();x.globalAlpha=A.skin/100*0.8;x.drawImage(e,0,0);x.restore();}
-    if(A.bright>0){const L=mk(W,H);L.x.fillStyle="#fff1ea";L.x.fillRect(0,0,W,H);L.x.globalCompositeOperation="destination-in";L.x.drawImage(mask,0,0,W,H);
-      x.save();x.globalCompositeOperation="soft-light";x.globalAlpha=A.bright/100*0.85;x.drawImage(L.c,0,0);x.globalCompositeOperation="screen";x.globalAlpha=A.bright/100*0.16;x.drawImage(L.c,0,0);x.restore();}}}
-  if(!aiData)return;
-  aiData.faces.forEach(f=>{
-    const P=i=>[f[i].x*W,f[i].y*H],fw=Math.hypot(P(234)[0]-P(454)[0],P(234)[1]-P(454)[1]);
-    if(A.slim>0){const nose=P(1);[...JAW_L,...JAW_R].forEach(i=>{const p=P(i),dir=Math.sign(nose[0]-p[0]),amt=A.slim/100*fw*0.045;pushWarp(x,p,[p[0]+dir*amt,p[1]],fw*0.16,1);});}
-    if(A.eyes>0){[[33,133],[362,263]].forEach(([i,j])=>{const a=P(i),b=P(j),c=[(a[0]+b[0])/2,(a[1]+b[1])/2],ew=Math.hypot(a[0]-b[0],a[1]-b[1]);radialWarp(x,c,ew*0.95,A.eyes/100*0.55,true);});}
-    if(A.lips>0){x.save();x.beginPath();LIP_OUT.forEach((i,k)=>{const p=P(i);k?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]);});x.closePath();
-      LIP_IN.forEach((i,k)=>{const p=P(i);k?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]);});x.closePath();x.clip("evenodd");
-      x.globalCompositeOperation="color";x.globalAlpha=A.lips/100*0.6;x.fillStyle=A.lipColor;x.fillRect(0,0,W,H);
-      x.globalCompositeOperation="multiply";x.globalAlpha=A.lips/100*0.18;x.fillRect(0,0,W,H);x.restore();}
-  });
-}
-function applyAIBg(x,W,H){
-  if(!aiData||state.ai.bg==="keep")return;const A=state.ai;
-  if(A.bg==="remove"){x.save();x.globalCompositeOperation="destination-out";x.drawImage(aiData.bgC,0,0,W,H);x.restore();return;}
-  let e;if(A.bg==="blur")e=blurRegion(x.canvas,0,0,W,H,Math.max(2,W*0.03*A.bgBlur/100));else{const m=mk(W,H);m.x.fillStyle=A.bgColor;m.x.fillRect(0,0,W,H);e=m.c;}
-  const ex=e.getContext("2d");ex.globalCompositeOperation="destination-in";ex.drawImage(aiData.bgC,0,0,W,H);x.drawImage(e,0,0);
-}
-
 /* ---------- Frames, overlays, compose ---------- */
 const FRAMES=[["none","Không khung"],["white","Viền trắng"],["polaroid","Polaroid"],["film","Viền film"],["cream","Kem bo góc"]];
 function frameGeom(W,H){const m=Math.min(W,H),f=tool==="crop"?"none":state.frame;
@@ -1546,10 +1783,13 @@ function draw(){
   let img,e=null;
   if(comparing)img=geoOrig;
   else{e=hoverId?effective(hoverState(),false):effective(state,true);
-    if(dragging&&W*H>700000)render(prevTex,W>>1,H>>1,e);else render(prevTex,W,H,e);img=glc;}
+    if(dragging&&W*H>2600000)render(prevTex,W>>1,H>>1,e);else render(prevTex,W,H,e);img=glc;}
   const cut=state.ai.bg==="remove"&&aiData?geoPrev:null;
   composeTo(vctx,img,W,H,fr,{date:e?e.date:0,overlays:!comparing,preview:true,cutout:cut});
   if(split&&!comparing){const sx=Math.round(W*splitX);vctx.save();vctx.beginPath();vctx.rect(fr.x,fr.y,sx,H);vctx.clip();vctx.drawImage(geoOrig,fr.x,fr.y);vctx.restore();}
+  if(act&&act.type==="brush"&&MASKK.has(act.op.k)&&act.outPts.length){const r=brushROut(),o=mk(W,H);o.x.fillStyle="#f2a33a";
+    for(let i=0;i<act.outPts.length;i+=2){o.x.beginPath();o.x.arc(act.outPts[i]*W,act.outPts[i+1]*H,r*0.85,0,Math.PI*2);o.x.fill();}
+    vctx.save();vctx.globalAlpha=0.38;vctx.drawImage(o.c,fr.x,fr.y);vctx.restore();}
   fitView();placeCrop();afterDraw();
 }
 let fitKey="";
@@ -1561,14 +1801,14 @@ async function exportImage(){
   await new Promise(r=>setTimeout(r,40));
   try{
     try{await document.fonts.ready;}catch(e){}
-    const e=effective(state,true),ret=buildRet(fullSrc),g=applyGeo(ret,state.geo).canvas,W=g.width,H=g.height,tex=makeTex(0,0,g);
+    const e=effective(state,true),ret=buildRet(fullSrc,null),g=applyGeo(ret,state.geo).canvas,W=g.width,H=g.height,tex=makeTex(0,0,g);
     render(tex,W,H,e);gl.deleteTexture(tex);
     const fr=(()=>{const t=tool;tool=null;const r=frameGeom(W,H);tool=t;return r;})();
     const out=mk(fr.OW,fr.OH),cut=state.ai.bg==="remove"&&aiData?g:null;
     composeTo(out.x,glc,W,H,fr,{date:e.date,overlays:true,preview:false,cutout:cut});
-    retDirty=true;draw();
+    draw();
     const png=!!cut&&fr.f==="none",mime=png?"image/png":"image/jpeg";
-    const blob=await new Promise(r=>out.c.toBlob(r,mime,0.93));if(!blob)throw new Error("encode");
+    const blob=await new Promise(r=>out.c.toBlob(r,mime,0.96));if(!blob)throw new Error("encode");
     const name="iohk-"+norm(findPreset(state.presetId).name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+(png?".png":".jpg");
     const dl=await getDownloads();
     if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+fr.OW+"×"+fr.OH);}catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}return;}
@@ -1577,7 +1817,7 @@ async function exportImage(){
       try{await navigator.share({files:[file]});toast("Đã mở bảng chia sẻ. Chọn “Lưu hình ảnh”.");}catch(err){if(err&&err.name==="AbortError")toast("Đã huỷ");else showOverlay(blob);}return;}
     const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);
     if(/iPhone|iPad|iPod/.test(navigator.userAgent))showOverlay(blob);else toast("Đã lưu ảnh "+fr.OW+"×"+fr.OH);
-  }catch(err){toast("Không xuất được ảnh. Thử lại với ảnh nhỏ hơn.");if(window.console)console.error(err);retDirty=true;draw();}
+  }catch(err){toast("Không xuất được ảnh. Thử lại với ảnh nhỏ hơn.");if(window.console)console.error(err);draw();}
   finally{saving=false;["tSave","mSave"].forEach(i=>{$(i).disabled=false;});}
 }
 
@@ -1592,7 +1832,310 @@ function restore(i){
   document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id===state.presetId)));
   syncAll();renderToolUI();schedule();updUndo();
 }
-function commitOp(op){OPS.length=state.opsLen;OPS.push(op);state.opsLen=OPS.length;pushHistory();}
+function commitOp(op){OPS.length=state.opsLen;OPS.push(op);state.opsLen=OPS.length;retDirty=true;pushHistory();schedule();}
+
+/* ---------- GPU image processing (quality-preserving retouch) ---------- */
+const GHEAD=HEAD+`
+vec4 cubicW(float x){vec4 n=vec4(1.0,2.0,3.0,4.0)-x;vec4 s=n*n*n;float a=s.x;float b=s.y-4.0*s.x;float c=s.z-4.0*s.y+6.0*s.x;float d=6.0-a-b-c;return vec4(a,b,c,d)*(1.0/6.0);}
+vec4 bicubic(sampler2D t,vec2 uv,vec2 sz){vec2 inv=1.0/sz;uv=uv*sz-0.5;vec2 f=fract(uv);uv-=f;vec4 xc=cubicW(f.x),yc=cubicW(f.y);
+  vec4 c=uv.xxyy+vec2(-0.5,1.5).xyxy;vec4 s=vec4(xc.xz+xc.yw,yc.xz+yc.yw);vec4 o=(c+vec4(xc.yw,yc.yw)/s)*inv.xxyy;
+  vec4 s0=texture2D(t,o.xz),s1=texture2D(t,o.yz),s2=texture2D(t,o.xw),s3=texture2D(t,o.yw);float sx=s.x/(s.x+s.y),sy=s.z/(s.z+s.w);
+  return mix(mix(s3,s2,sx),mix(s1,s0,sx),sy);}
+float lumi(vec3 c){return dot(c,vec3(0.299,0.587,0.114));}
+vec3 nrm(vec4 a){return a.rgb/max(a.a,0.0001);}
+`;
+const GSKIN=`
+uniform sampler2D u_mask;uniform vec2 u_szMask;uniform float u_ai;
+float region(vec2 uv){vec4 m=bicubic(u_mask,uv,u_szMask);return clamp(m.r,0.0,1.0)*(1.0-clamp(m.g,0.0,1.0));}
+float regionB(vec2 uv){vec4 m=bicubic(u_mask,uv,u_szMask);return clamp(m.b,0.0,1.0)*(1.0-clamp(m.g,0.0,1.0));}
+float colorP(vec3 c,float wide){float y=lumi(c);float cb=0.5-0.1687*c.r-0.3313*c.g+0.5*c.b;float cr=0.5+0.5*c.r-0.4187*c.g-0.0813*c.b;float e=0.015+0.045*wide;
+  return smoothstep(0.27-e,0.30-e,cb)*(1.0-smoothstep(0.51+e,0.54+e,cb))*smoothstep(0.505-e,0.53-e,cr)*(1.0-smoothstep(0.70+e,0.73+e,cr))*smoothstep(0.06,0.14,y);}
+`;
+const GFS={
+ down:`uniform sampler2D u_src;uniform vec2 u_px;void main(){gl_FragColor=0.25*(texture2D(u_src,v+u_px*vec2(-0.5,-0.5))+texture2D(u_src,v+u_px*vec2(0.5,-0.5))+texture2D(u_src,v+u_px*vec2(-0.5,0.5))+texture2D(u_src,v+u_px*vec2(0.5,0.5)));}`,
+ gauss:`uniform sampler2D u_src;uniform vec2 u_step;uniform float u_sig;void main(){vec4 a=vec4(0.0);float ws=0.0;for(int i=-8;i<=8;i++){float f=float(i);float w=exp(-0.5*f*f/(u_sig*u_sig));a+=texture2D(u_src,v+u_step*f)*w;ws+=w;}gl_FragColor=a/ws;}`,
+ spot:GSKIN+`uniform sampler2D u_S;uniform vec2 u_px;uniform float u_r1,u_r2,u_r3,u_r4,u_r5,u_thr,u_d3;
+float redn(vec3 c){return c.r-0.5*(c.g+c.b);}
+float mreg(vec2 uv){vec4 m=texture2D(u_mask,uv);return clamp(m.r,0.0,1.0)*(1.0-clamp(m.g,0.0,1.0));}
+void probe(float r,float lc,float rc,out vec4 o,out float da,out float mr){float dmn=9.0,dmx=-9.0,rmn=9.0,rmx=-9.0,ds=0.0;mr=1.0;
+  for(int k=0;k<4;k++){float a=float(k)*0.7853982;vec2 d=vec2(cos(a),sin(a))*r*u_px;vec3 p=texture2D(u_S,v+d).rgb,q=texture2D(u_S,v-d).rgb;
+    float dl=0.5*(lumi(p)+lumi(q))-lc,dr=rc-0.5*(redn(p)+redn(q));dmn=min(dmn,dl);dmx=max(dmx,dl);rmn=min(rmn,dr);rmx=max(rmx,dr);ds+=dl;mr=min(mr,min(mreg(v+d),mreg(v-d)));}
+  o=vec4(dmn,dmx,rmn,rmx);da=ds*0.25;}
+float iso(float mn,float mx){return smoothstep(0.35,0.6,mn/max(mx,0.0001));}
+float sc(float r,float lc,float rc,float useDark,float outer){vec4 o;float da,mr;probe(r,lc,rc,o,da,mr);
+  float rel=o.x/max(lc,0.2);float dark=rel*0.6*(1.0-smoothstep(0.3,0.5,rel))*iso(o.x,o.y)*useDark;
+  float lite=(-o.y)/max(lc,0.2)*0.5*iso(-o.y,-o.x)*useDark*outer;
+  if(outer>0.5&&(dark>0.0||lite>0.0)){vec4 o2;float d2,m2;probe(r*2.2,lc,rc,o2,d2,m2);dark*=smoothstep(0.0,0.03,o2.x);lite*=smoothstep(0.0,0.03,-o2.y);}
+  dark=max(dark,lite*0.85);
+  float red=o.z*0.95*iso(o.z,o.w)*(1.0-smoothstep(0.16,0.28,da/max(lc,0.2)));
+  return max(dark,red)*smoothstep(0.3,0.7,mr);}
+void main(){vec3 c=texture2D(u_S,v).rgb;float lc=lumi(c),rc=redn(c);
+  float s=max(max(sc(u_r1,lc,rc,1.0,1.0),sc(u_r2,lc,rc,1.0,1.0)),max(max(sc(u_r3,lc,rc,u_d3,1.0),sc(u_r4,lc,rc,0.0,0.0)),sc(u_r5,lc,rc,0.0,0.0)));
+  float o=smoothstep(u_thr,u_thr*1.7,s)*region(v);gl_FragColor=vec4(o,o,o,1.0);}`,
+ pack2:`uniform sampler2D u_A,u_B;uniform vec2 u_szA,u_szB;void main(){gl_FragColor=vec4(bicubic(u_A,v,u_szA).r,bicubic(u_B,v,u_szB).r,0.0,1.0);}`,
+ absd:`uniform sampler2D u_I,u_B;uniform vec2 u_szB;void main(){vec3 c=texture2D(u_I,v).rgb,b=bicubic(u_B,v,u_szB).rgb;float d=length(c-b)*2.5;gl_FragColor=vec4(d,d,d,1.0);}`,
+ pw:GSKIN+`uniform sampler2D u_I,u_sp;uniform vec2 u_szSp;void main(){vec3 c=texture2D(u_I,v).rgb;float s=clamp(bicubic(u_sp,v,u_szSp).r*3.0,0.0,1.0);float w=(1.0-s)*(0.02+0.98*region(v)*colorP(c,1.0));gl_FragColor=vec4(c*w,w);}`,
+ pwr:GSKIN+`uniform sampler2D u_I,u_M;void main(){vec3 c=texture2D(u_I,v).rgb;float w=(1.0-smoothstep(0.02,0.4,texture2D(u_M,v).r))*(0.03+0.97*colorP(c,1.0));gl_FragColor=vec4(c*w,w);}`,
+ pwm:`uniform sampler2D u_I,u_M;void main(){vec3 c=texture2D(u_I,v).rgb;float w=1.0-smoothstep(0.02,0.4,texture2D(u_M,v).r);gl_FragColor=vec4(c*w,w);}`,
+ beauty:GSKIN+`uniform sampler2D u_I,u_BF,u_sp,u_W1,u_W2,u_Ws,u_E;uniform vec2 u_px,u_szBF,u_szSp,u_szW1,u_szW2,u_szWs,u_szE;uniform float u_acne,u_smooth,u_bright,u_texOff;
+float redn(vec3 c){return c.r-0.5*(c.g+c.b);}
+void main(){vec4 I4=texture2D(u_I,v);vec3 I=I4.rgb;vec3 bf=bicubic(u_BF,v,u_szBF).rgb;
+  float E=bicubic(u_E,v,u_szE).r;float tg=1.0-smoothstep(0.07,0.16,E);
+  float sk=region(v)*colorP(I,u_ai);
+  float sp=u_acne*clamp(bicubic(u_sp,v,u_szSp).r*2.2,0.0,1.0);
+  vec4 w1=bicubic(u_W1,v,u_szW1),w2=bicubic(u_W2,v,u_szW2);vec3 big=nrm(w2);vec3 fill=mix(big,nrm(w1),smoothstep(0.04,0.25,w1.a));
+  vec2 o1=vec2(u_texOff,u_texOff*0.4)*u_px,o2=vec2(-u_texOff*0.4,u_texOff)*u_px;float s1=bicubic(u_sp,v+o1,u_szSp).r,s2=bicubic(u_sp,v+o2,u_szSp).r;vec2 o=s1<=s2?o1:o2;
+  vec3 tex=texture2D(u_I,v+o).rgb-bicubic(u_BF,v+o,u_szBF).rgb;
+  vec3 c=mix(I,fill+tex*0.85,sp);
+  if(u_smooth>0.001){vec4 ws=bicubic(u_Ws,v,u_szWs);vec3 base=mix(fill,nrm(ws),smoothstep(0.04,0.25,ws.a));vec3 det=mix(I-bf,tex,sp);
+    vec3 sm=base+det*(1.0-0.35*u_smooth);float g=1.0-smoothstep(0.07,0.18,abs(lumi(c)-lumi(base)))*(1.0-sp);
+    float w=clamp(u_smooth*0.95*sk*g*max(tg,sp),0.0,1.0);c=mix(c,sm,w);
+    float ex=redn(c)-redn(big);float pull=smoothstep(0.015,0.05,ex)*(1.0-smoothstep(0.12,0.18,ex))*clamp(ex,0.0,0.12);
+    c-=vec3(0.667,-0.333,-0.333)*pull*u_smooth*0.9*sk*max(tg,0.4);}
+  if(u_acne>0.5){float halo=clamp(bicubic(u_sp,v,u_szSp).g*6.0,0.0,1.0);float ex=redn(c)-redn(big);float pull=smoothstep(0.01,0.04,ex)*clamp(ex,0.0,0.14);c-=vec3(0.667,-0.333,-0.333)*pull*halo*sk;}
+  if(u_bright>0.001){vec4 wb=bicubic(u_Ws,v,u_szWs);float Lb=lumi(nrm(wb));float Lbn=Lb+u_bright*0.16*(1.0-Lb);float m=Lbn/max(Lb,0.05);
+    vec3 cb=c*m;float lb=lumi(cb);cb=mix(cb,vec3(lb)+(cb-vec3(lb))*0.92,u_bright*0.5);cb.b+=u_bright*0.01*lb;c=mix(c,clamp(cb,0.0,1.0),regionB(v)*colorP(nrm(wb),u_ai));}
+  gl_FragColor=vec4(clamp(c,0.0,1.0),I4.a);}`,
+ bheal:`uniform sampler2D u_I,u_M,u_BF,u_W1,u_W2;uniform vec2 u_px,u_szBF,u_szW1,u_szW2;uniform float u_off,u_s;
+void main(){vec4 I4=texture2D(u_I,v);float m=texture2D(u_M,v).r;vec4 w1=bicubic(u_W1,v,u_szW1),w2=bicubic(u_W2,v,u_szW2);
+  vec3 fill=mix(nrm(w2),nrm(w1),smoothstep(0.04,0.25,w1.a));
+  vec2 o1=vec2(u_off,u_off*0.4)*u_px,o2=-o1,o3=vec2(-u_off*0.4,u_off)*u_px,o4=-o3;
+  float m1=texture2D(u_M,v+o1).r,m2=texture2D(u_M,v+o2).r,m3=texture2D(u_M,v+o3).r,m4=texture2D(u_M,v+o4).r;
+  vec2 o=o1;float mm=m1;if(m2<mm){mm=m2;o=o2;}if(m3<mm){mm=m3;o=o3;}if(m4<mm){o=o4;}
+  vec3 tex=texture2D(u_I,v+o).rgb-bicubic(u_BF,v+o,u_szBF).rgb;float a=smoothstep(0.02,0.55,m)*u_s;
+  gl_FragColor=vec4(clamp(mix(I4.rgb,fill+tex*0.85,a),0.0,1.0),I4.a);}`,
+ bsmooth:`uniform sampler2D u_I,u_M,u_BF,u_B;uniform vec2 u_szBF,u_szB;uniform float u_s;
+void main(){vec4 I4=texture2D(u_I,v);vec3 I=I4.rgb;float m=texture2D(u_M,v).r;vec3 bf=bicubic(u_BF,v,u_szBF).rgb,b=bicubic(u_B,v,u_szB).rgb;
+  vec3 sm=b+(I-bf)*0.75;float g=1.0-smoothstep(0.08,0.2,abs(lumi(I)-lumi(b)));gl_FragColor=vec4(clamp(mix(I,sm,clamp(m*u_s*g,0.0,1.0)),0.0,1.0),I4.a);}`,
+ bblur:`uniform sampler2D u_I,u_M,u_B;uniform vec2 u_szB;uniform float u_s;
+void main(){vec4 I4=texture2D(u_I,v);float m=texture2D(u_M,v).r;gl_FragColor=vec4(mix(I4.rgb,bicubic(u_B,v,u_szB).rgb,clamp(m*u_s,0.0,1.0)),I4.a);}`,
+ jbu:`uniform sampler2D u_I,u_M,u_G;uniform vec2 u_szM;uniform float u_sr;
+void main(){vec3 c=texture2D(u_I,v).rgb;vec2 p=v*u_szM-0.5;vec2 b=floor(p);float acc=0.0,ws=0.0;
+  for(int j=-2;j<=3;j++)for(int i=-2;i<=3;i++){vec2 q=b+vec2(float(i),float(j));vec2 uv=(q+0.5)/u_szM;vec2 d=p-q;float wsp=exp(-dot(d,d)/2.2);
+    vec3 dc=c-texture2D(u_G,uv).rgb;float w=wsp*exp(-dot(dc,dc)/(2.0*u_sr*u_sr))+1e-6;acc+=w*texture2D(u_M,uv).r;ws+=w;}
+  float f=smoothstep(0.3,0.7,1.0-acc/ws);gl_FragColor=vec4(f,f,f,1.0);}`,
+ pbg:`uniform sampler2D u_I,u_F;void main(){vec3 c=texture2D(u_I,v).rgb;float w=1.0-texture2D(u_F,v).r;w=w*w;gl_FragColor=vec4(c*w,w);}`,
+ bgc:`uniform sampler2D u_I,u_F,u_B;uniform vec2 u_szB;uniform vec3 u_col;uniform float u_mode;
+void main(){vec4 I4=texture2D(u_I,v);float f=texture2D(u_F,v).r;
+  if(u_mode<0.5){vec4 b=bicubic(u_B,v,u_szB);gl_FragColor=vec4(mix(nrm(b),I4.rgb,f),I4.a);}
+  else if(u_mode<1.5){gl_FragColor=vec4(mix(u_col,I4.rgb,f),I4.a);}
+  else{gl_FragColor=vec4(I4.rgb,I4.a*f);}}`
+};
+const GQ={};
+function initGPU(){for(const k in GFS)GQ[k]=program(GHEAD+GFS[k]);}
+function gT(w,h){return makeTarget(Math.max(1,w),Math.max(1,h));}
+function gUp(src){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);return {tex:t,w:src.width,h:src.height};}
+function gDel(t){if(!t)return;if(t.fb)freeTarget(t);else gl.deleteTexture(t.tex);}
+function gRun(prog,dst,texs,uni){
+  gl.useProgram(prog.p);gl.bindFramebuffer(gl.FRAMEBUFFER,dst.fb);gl.viewport(0,0,dst.w,dst.h);
+  texs.forEach((t,i)=>{gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t[1].tex);const l=prog.u[t[0]];if(l!=null)gl.uniform1i(l,i);});
+  for(const k in uni){const l=prog.u[k],val=uni[k];if(l==null)continue;
+    if(typeof val==="number")gl.uniform1f(l,val);else if(val.length===2)gl.uniform2f(l,val[0],val[1]);else if(val.length===3)gl.uniform3f(l,val[0],val[1],val[2]);}
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+}
+function gRead(t,dst,dx,dy){gl.bindFramebuffer(gl.FRAMEBUFFER,t.fb);const px=new Uint8Array(t.w*t.h*4);gl.readPixels(0,0,t.w,t.h,gl.RGBA,gl.UNSIGNED_BYTE,px);
+  const id=new ImageData(new Uint8ClampedArray(px.buffer),t.w,t.h);if(dst){dst.putImageData(id,dx||0,dy||0);return null;}const m=mk(t.w,t.h);m.x.putImageData(id,0,0);return m.c;}
+function gZero(){const t=gT(1,1);gl.bindFramebuffer(gl.FRAMEBUFFER,t.fb);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);return t;}
+/* Gaussian blur through a box pyramid: result may be smaller than src; sample it with bicubic(). */
+function gBlur(src,sigma){
+  let cur=src,own=false;
+  while(sigma*(cur.w/src.w)>2.2&&cur.w>12&&cur.h>12){const t=gT(Math.ceil(cur.w/2),Math.ceil(cur.h/2));gRun(GQ.down,t,[["u_src",cur]],{u_px:[1/cur.w,1/cur.h]});if(own)gDel(cur);cur=t;own=true;}
+  const s=Math.max(0.01,sigma*(cur.w/src.w)),a=gT(cur.w,cur.h),b=gT(cur.w,cur.h);
+  gRun(GQ.gauss,a,[["u_src",cur]],{u_step:[1/cur.w,0],u_sig:s});gRun(GQ.gauss,b,[["u_src",a]],{u_step:[0,1/cur.h],u_sig:s});
+  gDel(a);if(own)gDel(cur);return b;
+}
+function gBlurCanvas(cv,sigma){const t=gUp(cv),b=gBlur(t,sigma),o=gT(cv.width,cv.height);
+  gRun(GQ.bblur,o,[["u_I",t],["u_M",o.__one||(o.__one=gOne())],["u_B",b]],{u_szB:[b.w,b.h],u_s:1});
+  const c=gRead(o);gDel(t);gDel(b);gDel(o.__one);gDel(o);return c;}
+function gOne(){const t=gT(1,1);gl.bindFramebuffer(gl.FRAMEBUFFER,t.fb);gl.clearColor(1,1,1,1);gl.clear(gl.COLOR_BUFFER_BIT);return t;}
+const sz=t=>[t.w,t.h];
+
+/* ---------- Skin mask (AI or colour based), cached per source ---------- */
+let maskTexC=null,maskKey="",srcStamp=0,aiStamp=0,skinBase=null,aiSrc=null,fsFrac=0.3;
+const EYE_L=[33,7,163,144,145,153,154,155,133,173,157,158,159,160,161,246],EYE_R=[263,249,390,373,374,380,381,382,362,398,384,385,386,387,388,466];
+const BROW_L=[70,63,105,66,107,55,65,52,53,46],BROW_R=[300,293,334,296,336,285,295,282,283,276],NOSE_B=[98,97,2,326,327,294,278,344,440,275,4,45,220,115,48,64];
+const FACE_OVAL=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
+function polyFill(x,f,ids,sc,M,N,oy){let cx=0,cy=0;ids.forEach(i=>{cx+=f[i].x;cy+=f[i].y;});cx/=ids.length;cy/=ids.length;
+  x.beginPath();ids.forEach((i,k)=>{const X=(cx+(f[i].x-cx)*sc)*M,Y=(cy+(f[i].y-cy)*sc+(oy||0))*N;k?x.lineTo(X,Y):x.moveTo(X,Y);});x.closePath();x.fill();}
+function colorSkinMask(w,h,d,person){
+  const n=w*h,p=new Float32Array(n),L=new Float32Array(n);
+  for(let i=0;i<n;i++){const r=d[i*4]/255,g=d[i*4+1]/255,b=d[i*4+2]/255,y=0.299*r+0.587*g+0.114*b,cb=0.5-0.1687*r-0.3313*g+0.5*b,cr=0.5+0.5*r-0.4187*g-0.0813*b;L[i]=y;
+    p[i]=sstep(0.29,0.31,cb)*(1-sstep(0.495,0.515,cb))*sstep(0.535,0.552,cr)*(1-sstep(0.69,0.71,cr))*sstep(0.14,0.22,y)*(person?person(i):1);}
+  const box=(a,R)=>{const t=new Float32Array(n),o=new Float32Array(n),k=2*R+1;
+    for(let y=0;y<h;y++){const row=y*w;let s=0;for(let x=-R;x<=R;x++)s+=a[row+Math.min(w-1,Math.max(0,x))];
+      for(let x=0;x<w;x++){t[row+x]=s/k;s+=a[row+Math.min(w-1,x+R+1)]-a[row+Math.max(0,x-R)];}}
+    for(let x=0;x<w;x++){let s=0;for(let y=-R;y<=R;y++)s+=t[Math.min(h-1,Math.max(0,y))*w+x];
+      for(let y=0;y<h;y++){o[y*w+x]=s/k;s+=t[Math.min(h-1,y+R+1)*w+x]-t[Math.max(0,y-R)*w+x];}}
+    return o;};
+  const mL=box(L,2),dev=new Float32Array(n);for(let i=0;i<n;i++)dev[i]=Math.abs(L[i]-mL[i]);const T=box(dev,Math.max(3,Math.round(Math.max(w,h)*0.01)));
+  for(let i=0;i<n;i++)p[i]*=1-sstep(0.012,0.03,T[i]);
+  const c=box(p,Math.max(2,Math.round(Math.max(w,h)*0.006)));const lab=new Int32Array(n).fill(-1),area=[];let nl=0;
+  for(let i=0;i<n;i++){c[i]=sstep(0.25,0.5,c[i]);}
+  const edg=[];for(let i=0;i<n;i++){if(c[i]<0.5||lab[i]>=0)continue;const st=[i];lab[i]=nl;let a=0,eT=0,eL=0,eR=0;while(st.length){const q=st.pop();a++;const qx=q%w,qy=(q/w)|0;if(qy===0)eT=1;if(qx===0)eL=1;if(qx===w-1)eR=1;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=qx+dx,Y=qy+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const z=Y*w+X;if(lab[z]<0&&c[z]>=0.5){lab[z]=nl;st.push(z);}}}area.push(a);edg.push(eT&&(eL||eR));nl++;}
+  const ne=area.filter((a,i)=>!edg[i]),bigNE=Math.max(0,...ne),useEdge=bigNE<n*0.01,big=useEdge?Math.max(0,...area):bigNE,keep=area.map((a,i)=>(useEdge||!edg[i])&&a>=Math.max(big*0.18,n*0.002));
+  let sum=0;const cb=new Float32Array(n);for(let i=0;i<n;i++){if(lab[i]<0||!keep[lab[i]])c[i]=0;else if(!edg[lab[i]])cb[i]=c[i];sum+=c[i];}
+  return {c,cb,sum};
+}
+function skinMaskTex(){
+  const key=srcStamp+"|"+aiStamp;if(maskTexC&&maskKey===key)return maskTexC;
+  if(maskTexC)gDel(maskTexC);maskTexC=null;maskKey=key;let cv;
+  if(aiData&&aiData.faces.length){const M=768,N=Math.round(768*fullSrc.height/fullSrc.width),m=mk(M,N);m.x.fillStyle="#f00";
+    aiData.faces.forEach(f=>{const fh=Math.abs(f[152].y-f[10].y);polyFill(m.x,f,FACE_OVAL,1.07,M,N);polyFill(m.x,f,FACE_OVAL,0.96,M,N,-0.13*fh);polyFill(m.x,f,[152,148,176,149,150,136,172,58,132,288,397,365,379,378,400,377],1.0,M,N,0.03);});
+    if(aiData.skin){const s=aiData.skin,w=aiData.w,h=aiData.h,id=m.x.getImageData(0,0,M,N),q=id.data;
+      for(let y=0;y<N;y++)for(let x=0;x<M;x++){const v=s[Math.min(h-1,Math.floor(y*h/N))*w+Math.min(w-1,Math.floor(x*w/M))],o=(y*M+x)*4;q[o]=Math.max(q[o],Math.round(255*Math.min(1,v*1.2)));}m.x.putImageData(id,0,0);}
+    const pr=mk(M,N);pr.x.fillStyle="#fff";
+    aiData.faces.forEach(f=>{polyFill(pr.x,f,EYE_L,1.6,M,N);polyFill(pr.x,f,EYE_R,1.6,M,N);polyFill(pr.x,f,BROW_L,1.35,M,N);polyFill(pr.x,f,BROW_R,1.35,M,N);polyFill(pr.x,f,LIP_OUT,1.04,M,N);polyFill(pr.x,f,[98,2,327,1],1.3,M,N);});
+    const pd=pr.x.getImageData(0,0,M,N).data,md=m.x.getImageData(0,0,M,N);for(let i=0;i<M*N;i++){md.data[i*4+1]=pd[i*4+3];md.data[i*4+2]=md.data[i*4];md.data[i*4+3]=255;}m.x.putImageData(md,0,0);
+    cv=gBlurCanvas(m.c,1.5);
+    let fw=0;aiData.faces.forEach(f=>{fw=Math.max(fw,Math.hypot((f[234].x-f[454].x)*fullSrc.width,(f[234].y-f[454].y)*fullSrc.height));});
+    fsFrac=Math.max(0.05,fw/Math.min(fullSrc.width,fullSrc.height));
+  }else if(aiData&&aiData.skin){const s=aiData.skin,w=aiData.w,h=aiData.h,m=mk(w,h),id=m.x.createImageData(w,h),q=id.data;
+    for(let i=0;i<w*h;i++){q[i*4]=q[i*4+2]=Math.round(255*Math.min(1,s[i]*1.2));q[i*4+3]=255;}m.x.putImageData(id,0,0);cv=gBlurCanvas(m.c,1);fsFrac=areaFrac(s.length,i=>s[i]);
+  }else{
+    if(!skinBase)return null;const w=skinBase.width,h=skinBase.height,d=skinBase.getContext("2d",{willReadFrequently:true}).getImageData(0,0,w,h).data;
+    let person=null;if(aiData&&aiData.bg&&aiData.w>1){const B=aiData.bg,aw=aiData.w,ah=aiData.h;person=i=>1-B[Math.min(ah-1,Math.floor(((i/w)|0)*ah/h))*aw+Math.min(aw-1,Math.floor((i%w)*aw/w))];}
+    const r=colorSkinMask(w,h,d,person),m=mk(w,h),id=m.x.createImageData(w,h),q=id.data;
+    for(let i=0;i<w*h;i++){q[i*4]=Math.round(r.c[i]*255);q[i*4+2]=Math.round(r.cb[i]*255);q[i*4+3]=255;}m.x.putImageData(id,0,0);cv=gBlurCanvas(m.c,Math.max(1,Math.max(w,h)*0.004));
+    fsFrac=Math.max(0.12,Math.min(0.9,Math.sqrt(r.sum/(w*h)*(Math.max(w,h)/Math.min(w,h)))*0.9));
+  }
+  maskTexC=gUp(cv);return maskTexC;
+}
+function areaFrac(n,get){let s=0;for(let i=0;i<n;i++)s+=get(i);return Math.max(0.12,Math.min(0.9,Math.sqrt(s/n)*0.85));}
+function faceScale(W,H){return Math.max(24,fsFrac*Math.min(W,H));}
+
+/* ---------- Beauty (heal + smoothing + brightening) ---------- */
+function gpuBeauty(src,A){
+  if(A.acne>=50){const h=gpuBeautyPass(src,{acne:A.acne,skin:0,bright:0});if(h){const r=gpuBeautyPass(h,A);return r||h;}}
+  return gpuBeautyPass(src,A);
+}
+function gpuBeautyPass(src,A){
+  const mask=skinMaskTex();if(!mask)return null;
+  const W=src.width,H=src.height,fs=faceScale(W,H),acne=A.acne/100,sm=A.skin/100,br=A.bright/100;
+  const I=gUp(src);let D=I,ownD=false;
+  while(Math.max(D.w,D.h)>1700){const t=gT(Math.ceil(D.w/2),Math.ceil(D.h/2));gRun(GQ.down,t,[["u_src",D]],{u_px:[1/D.w,1/D.h]});if(ownD)gDel(D);D=t;ownD=true;}
+  const k=D.w/W;let spotD;
+  if(acne>0){const S=gBlur(D,Math.max(0.6,fs*0.0032*k)),SP=gT(D.w,D.h);
+    gRun(GQ.spot,SP,[["u_S",S],["u_mask",mask]],{u_px:[1/D.w,1/D.h],u_szMask:sz(mask),u_r1:Math.max(1.5,fs*0.006*k),u_r2:Math.max(2.5,fs*0.011*k),u_r3:Math.max(3.5,fs*0.019*k),u_r4:Math.max(5,fs*0.032*k),u_r5:Math.max(7,fs*0.05*k),u_thr:0.036-0.014*acne,u_d3:aiData&&aiData.faces.length?1:0});
+    gDel(S);const s1=gBlur(SP,Math.max(0.7,fs*0.0055*k));gDel(SP);const s2=gBlur(s1,Math.max(1,fs*0.03*k));spotD=gT(s1.w,s1.h);gRun(GQ.pack2,spotD,[["u_A",s1],["u_B",s2]],{u_szA:sz(s1),u_szB:sz(s2)});gDel(s1);gDel(s2);}
+  else spotD=gZero();
+  const P=gT(D.w,D.h);gRun(GQ.pw,P,[["u_I",D],["u_sp",spotD],["u_mask",mask]],{u_szSp:sz(spotD),u_szMask:sz(mask)});
+  const W1=gBlur(P,fs*0.022*k),W2=gBlur(P,fs*0.055*k),Ws=gBlur(P,fs*(0.006+0.012*sm)*k);gDel(P);
+  const Bd=gBlur(D,Math.max(0.8,fs*0.004*k)),Ad=gT(D.w,D.h);gRun(GQ.absd,Ad,[["u_I",D],["u_B",Bd]],{u_szB:sz(Bd)});gDel(Bd);const E=gBlur(Ad,Math.max(1,fs*0.012*k));gDel(Ad);if(ownD)gDel(D);
+  const BF=gBlur(I,Math.max(0.8,fs*0.0035)),O=gT(W,H);
+  gRun(GQ.beauty,O,[["u_I",I],["u_BF",BF],["u_mask",mask],["u_sp",spotD],["u_W1",W1],["u_W2",W2],["u_Ws",Ws],["u_E",E]],
+    {u_px:[1/W,1/H],u_szBF:sz(BF),u_szMask:sz(mask),u_szSp:sz(spotD),u_szW1:sz(W1),u_szW2:sz(W2),u_szWs:sz(Ws),u_szE:sz(E),u_acne:acne>0?1:0,u_smooth:sm,u_bright:br,u_ai:aiData?1:0,u_texOff:Math.max(3,fs*0.03)});
+  const c=gRead(O);[I,BF,spotD,W1,W2,Ws,E,O].forEach(gDel);return c;
+}
+
+/* ---------- Brush ops on a region, applied once per stroke ---------- */
+function strokeBox(pts,r,pad,W,H){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  const bx=Math.max(0,Math.floor(x0-pad)),by=Math.max(0,Math.floor(y0-pad));return {bx,by,bw:Math.min(W,Math.ceil(x1+pad))-bx,bh:Math.min(H,Math.ceil(y1+pad))-by};}
+function strokeMask(pts,r,b,hard){const m=mk(b.bw,b.bh);m.x.globalCompositeOperation="lighten";const step=Math.max(1,r*0.25);
+  const dab=(x,y)=>{const g=m.x.createRadialGradient(x-b.bx,y-b.by,0,x-b.bx,y-b.by,r);g.addColorStop(0,"#fff");g.addColorStop(hard?0.75:0.5,"#fff");g.addColorStop(1,"rgba(255,255,255,0)");m.x.fillStyle=g;m.x.fillRect(x-b.bx-r,y-b.by-r,r*2,r*2);};
+  dab(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++){const a=pts[i-1],c=pts[i],d=Math.hypot(c[0]-a[0],c[1]-a[1]),n=Math.max(1,Math.ceil(d/step));for(let j=1;j<=n;j++)dab(a[0]+(c[0]-a[0])*j/n,a[1]+(c[1]-a[1])*j/n);}
+  const id=m.x.getImageData(0,0,b.bw,b.bh),p=id.data;for(let i=0;i<p.length;i+=4){p[i]=p[i+1]=p[i+2]=p[i+3];p[i+3]=255;}m.x.putImageData(id,0,0);return m.c;}
+function gpuBrush(x,op,pts,r){
+  const W=x.canvas.width,H=x.canvas.height,pad=op.k==="heal"?r*3.4:r*1.8,b=strokeBox(pts,r,pad,W,H);if(b.bw<2||b.bh<2)return;
+  const I=gUp(x.getImageData(b.bx,b.by,b.bw,b.bh)),M=gUp(strokeMask(pts,r,b,op.k==="heal")),O=gT(b.bw,b.bh);
+  if(op.k==="heal"){const P=gT(b.bw,b.bh);gRun(GQ.pwr,P,[["u_I",I],["u_M",M]],{});const W1=gBlur(P,r*0.55),W2=gBlur(P,r*1.5);gDel(P);const BF=gBlur(I,Math.max(0.8,r*0.08));
+    gRun(GQ.bheal,O,[["u_I",I],["u_M",M],["u_BF",BF],["u_W1",W1],["u_W2",W2]],{u_px:[1/b.bw,1/b.bh],u_szBF:sz(BF),u_szW1:sz(W1),u_szW2:sz(W2),u_off:r*2.3,u_s:1});[W1,W2,BF].forEach(gDel);}
+  else if(op.k==="smooth"){const BF=gBlur(I,Math.max(0.8,r*0.035)),B=gBlur(I,r*0.22);gRun(GQ.bsmooth,O,[["u_I",I],["u_M",M],["u_BF",BF],["u_B",B]],{u_szBF:sz(BF),u_szB:sz(B),u_s:op.s});gDel(BF);gDel(B);}
+  else{const B=gBlur(I,r*0.4);gRun(GQ.bblur,O,[["u_I",I],["u_M",M],["u_B",B]],{u_szB:sz(B),u_s:op.s});gDel(B);}
+  gRead(O,x,b.bx,b.by);[I,M,O].forEach(gDel);
+}
+function cpuBrush(x,op,pts,r){
+  const W=x.canvas.width,H=x.canvas.height,b=strokeBox(pts,r,r*1.6,W,H);if(b.bw<2||b.bh<2)return;
+  const m=strokeMask(pts,r,b,op.k==="mosaic"),md=m.getContext("2d").getImageData(0,0,b.bw,b.bh).data,img=x.getImageData(b.bx,b.by,b.bw,b.bh),p=img.data;let eff;
+  if(op.k==="mosaic"){const cell=Math.max(3,r*0.32),sw=Math.max(1,Math.round(b.bw/cell)),sh=Math.max(1,Math.round(b.bh/cell)),a=mk(sw,sh);a.x.drawImage(x.canvas,b.bx,b.by,b.bw,b.bh,0,0,sw,sh);
+    const e=mk(b.bw,b.bh);e.x.imageSmoothingEnabled=false;e.x.drawImage(a.c,0,0,b.bw,b.bh);eff=e.x.getImageData(0,0,b.bw,b.bh).data;}
+  else if(op.k==="lips"){const e=mk(b.bw,b.bh);e.x.putImageData(img,0,0);e.x.globalCompositeOperation="color";e.x.fillStyle=op.c||"#c2334d";e.x.fillRect(0,0,b.bw,b.bh);eff=e.x.getImageData(0,0,b.bw,b.bh).data;}
+  else{eff=new Uint8ClampedArray(p);for(let i=0;i<p.length;i+=4){const R=p[i],G=p[i+1],B=p[i+2],l=(R*0.3+G*0.59+B*0.11)/255,mx=Math.max(R,G,B),mn=Math.min(R,G,B),sat=mx?(mx-mn)/mx:0,
+      w=sstep(0.32,0.55,l)*(1-sstep(0.3,0.55,sat)),L=l*255,nr=Math.min(255,(R*0.4+L*0.6)*1.1+4),ng=Math.min(255,(G*0.4+L*0.6)*1.11+4),nb=Math.min(255,(B*0.4+L*0.6)*1.14+10);
+      eff[i]=R+(nr-R)*w;eff[i+1]=G+(ng-G)*w;eff[i+2]=B+(nb-B)*w;}}
+  const s=op.k==="mosaic"?1:op.k==="lips"?op.s*0.7:op.s;
+  for(let i=0;i<p.length;i+=4){const a=md[i]/255*s;if(a<=0)continue;p[i]+=(eff[i]-p[i])*a;p[i+1]+=(eff[i+1]-p[i+1])*a;p[i+2]+=(eff[i+2]-p[i+2])*a;}
+  x.putImageData(img,b.bx,b.by);
+}
+
+/* ---------- Warps: compose displacements, resample once (Catmull-Rom) ---------- */
+function Field(bx,by,bw,bh){this.bx=bx;this.by=by;this.w=bw;this.h=bh;this.dx=new Float32Array(bw*bh);this.dy=new Float32Array(bw*bh);this.max=0;}
+Field.prototype.apply=function(cx,cy,r,fn){
+  const X0=Math.max(this.bx,Math.floor(cx-r)),X1=Math.min(this.bx+this.w-1,Math.ceil(cx+r)),Y0=Math.max(this.by,Math.floor(cy-r)),Y1=Math.min(this.by+this.h-1,Math.ceil(cy+r));if(X1<X0||Y1<Y0)return;
+  const m=Math.ceil(r)+2,sx0=Math.max(this.bx,X0-m),sy0=Math.max(this.by,Y0-m),sx1=Math.min(this.bx+this.w-1,X1+m),sy1=Math.min(this.by+this.h-1,Y1+m),sw=sx1-sx0+1,sh=sy1-sy0+1;
+  const sdx=new Float32Array(sw*sh),sdy=new Float32Array(sw*sh);
+  for(let y=0;y<sh;y++){const o=(y+sy0-this.by)*this.w+(sx0-this.bx);sdx.set(this.dx.subarray(o,o+sw),y*sw);sdy.set(this.dy.subarray(o,o+sw),y*sw);}
+  const S=(x,y)=>{x-=sx0;y-=sy0;if(x<0||y<0||x>sw-1||y>sh-1)return [0,0];const ix=Math.min(sw-2,x|0),iy=Math.min(sh-2,y|0),fx=x-ix,fy=y-iy,i=iy*sw+ix;
+    if(sw<2||sh<2)return [sdx[0],sdy[0]];
+    return [(sdx[i]*(1-fx)+sdx[i+1]*fx)*(1-fy)+(sdx[i+sw]*(1-fx)+sdx[i+sw+1]*fx)*fy,(sdy[i]*(1-fx)+sdy[i+1]*fx)*(1-fy)+(sdy[i+sw]*(1-fx)+sdy[i+sw+1]*fx)*fy];};
+  const r2=r*r;
+  for(let y=Y0;y<=Y1;y++)for(let x=X0;x<=X1;x++){const ddx=x-cx,ddy=y-cy,t2=(ddx*ddx+ddy*ddy)/r2;if(t2>=1)continue;const d=fn(ddx,ddy,t2),o=S(x+d[0],y+d[1]),i=(y-this.by)*this.w+(x-this.bx);
+    this.dx[i]=d[0]+o[0];this.dy[i]=d[1]+o[1];const a=Math.abs(this.dx[i])+Math.abs(this.dy[i]);if(a>this.max)this.max=a;}
+};
+Field.prototype.push=function(p0,p1,r,s){const ddx=p1[0]-p0[0],ddy=p1[1]-p0[1];if(!ddx&&!ddy)return;this.apply(p1[0],p1[1],r,(x,y,t2)=>{const f=(1-t2)*(1-t2)*s;return [-ddx*f,-ddy*f];});};
+Field.prototype.radial=function(c,r,s,bloat){this.apply(c[0],c[1],r,(x,y,t2)=>{const f=(1-t2)*(1-t2)*s,k=bloat?1-f*0.5:1+f*0.4;return [(k-1)*x,(k-1)*y];});};
+function resampleField(x,F){
+  if(F.max<0.01)return;const W=x.canvas.width,H=x.canvas.height,pad=Math.ceil(F.max)+3,rx=Math.max(0,F.bx-pad),ry=Math.max(0,F.by-pad),rw=Math.min(W,F.bx+F.w+pad)-rx,rh=Math.min(H,F.by+F.h+pad)-ry;
+  const src=x.getImageData(rx,ry,rw,rh).data,out=x.getImageData(F.bx,F.by,F.w,F.h),o=out.data,wx=[0,0,0,0],wy=[0,0,0,0];
+  const cw=(t,w)=>{const t2=t*t,t3=t2*t;w[0]=(-t3+2*t2-t)*0.5;w[1]=(3*t3-5*t2+2)*0.5;w[2]=(-3*t3+4*t2+t)*0.5;w[3]=(t3-t2)*0.5;};
+  for(let y=0;y<F.h;y++)for(let xx=0;xx<F.w;xx++){const i=y*F.w+xx,dx=F.dx[i],dy=F.dy[i];if(Math.abs(dx)+Math.abs(dy)<0.01)continue;
+    const sx=F.bx+xx+dx-rx,sy=F.by+y+dy-ry,ix=Math.floor(sx),iy=Math.floor(sy);cw(sx-ix,wx);cw(sy-iy,wy);let r=0,g=0,b=0,a=0;
+    for(let j=0;j<4;j++){const yy=Math.max(0,Math.min(rh-1,iy-1+j));for(let k=0;k<4;k++){const xk=Math.max(0,Math.min(rw-1,ix-1+k)),q=(yy*rw+xk)*4,w=wx[k]*wy[j];r+=src[q]*w;g+=src[q+1]*w;b+=src[q+2]*w;a+=src[q+3]*w;}}
+    const q=i*4;o[q]=r;o[q+1]=g;o[q+2]=b;o[q+3]=a;}
+  x.putImageData(out,F.bx,F.by);
+}
+function applyOp(cv,op){
+  const x=cv.getContext("2d",{willReadFrequently:true}),W=cv.width,H=cv.height,pts=[];for(let i=0;i<op.p.length;i+=2)pts.push([op.p[i]*W,op.p[i+1]*H]);const r=Math.max(1,op.r*W);
+  if(op.k==="push"||op.k==="bloat"||op.k==="pinch"){const b=strokeBox(pts,r,r+2,W,H);if(b.bw<2||b.bh<2)return;const F=new Field(b.bx,b.by,b.bw,b.bh);
+    if(op.k==="push"){for(let i=1;i<pts.length;i++)F.push(pts[i-1],pts[i],r,op.s);}else pts.forEach(p=>F.radial(p,r,op.s*0.6,op.k==="bloat"));resampleField(x,F);}
+  else if(op.k==="heal"||op.k==="smooth"||op.k==="blur")gpuBrush(x,op,pts,r);
+  else cpuBrush(x,op,pts,r);
+}
+
+/* ---------- Face shaping, lips, background ---------- */
+function faceStage(cv,A){
+  const x=cv.getContext("2d",{willReadFrequently:true}),W=cv.width,H=cv.height;
+  aiData.faces.forEach(f=>{
+    const P=i=>[f[i].x*W,f[i].y*H],fw=Math.hypot(P(234)[0]-P(454)[0],P(234)[1]-P(454)[1]);
+    if(A.slim>0||A.eyes>0){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;f.forEach(q=>{x0=Math.min(x0,q.x*W);y0=Math.min(y0,q.y*H);x1=Math.max(x1,q.x*W);y1=Math.max(y1,q.y*H);});
+      const pad=fw*0.3,bx=Math.max(0,Math.floor(x0-pad)),by=Math.max(0,Math.floor(y0-pad)),F=new Field(bx,by,Math.min(W,Math.ceil(x1+pad))-bx,Math.min(H,Math.ceil(y1+pad))-by);
+      if(A.slim>0){const nose=P(1);[...JAW_L,...JAW_R].forEach(i=>{const p=P(i),dir=Math.sign(nose[0]-p[0]),amt=A.slim/100*fw*0.045;F.push(p,[p[0]+dir*amt,p[1]],fw*0.16,1);});}
+      if(A.eyes>0){[[33,133],[362,263]].forEach(([i,j])=>{const a=P(i),b=P(j),c=[(a[0]+b[0])/2,(a[1]+b[1])/2],ew=Math.hypot(a[0]-b[0],a[1]-b[1]);F.radial(c,ew*0.95,A.eyes/100*0.55,true);});}
+      resampleField(x,F);}
+    if(A.lips>0){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;LIP_OUT.forEach(i=>{const p=P(i);x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+      const pad=fw*0.03+4,bx=Math.max(0,Math.floor(x0-pad)),by=Math.max(0,Math.floor(y0-pad)),bw=Math.min(W,Math.ceil(x1+pad))-bx,bh=Math.min(H,Math.ceil(y1+pad))-by;if(bw<2||bh<2)return;
+      const m=mk(bw,bh);m.x.fillStyle="#fff";m.x.beginPath();LIP_OUT.forEach((i,k)=>{const p=P(i);k?m.x.lineTo(p[0]-bx,p[1]-by):m.x.moveTo(p[0]-bx,p[1]-by);});m.x.closePath();
+      LIP_IN.forEach((i,k)=>{const p=P(i);k?m.x.lineTo(p[0]-bx,p[1]-by):m.x.moveTo(p[0]-bx,p[1]-by);});m.x.closePath();m.x.fill("evenodd");
+      const mb=gBlurCanvas(m.c,Math.max(0.8,fw*0.004)).getContext("2d").getImageData(0,0,bw,bh).data;
+      const img=x.getImageData(bx,by,bw,bh),p=img.data,e=mk(bw,bh);e.x.putImageData(img,0,0);e.x.globalCompositeOperation="color";e.x.fillStyle=A.lipColor;e.x.fillRect(0,0,bw,bh);
+      const ed=e.x.getImageData(0,0,bw,bh).data,s=A.lips/100;
+      for(let i=0;i<p.length;i+=4){const a=mb[i+3]/255*s;if(a<=0)continue;for(let c=0;c<3;c++){const v=p[i+c]+(ed[i+c]-p[i+c])*a*0.6;p[i+c]=v*(1-a*0.12);}}
+      x.putImageData(img,bx,by);}
+  });
+}
+function beautyStage(src){
+  const A=state.ai;let out=src;
+  if(A.acne>0||A.skin>0||A.bright>0){const r=gpuBeauty(src,A);if(r)out=r;}
+  if(aiData&&aiData.faces.length&&(A.eyes>0||A.slim>0||A.lips>0)){if(out===src)out=cloneCanvas(src);faceStage(out,A);}
+  return out;
+}
+let bgTexC=null,bgKeyC="";
+function bgTextures(){const key=srcStamp+"|"+aiStamp;if(bgTexC&&bgKeyC===key)return bgTexC;if(bgTexC){gDel(bgTexC.M);gDel(bgTexC.G);}
+  const w=aiData.w,h=aiData.h,m=mk(w,h),id=m.x.createImageData(w,h),p=id.data;for(let i=0;i<w*h;i++){p[i*4]=Math.round(aiData.bg[i]*255);p[i*4+3]=255;}m.x.putImageData(id,0,0);
+  const g=mk(w,h);g.x.imageSmoothingQuality="high";g.x.drawImage(aiSrc,0,0,w,h);bgTexC={M:gUp(m.c),G:gUp(g.c)};bgKeyC=key;return bgTexC;}
+function bgStage(cv){
+  const A=state.ai;if(!aiData||!aiData.bg||A.bg==="keep")return cv;
+  const W=cv.width,H=cv.height,T=bgTextures(),I=gUp(cv),F=gT(W,H);
+  gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});
+  let B=null;if(A.bg==="blur"){const P=gT(Math.ceil(W/2),Math.ceil(H/2));gRun(GQ.pbg,P,[["u_I",I],["u_F",F]],{});B=gBlur(P,Math.max(1.5,Math.max(W,H)*0.012*A.bgBlur/100));gDel(P);}
+  const O=gT(W,H),col=A.bgColor.match(/\w\w/g).map(h=>parseInt(h,16)/255);
+  gRun(GQ.bgc,O,[["u_I",I],["u_F",F],["u_B",B||F]],{u_szB:B?sz(B):sz(F),u_col:col,u_mode:A.bg==="blur"?0:A.bg==="color"?1:2});
+  const c=gRead(O);[I,F,O].forEach(gDel);if(B)gDel(B);return c;
+}
+function cloneCanvas(c){const m=mk(c.width,c.height);m.x.drawImage(c,0,0);return m.c;}
 
 /* ---------- Tool UI ---------- */
 const TOOLS=[["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];
@@ -1642,9 +2185,9 @@ function panelFor(t){
     d.appendChild(f);box.appendChild(d);
     const d2=document.createElement("details");d2.className="fold";d2.open=!!beautyOpen.brush;d2.ontoggle=()=>{beautyOpen.brush=d2.open;};
     d2.appendChild(el("summary",null,"Sửa tay bằng cọ"));const g=el("div","tpane-in");
-    g.appendChild(chipRow([["smooth","Mịn da"],["heal","Xoá mụn"],["teeth","Trắng răng"],["lips","Son môi"]],brush.beauty,v=>{brush.beauty=v;renderToolUI();}));
+    g.appendChild(chipRow([["heal","Xoá mụn"],["smooth","Mịn da"],["teeth","Trắng răng"],["lips","Son môi"]],brush.beauty,v=>{brush.beauty=v;if(v==="heal"&&brush.size>16)brush.size=10;if(v!=="heal"&&brush.size<16)brush.size=30;renderToolUI();}));
     if(brush.beauty==="lips")g.appendChild(swRow(LIPS,brush.lip,c=>{brush.lip=c;renderToolUI();}));
-    g.append(brushSizeRow(),sld("Độ mạnh cọ",10,100,brush.strength,v=>{brush.strength=v;},null),hint("Dùng khi còn sót mụn lớn hoặc muốn trắng răng. Tô trực tiếp lên ảnh."));
+    g.append(brushSizeRow());if(brush.beauty!=="heal")g.appendChild(sld("Độ mạnh cọ",10,100,brush.strength,v=>{brush.strength=v;},null));g.appendChild(hint(brush.beauty==="heal"?"Chạm hoặc tô lên nốt mụn còn sót. Cọ nên to hơn nốt mụn một chút; buông tay là mụn được lấp bằng da xung quanh.":"Tô trực tiếp lên ảnh, buông tay để áp dụng."));
     const r=el("div","btnrow");r.append(handBtn(),btn("Bỏ mọi nét cọ","",clearOps));g.appendChild(r);d2.appendChild(g);box.appendChild(d2);
   }
   else if(t==="reshape"){
@@ -1686,7 +2229,7 @@ function panelFor(t){
   }
   else if(t==="frame"){const s=sec("Khung");s.appendChild(chipRow(FRAMES,state.frame,v=>{state.frame=v;pushHistory();renderToolUI();schedule();}));box.append(s,hint("Khung được thêm vào ảnh khi lưu."));}
   else if(t==="ai"){
-    if(!aiData){box.appendChild(hint("AI chạy ngay trên máy bạn để tách người khỏi nền, không tốn token Claude. Lần đầu cần tải khoảng 20MB mô hình. Chỉ chạy được trên bản web GitHub, không chạy trong khung xem của Claude."));
+    if(!aiData||!aiData.bg){box.appendChild(hint("AI chạy ngay trên máy bạn để tách người khỏi nền, không tốn token Claude. Lần đầu cần tải khoảng 20MB mô hình. Chỉ chạy được trên bản web GitHub, không chạy trong khung xem của Claude."));
       const b=btn(aiBusy?"Đang tải và phân tích…":"Phân tích ảnh bằng AI","primary",()=>{aiFailed=false;analyzeAI(false);});b.disabled=aiBusy;box.appendChild(b);}
     else{const A=state.ai,upd=()=>{retDirty=true;schedule();};
       const s=sec("Nền");s.appendChild(chipRow([["keep","Giữ nguyên"],["blur","Làm mờ"],["color","Đổi màu"],["remove","Xoá nền"]],A.bg,v=>{A.bg=v;upd();pushHistory();renderToolUI();}));
@@ -1722,6 +2265,7 @@ function setTool(t){
   if(t==="collage"){openCollage();return;}
   const prev=tool;if(prev==="crop"&&t!=="crop"){const d=cropDraft||{x:0,y:0,w:1,h:1},full=d.x<0.002&&d.y<0.002&&d.w>0.998&&d.h>0.998;state.geo.crop=full?null:{x:d.x,y:d.y,w:d.w,h:d.h};geoDirty=true;pushHistory();}
   tool=t;handMode=false;act=null;
+  if((t==="reshape"||t==="blur")&&brush.size<16)brush.size=30;if(t==="beauty"&&brush.beauty==="heal"&&brush.size>16)brush.size=10;
   if(t==="crop"){geoDirty=true;resetZoom();rebuildPrev();cropDraft=state.geo.crop?Object.assign({},state.geo.crop):{x:0,y:0,w:1,h:1};}
   if(t!=="text"&&t!=="sticker")selId=null;
   if(!desk&&t&&mTab!=="edit")setMTab("edit");
@@ -1759,15 +2303,17 @@ cbox.addEventListener("pointermove",e=>{if(!cdrag)return;e.stopPropagation();con
 const cEnd=()=>{if(cdrag){cdrag=null;}};cbox.addEventListener("pointerup",cEnd);cbox.addEventListener("pointercancel",cEnd);
 
 /* ---------- Painting & overlay interaction ---------- */
-let act=null,holdTimer=null;
+let holdTimer=null;
 function evOut(e){const r=view.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*view.width,vy=(e.clientY-r.top)/r.height*view.height;
   return {u:(vx-imgRect.x)/imgRect.w,v:(vy-imgRect.y)/imgRect.h,k:r.width/view.width};}
 function takeP(e){e.stopPropagation();e.preventDefault();try{stage.setPointerCapture(e.pointerId);}catch(_){}}
 function brushKind(){return tool==="beauty"?brush.beauty:tool==="reshape"?brush.reshape:brush.blur;}
 function brushROut(){return brush.size/100*0.12*Math.min(geoPrev.width,geoPrev.height);}
-function stepLive(op){const W=retPrev.width,H=retPrev.height,x=retPrev.getContext("2d",{willReadFrequently:true}),n=op.p.length/2,i=n-1,P=j=>[op.p[j*2]*W,op.p[j*2+1]*H],r=Math.max(1,op.r*W);
-  if(MASKK.has(op.k))maskedApply(x,i===0?[P(0)]:segDabs(P(i-1),P(i),r,false),r,op.k,op);
-  else if(op.k==="push"){if(i>=1)pushWarp(x,P(i-1),P(i),r,op.s);}
+function stepLive(op,p){
+  if(MASKK.has(op.k)){if(p&&act)act.outPts.push(p.u,p.v);schedule();return;}
+  if(act&&!act.cloned){retPrev=cloneCanvas(retPrev);act.cloned=true;}
+  const W=retPrev.width,H=retPrev.height,x=retPrev.getContext("2d",{willReadFrequently:true}),n=op.p.length/2,i=n-1,P=j=>[op.p[j*2]*W,op.p[j*2+1]*H],r=Math.max(1,op.r*W);
+  if(op.k==="push"){if(i>=1)pushWarp(x,P(i-1),P(i),r,op.s);}
   else radialWarp(x,P(i),r,op.s*0.6,op.k==="bloat");
   geoDirty=true;schedule();}
 function hitTest(p){const W=geoPrev.width,H=geoPrev.height,u=Math.min(W,H);
@@ -1778,9 +2324,9 @@ stage.addEventListener("pointerdown",e=>{
   if(!tool||handMode||!origPrev||tool==="crop"||tool==="frame"||tool==="ai")return;if(e.target.closest&&e.target.closest("#cropBox,#split"))return;if(!e.isPrimary)return;
   const p=evOut(e),inside=p.u>=0&&p.u<=1&&p.v>=0&&p.v<=1;
   if(BRUSH_T.has(tool)){if(!inside)return;takeP(e);rebuildPrev();
-    const k=brushKind(),src=outToSrc(p.u,p.v,geoInfo),op={k,p:[src[0],src[1]],r:brushROut()/geoInfo.s/geoInfo.W0,s:brush.strength/100};if(k==="lips")op.c=brush.lip;
-    act={type:"brush",op,last:p,prevOut:[p.u,p.v]};stepLive(op);
-    if(k==="bloat"||k==="pinch"){clearInterval(holdTimer);holdTimer=setInterval(()=>{if(!act||act.op!==op)return;const s=outToSrc(act.last.u,act.last.v,geoInfo);op.p.push(s[0],s[1]);stepLive(op);},70);}
+    const k=brushKind(),src=outToSrc(p.u,p.v,geoInfo),op={k,p:[src[0],src[1]],r:brushROut()/geoInfo.s/geoInfo.W0,s:k==="heal"?1:brush.strength/100};if(k==="lips")op.c=brush.lip;
+    act={type:"brush",op,last:p,prevOut:[p.u,p.v],outPts:[],cloned:false};stepLive(op,p);
+    if(k==="bloat"||k==="pinch"){clearInterval(holdTimer);holdTimer=setInterval(()=>{if(!act||act.op!==op)return;const s=outToSrc(act.last.u,act.last.v,geoInfo);op.p.push(s[0],s[1]);stepLive(op,act.last);},70);}
   }
   else if(tool==="draw"){if(!inside)return;takeP(e);const it={id:"o"+Date.now(),kind:"stroke",pts:[p.u,p.v],color:brush.color,w:brush.penSize/700,style:brush.pen};state.overlays.push(it);act={type:"draw",it};schedule();}
   else if(tool==="text"||tool==="sticker"){const hit=hitTest(p);
@@ -1793,7 +2339,7 @@ stage.addEventListener("pointermove",e=>{
   if(act.type==="brush"){const op=act.op;act.last=p;if(op.k==="bloat"||op.k==="pinch")return;
     const W=geoPrev.width,H=geoPrev.height,prev=act.prevOut;
     if(Math.hypot((p.u-prev[0])*W,(p.v-prev[1])*H)<Math.max(2,brushROut()*0.18))return;
-    act.prevOut=[p.u,p.v];const s=outToSrc(Math.max(0,Math.min(1,p.u)),Math.max(0,Math.min(1,p.v)),geoInfo);op.p.push(s[0],s[1]);stepLive(op);}
+    act.prevOut=[p.u,p.v];const s=outToSrc(Math.max(0,Math.min(1,p.u)),Math.max(0,Math.min(1,p.v)),geoInfo);op.p.push(s[0],s[1]);stepLive(op,p);}
   else if(act.type==="draw"){act.it.pts.push(p.u,p.v);schedule();}
   else if(act.type==="move"){act.it.x=Math.max(0,Math.min(1,act.x0+(p.u-act.u0)));act.it.y=Math.max(0,Math.min(1,act.y0+(p.v-act.v0)));act.moved=true;schedule();}
 },true);
@@ -1842,7 +2388,7 @@ function drawCollageUI(){
   else pv.appendChild(el("p","note","Chọn từ 2 đến 9 ảnh để bắt đầu ghép."));
   const head=el("div","ptitle");head.append(el("h2",null,"Ghép ảnh"));const cl=el("button","ib");cl.type="button";cl.setAttribute("aria-label","Đóng");cl.innerHTML='<svg class="i"><use href="#i-close"/></svg>';cl.onclick=()=>{cmodal.hidden=true;};head.appendChild(cl);side.appendChild(head);
   const fi=document.createElement("input");fi.type="file";fi.accept="image/*";fi.multiple=true;fi.hidden=true;
-  fi.onchange=async()=>{const fs=[...fi.files].filter(f=>/^image\//.test(f.type)).slice(0,9);const imgs=await Promise.all(fs.map(f=>new Promise(res=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=scaled(im,1600);URL.revokeObjectURL(u);res(c);};im.onerror=()=>{URL.revokeObjectURL(u);res(null);};im.src=u;})));
+  fi.onchange=async()=>{const fs=[...fi.files].filter(f=>/^image\//.test(f.type)).slice(0,9);const imgs=await Promise.all(fs.map(f=>new Promise(res=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=scaled(im,desk?3000:2000);URL.revokeObjectURL(u);res(c);};im.onerror=()=>{URL.revokeObjectURL(u);res(null);};im.src=u;})));
     col.imgs=imgs.filter(Boolean);col.layout=0;col.sel=-1;if(col.imgs.length<2)toast("Cần ít nhất 2 ảnh để ghép");drawCollageUI();};
   side.append(fi,btn(col.imgs.length?"Chọn lại ảnh ("+col.imgs.length+")":"Chọn ảnh (2–9)","primary",()=>fi.click()));
   if(col.imgs.length>=2){
@@ -1850,7 +2396,7 @@ function drawCollageUI(){
     const s2=sec("Khổ ảnh");s2.appendChild(chipRow([["1:1","1:1"],["4:5","4:5"],["9:16","9:16"],["3:4","3:4"],["16:9","16:9"]],col.ratio,v=>{col.ratio=v;drawCollageUI();}));side.appendChild(s2);
     side.append(sld("Khoảng cách",0,10,col.gap,v=>{col.gap=v;},v=>drawCollageUI()),sld("Bo góc",0,20,col.radius,v=>{col.radius=v;},v=>drawCollageUI()));
     const s3=sec("Màu nền");s3.appendChild(swRow(BGS.concat(["#0d0d0e"]),col.bg,c=>{col.bg=c;drawCollageUI();}));side.appendChild(s3);
-    side.append(hint("Chạm vào hai ô để đổi chỗ hai ảnh."),btn("Dùng ảnh ghép này","primary",()=>{const c=renderCollage(2400,false);cmodal.hidden=true;setSource(c,false);toast("Đã tạo ảnh ghép. Giờ bạn có thể áp preset và chỉnh tiếp.");}));}
+    side.append(hint("Chạm vào hai ô để đổi chỗ hai ảnh."),btn("Dùng ảnh ghép này","primary",()=>{const c=renderCollage(desk?4000:3000,false);cmodal.hidden=true;setSource(c,false);toast("Đã tạo ảnh ghép. Giờ bạn có thể áp preset và chỉnh tiếp.");}));}
   box.append(pv,side);cmodal.appendChild(box);
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cmodal&&!cmodal.hidden)cmodal.hidden=true;});
@@ -1858,7 +2404,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cmodal&&!cmodal.hid
 
 /* ---------- Boot ---------- */
 try{
-  initGL();wire();renderToolUI();buildMood();buildDesktopGroups();$("mStrength").appendChild(sliderRow("strength","Độ mạnh preset","m-"));buildMine();applyMode();setDTab("adjust");syncAll();pushHistory();
+  initGL();initGPU();wire();if(window.__TPDEBUG){window.__TPDEBUG.setAI=o=>{Object.assign(state.ai,o);retDirty=true;schedule();};window.__TPDEBUG.prev=()=>[origPrev.width,origPrev.height,fullSrc.width,fullSrc.height];window.__TPDEBUG.setAiData=o=>{aiData=Object.assign(aiData||{faces:[],skin:null},o);aiStamp++;retDirty=true;schedule();};window.__TPDEBUG.view=()=>{const r=view.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,iw:imgRect.w,ih:imgRect.h,ix:imgRect.x,iy:imgRect.y,vw:view.width,vh:view.height};};window.__TPDEBUG.ai=()=>aiData&&{faces:aiData.faces.length,bg:!!aiData.bg,skin:!!aiData.skin,w:aiData.w,fs:fsFrac};}renderToolUI();buildMood();buildDesktopGroups();$("mStrength").appendChild(sliderRow("strength","Độ mạnh preset","m-"));buildMine();applyMode();setDTab("adjust");syncAll();pushHistory();
   setSource(makeSample(),true);
   if(document.fonts&&document.fonts.load)document.fonts.load('40px "DotGothic16"').then(()=>schedule()).catch(()=>{});
   getDownloads();
