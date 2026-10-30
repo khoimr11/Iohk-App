@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IOHK Video</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IOHK">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Dancing+Script:wght@700&family=Pacifico&family=DotGothic16&family=Bebas+Neue&display=swap">
+<style>
+:root{
+  --bg:#0a0a0b;--fg:#f4f1ea;--muted:rgba(244,241,234,.64);--faint:rgba(244,241,234,.40);--line:rgba(255,255,255,.09);
+  --glass:rgba(22,23,26,.72);--glass-solid:#16171a;--panel:#121315;--well:rgba(255,255,255,.05);--well-hi:rgba(255,255,255,.10);
+  --accent:#e9b45c;--sel:#f4f1ea;--danger:#ff7a6b;
+  --font-ui:"Inter",system-ui,-apple-system,"SF Pro Text","Segoe UI",sans-serif;
+  --font-display:"Cormorant Garamond","Cormorant",Georgia,serif;
+  --topbar:56px;color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:13px/1.45 var(--font-ui);letter-spacing:-.006em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overscroll-behavior:none;font-feature-settings:"cv05","cv11"}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.num{font-variant-numeric:tabular-nums}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 50px rgba(0,0,0,.45)}
+.ib{width:34px;height:34px;border-radius:9px;display:inline-grid;place-items:center;color:var(--muted);flex:none}
+.ib:hover{background:var(--well-hi);color:var(--fg)}
+.ib[aria-pressed="true"]{background:var(--fg);color:#121212}
+.ib[disabled]{opacity:.3;cursor:default;background:none}
+.pbtn{height:34px;border-radius:999px;padding:0 18px;background:var(--fg);color:#121212;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;flex:none}
+.pbtn:hover{filter:brightness(.92)}
+.pbtn[disabled]{opacity:.55;cursor:progress}
+.tbtn{height:30px;border-radius:8px;padding:0 12px;background:var(--well);border:1px solid var(--line);font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.tbtn:hover{background:var(--well-hi)}
+.tbtn[aria-pressed="true"],.tbtn.on{background:var(--fg);color:#121212;border-color:var(--fg)}
+.tbtn.primary{background:var(--fg);color:#121212;border-color:var(--fg);font-weight:600}
+.tbtn.warn{color:var(--danger)}
+.sep{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+.brand{display:flex;align-items:baseline;gap:10px;flex:none}
+.wm-name{font-family:var(--font-display);font-weight:500;font-size:24px;letter-spacing:.14em;display:flex;align-items:center;line-height:1}
+.wm-o{width:.72em;height:.72em;margin:0 .14em 0 .02em;display:block}
+.wm-sub{font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--faint)}
+.modes{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--well);border:1px solid var(--line);flex:none}
+.mode{height:28px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:500;color:var(--muted)}
+.mode:hover{color:var(--fg)}
+.mode[aria-current="page"]{background:var(--fg);color:#121212}
+.topbar{height:var(--topbar);display:flex;align-items:center;gap:16px;padding:0 14px 0 20px;box-sizing:border-box;border-bottom:1px solid var(--line);background:#0d0d0f;flex:none}
+.topbar .mid{display:flex;align-items:center;gap:2px;margin:0 auto}
+.topbar .right{display:flex;align-items:center;gap:8px}
+.mbrand{display:none;align-items:center;gap:8px;height:38px;padding:0 10px 0 4px;border-radius:19px;font-size:13px;font-weight:600}
+.mbrand img{width:28px;height:28px;border-radius:8px}
+.mbrand svg.i{width:14px;height:14px;color:var(--faint)}
+.modemenu{position:fixed;z-index:60;top:52px;left:10px;border-radius:16px;padding:6px;display:flex;flex-direction:column;min-width:200px}
+.modemenu a{display:flex;flex-direction:column;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}
+.modemenu a small{font-weight:400;font-size:11.5px;color:var(--faint)}
+.modemenu a[aria-current="page"]{background:var(--well-hi)}
+@media (max-width:899px){.topbar{padding:0 8px;gap:4px}.topbar .brand,.topbar .modes{display:none}.mbrand{display:flex}.topbar .mid{margin:0 0 0 auto}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:28px;padding:0 11px;border-radius:999px;background:var(--well);border:1px solid var(--line);font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.chip:hover{color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--fg);color:#121212;border-color:var(--fg)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 8px}
+.row label{font-size:12.5px;color:var(--muted)}
+.row .val{font-size:12px;font-variant-numeric:tabular-nums;color:var(--fg);min-width:40px;text-align:right}
+.row input[type=range]{grid-column:1/-1}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:2px;border-radius:1px;background:var(--track,rgba(255,255,255,.18))}
+input[type=range]::-moz-range-track{height:2px;border-radius:1px;background:var(--track,rgba(255,255,255,.18))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff}
+.field{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0;color:var(--fg);box-sizing:border-box}
+select.field{padding:5px 8px;height:30px}
+textarea.field{resize:vertical;min-height:64px;width:100%}
+.swatches{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.swatch{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.swatch[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;border-radius:50%;cursor:pointer}
+.sec{display:flex;flex-direction:column;gap:8px}
+.sec h4{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ptitle{margin:0;font:500 22px/1.15 var(--font-display)}
+.note{font-size:12px;color:var(--faint);margin:0;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(244,241,234,.96);color:#121212;padding:9px 16px;border-radius:999px;font-weight:500;font-size:12.5px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:80;max-width:calc(100% - 32px);text-align:center}
+.overlay{position:fixed;inset:0;background:rgba(8,8,9,.88);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px}
+.dialog{border-radius:20px;padding:22px 24px;width:min(460px,100%);box-sizing:border-box;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow:auto}
+.dialog h3{margin:0;font:500 24px var(--font-display)}
+.bar{height:4px;border-radius:2px;background:var(--well-hi);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--fg);transition:width .2s}
+.scroll{overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+
+/* Video editor layout. Desktop: media bin | preview | inspector, timeline across the bottom (CapCut desktop).
+   Mobile: preview on top, play bar, timeline with a fixed centre playhead, icon toolbar and a bottom sheet (CapCut mobile). */
+#app{position:fixed;inset:0;display:grid;grid-template-columns:270px minmax(0,1fr) 340px;grid-template-rows:var(--topbar) minmax(0,1fr) auto 264px;grid-template-areas:"top top top" "media prev insp" "media bar insp" "tl tl tl"}
+.topbar{grid-area:top}
+#media{grid-area:media;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+#prevWrap{grid-area:prev;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px;background:#08080a}
+#pv{display:block;max-width:100%;max-height:100%;box-shadow:0 20px 60px rgba(0,0,0,.6);background:#000;touch-action:none}
+#pbar{grid-area:bar;display:flex;align-items:center;gap:8px;padding:6px 14px;border-top:1px solid var(--line);background:#0c0c0e}
+#pbar .tc{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);min-width:120px}
+#pbar .tc b{color:var(--fg);font-weight:600}
+#play{width:40px;height:40px;border-radius:50%;background:var(--fg);color:#121212;display:grid;place-items:center;margin:0 auto}
+#play svg{width:18px;height:18px;fill:currentColor;stroke:none}
+#insp{grid-area:insp;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+#tlBox{grid-area:tl;border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#0e0e10}
+.phd{padding:14px 16px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.phd span{font-size:11.5px;color:var(--faint)}
+.mlist{flex:1;min-height:0;padding:4px 12px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.mitem{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/10;display:block;text-align:left}
+.mitem canvas,.mitem img{width:100%;height:100%;object-fit:cover;display:block}
+.mitem .lb{position:absolute;left:6px;bottom:5px;right:6px;font-size:10.5px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mitem .du{position:absolute;right:5px;top:5px;font-size:10px;font-weight:600;background:rgba(0,0,0,.6);padding:1px 5px;border-radius:4px}
+.mitem .add{position:absolute;right:5px;bottom:5px;width:22px;height:22px;border-radius:50%;background:var(--fg);color:#121212;display:none;place-items:center;font-weight:700}
+.mitem:hover .add{display:grid}
+.mitem.audio{aspect-ratio:auto;height:46px;background:linear-gradient(90deg,#2b2236,#1b2a2c);display:flex;align-items:center;padding:0 10px;grid-column:1/-1}
+.mitem.audio .lb{position:static;text-shadow:none}
+.drop{margin:4px 12px 8px;border:1.5px dashed rgba(255,255,255,.18);border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.itabs{display:flex;gap:2px;padding:10px 12px 6px;overflow-x:auto;scrollbar-width:none;flex:none}
+.itabs::-webkit-scrollbar{display:none}
+.itab{height:30px;padding:0 11px;border-radius:8px;font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.itab[aria-selected="true"]{background:var(--well-hi);color:var(--fg)}
+.ibody{flex:1;min-height:0;padding:6px 16px 20px;display:flex;flex-direction:column;gap:16px}
+.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ptile{display:flex;flex-direction:column;gap:5px;min-width:0;text-align:left}
+.ptile canvas{width:100%;aspect-ratio:1;border-radius:7px;background:var(--well);display:block;outline:1.5px solid transparent;outline-offset:2px}
+.ptile[aria-pressed="true"] canvas{outline-color:var(--fg)}
+.ptile span{font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fxgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fx{height:58px;border-radius:10px;background:var(--well);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:500;color:var(--muted)}
+.fx b{font-size:18px;font-weight:400;color:var(--fg)}
+.fx[aria-pressed="true"]{background:var(--fg);color:#121212;border-color:var(--fg)}
+.fx[aria-pressed="true"] b{color:#121212}
+/* toolbar above timeline */
+.tlbar{display:flex;align-items:center;gap:2px;padding:6px 10px;border-bottom:1px solid var(--line);flex:none;overflow-x:auto;scrollbar-width:none}
+.tlbar::-webkit-scrollbar{display:none}
+.tlbar .grow{flex:1}
+.tlbar .zoom{display:flex;align-items:center;gap:6px;width:150px;color:var(--faint)}
+/* timeline */
+#tl{position:relative;flex:1;min-height:0;user-select:none;-webkit-user-select:none}
+#tlScroll{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;touch-action:pan-x}
+#tlInner{position:relative;height:100%}
+#playhead{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--fg);z-index:6;pointer-events:none;box-shadow:0 0 6px rgba(0,0,0,.6)}
+#playhead::before{content:"";position:absolute;top:0;left:-5px;width:12px;height:8px;background:var(--fg);clip-path:polygon(0 0,100% 0,50% 100%)}
+.ruler{position:absolute;left:0;right:0;top:0;height:22px;color:var(--faint);font-size:10px}
+.ruler i{position:absolute;top:0;height:6px;border-left:1px solid rgba(255,255,255,.18)}
+.ruler i.maj{height:10px;border-color:rgba(255,255,255,.35)}
+.ruler b{position:absolute;top:9px;font-weight:500;transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.track{position:absolute;left:0;right:0}
+.tk-label{position:sticky;left:0;z-index:4;font-size:10px;color:var(--faint);padding:2px 6px}
+.blk{position:absolute;top:0;bottom:0;border-radius:6px;overflow:hidden;cursor:pointer;box-sizing:border-box;touch-action:none}
+.blk.v{background:#222}
+.blk.v canvas{position:absolute;inset:0;width:100%;height:100%}
+.blk .bl{position:absolute;left:6px;top:3px;font-size:10px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap;pointer-events:none;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis}
+.blk .bd{position:absolute;right:6px;bottom:3px;font-size:9.5px;font-weight:600;background:rgba(0,0,0,.55);padding:0 4px;border-radius:3px;pointer-events:none}
+.blk.t{background:linear-gradient(180deg,#6f4cc9,#5a3db0);display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:600;white-space:nowrap}
+.blk.s{background:linear-gradient(180deg,#c9884c,#a86d36)}
+.blk.a{background:linear-gradient(180deg,#1f6f63,#185a50)}
+.blk.a canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
+.blk.sel{box-shadow:inset 0 0 0 2px var(--fg);z-index:3}
+.blk .h{position:absolute;top:0;bottom:0;width:14px;background:var(--fg);display:none;z-index:2}
+.blk .h::after{content:"";position:absolute;top:50%;left:50%;width:2px;height:14px;margin:-7px 0 0 -1px;background:#121212;border-radius:1px}
+.blk .h.l{left:0;border-radius:6px 0 0 6px}
+.blk .h.r{right:0;border-radius:0 6px 6px 0}
+.blk.sel .h{display:block}
+.tr{position:absolute;z-index:5;width:22px;height:22px;margin-left:-11px;border-radius:6px;background:#f4f1ea;color:#121212;display:grid;place-items:center;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.tr.off{background:rgba(20,20,22,.85);color:var(--fg);border:1px solid rgba(255,255,255,.3)}
+.tlempty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--faint);font-size:12.5px;pointer-events:none;text-align:center}
+/* tools row (mobile) */
+#mtools{display:none}
+.mt{flex:none;width:64px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:500;color:var(--muted);border-radius:12px}
+.mt svg.i{width:22px;height:22px}
+.mt:hover,.mt.on{color:var(--fg);background:var(--well)}
+.sheet{position:fixed;z-index:40;left:0;right:0;bottom:0;max-height:58dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(18,19,22,.97)}
+.sheet.open{transform:none}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 0 18px}
+.sbody{overflow:auto;padding:6px 16px 18px;display:flex;flex-direction:column;gap:16px}
+.vempty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--fg)}
+.vempty b{width:64px;height:64px;border-radius:50%;background:var(--fg);color:#121212;display:grid;place-items:center;font-size:34px;font-weight:300}
+.vempty small{font-weight:400;font-size:12px;color:var(--faint)}
+.busy{display:flex;flex-direction:column;gap:12px}
+@media (max-width:1180px){#app{grid-template-columns:230px minmax(0,1fr) 300px}}
+@media (max-width:899px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(50px + env(safe-area-inset-top,0px)) minmax(0,1fr) 46px 178px calc(70px + env(safe-area-inset-bottom,0px));grid-template-areas:"top" "prev" "bar" "tl" "tools"}
+  .topbar{padding-top:env(safe-area-inset-top,0px);height:auto;border-bottom:0;background:#0a0a0b}
+  #media,#insp{display:none}
+  #prevWrap{padding:8px}
+  #pbar{padding:0 10px;border-top:0}
+  #pbar .tc{min-width:0}
+  #pbar .dk{display:none}
+  .tlbar{display:none}
+  #mtools{grid-area:tools;display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding:4px 6px env(safe-area-inset-bottom,0px);border-top:1px solid var(--line);background:#0c0c0e;align-items:flex-start}
+  #mtools::-webkit-scrollbar{display:none}
+  .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:900px){.sheet,.mbrand{display:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M5 12h10a4 4 0 0 1 0 8h-3"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 8l4 4-4 4M19 12H9a4 4 0 0 0 0 8h3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 5v10M7.5 10.5L12 15l4.5-4.5M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><path d="M12 3v18M8 7l-4 5 4 5M16 7l4 5-4 5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-dup" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-speed" viewBox="0 0 24 24"><path d="M4.5 16a7.5 7.5 0 1 1 15 0"/><path d="M12 16l4-5"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></symbol>
+  <symbol id="i-adj" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.3" fill="#0c0c0e"/><circle cx="15" cy="17" r="2.3" fill="#0c0c0e"/></symbol>
+  <symbol id="i-fx" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 24 24"><path d="M7 3v14h14M3 7h14v14"/></symbol>
+  <symbol id="i-trans" viewBox="0 0 24 24"><rect x="3" y="6" width="8" height="12" rx="1.5"/><rect x="13" y="6" width="8" height="12" rx="1.5"/><path d="M10 12h4"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 6.5V5h14v1.5M12 5v14M9 19h6"/></symbol>
+  <symbol id="i-sticker" viewBox="0 0 24 24"><path d="M20 12.5A8 8 0 1 1 11.5 4c0 4.7 3.8 8.5 8.5 8.5z"/><path d="M9 13.5c.8 1.3 2 2 3.4 2M9 9.5h.01"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></symbol>
+  <symbol id="i-ratio" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/></symbol>
+  <symbol id="i-bg" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 15l5-4 4 3 3-2 5 4"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M14 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M10 6l6 6-6 6"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol>
+</svg>
+<div id="app">
+  <header class="topbar">
+    <button class="mbrand" id="mMode" type="button" aria-haspopup="true"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSIwLjM1IiBjeT0iMC4yOCIgcj0iMC45NSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjYyZCIvPjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMTIxNDE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwYjBkIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE0IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjEwNCIgZmlsbD0idXJsKCNhZykiIG1hc2s9InVybCgjY3V0KSIvPgogIDxjaXJjbGUgY3g9IjM0NiIgY3k9IjE3MCIgcj0iMTMiIGZpbGw9IiNmMmEzM2EiLz4KPC9zdmc+Cg==" alt="" width="28" height="28">Video<svg class="i"><use href="#i-chev"/></svg></button>
+    <div class="brand" role="img" aria-label="IOHK Film Lab"><span class="wm-name" aria-hidden="true">I<img class="wm-o" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ijg4IDg4IDMzNiAzMzYiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjE0Ii8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxMDQiIGZpbGw9InVybCgjYWcpIiBtYXNrPSJ1cmwoI2N1dCkiLz4KICA8Y2lyY2xlIGN4PSIzNDYiIGN5PSIxNzAiIHI9IjE2IiBmaWxsPSIjZjJhMzNhIi8+Cjwvc3ZnPgo=" alt="">HK</span><span class="wm-sub" aria-hidden="true">Film Lab</span></div>
+    <nav class="modes" aria-label="Chế độ"><a class="mode" href="index.html">Ảnh</a><a class="mode" href="video.html" aria-current="page">Video</a><a class="mode" href="studio.html">Studio Pro</a></nav>
+    <div class="mid">
+      <button class="ib" id="bUndo" type="button" aria-label="Hoàn tác" title="Hoàn tác (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button>
+      <button class="ib" id="bRedo" type="button" aria-label="Làm lại" title="Làm lại (Ctrl+Shift+Z)"><svg class="i"><use href="#i-redo"/></svg></button>
+    </div>
+    <div class="right">
+      <button class="pbtn" id="bExport" type="button"><svg class="i"><use href="#i-save"/></svg>Xuất video</button>
+    </div>
+  </header>
+  <aside id="media" aria-label="Thư viện media">
+    <div class="phd"><h2 class="ptitle">Media</h2><span id="mCount"></span></div>
+    <div class="drop" id="drop">Kéo thả video, ảnh hoặc nhạc vào đây<button class="tbtn primary" id="bImport" type="button"><svg class="i"><use href="#i-plus"/></svg>Nhập file</button></div>
+    <div class="mlist scroll" id="mlist"></div>
+  </aside>
+  <div id="prevWrap"><canvas id="pv" width="1080" height="1920" aria-label="Xem trước video"></canvas><button class="vempty" id="vEmpty" type="button"><b>+</b>Thêm video, ảnh hoặc nhạc<small>Mọi thứ xử lý ngay trên máy bạn</small></button></div>
+  <div id="pbar">
+    <span class="tc"><b id="tCur">00:00.0</b> / <span id="tDur">00:00.0</span></span>
+    <button id="play" type="button" aria-label="Phát / tạm dừng (Space)"><svg><use href="#i-play"/></svg></button>
+    <button class="ib" id="bFull" type="button" aria-label="Xem toàn màn hình"><svg class="i"><use href="#i-full"/></svg></button>
+  </div>
+  <aside id="insp" aria-label="Thuộc tính">
+    <div class="itabs" id="itabs" role="tablist"></div>
+    <div class="ibody scroll" id="ibody"></div>
+  </aside>
+  <section id="tlBox" aria-label="Dòng thời gian">
+    <div class="tlbar" id="tlbar">
+      <button class="ib" id="tSplit" type="button" title="Tách tại đầu phát (S)" aria-label="Tách"><svg class="i"><use href="#i-split"/></svg></button>
+      <button class="ib" id="tDel" type="button" title="Xoá (Delete)" aria-label="Xoá"><svg class="i"><use href="#i-trash"/></svg></button>
+      <button class="ib" id="tDup" type="button" title="Nhân đôi (Ctrl+D)" aria-label="Nhân đôi"><svg class="i"><use href="#i-dup"/></svg></button>
+      <span class="sep"></span>
+      <button class="ib" id="tLeft" type="button" title="Đưa clip lên trước" aria-label="Đưa clip lên trước"><svg class="i"><use href="#i-left"/></svg></button>
+      <button class="ib" id="tRight" type="button" title="Đưa clip ra sau" aria-label="Đưa clip ra sau"><svg class="i"><use href="#i-right"/></svg></button>
+      <span class="sep"></span>
+      <button class="tbtn" id="tText" type="button"><svg class="i"><use href="#i-text"/></svg>Chữ</button>
+      <button class="tbtn" id="tSticker" type="button"><svg class="i"><use href="#i-sticker"/></svg>Sticker</button>
+      <button class="tbtn" id="tMusic" type="button"><svg class="i"><use href="#i-music"/></svg>Nhạc</button>
+      <span class="grow"></span>
+      <label class="zoom"><svg class="i"><use href="#i-zoom"/></svg><input type="range" id="tZoom" min="0" max="100" value="40" aria-label="Thu phóng dòng thời gian"></label>
+    </div>
+    <div id="tl"><div id="tlScroll"><div id="tlInner"></div></div><div id="playhead"></div><div class="tlempty" id="tlEmpty">Thêm video hoặc ảnh để bắt đầu dựng</div></div>
+  </section>
+  <nav id="mtools" aria-label="Công cụ"></nav>
+</div>
+<nav class="modemenu glass" id="modeMenu" hidden aria-label="Chọn chế độ">
+  <a href="index.html">Ảnh<small>Preset film, chỉnh màu, làm đẹp</small></a>
+  <a href="video.html" aria-current="page">Video<small>Dựng clip kiểu CapCut</small></a>
+  <a href="studio.html">Studio Pro<small>Layer, vùng chọn, mask kiểu Photoshop</small></a>
+</nav>
+<section class="sheet glass" id="sheet" aria-hidden="true"><div class="shead"><h3 class="ptitle" id="sTitle"></h3><button class="ib" id="sClose" type="button" aria-label="Đóng"><svg class="i"><use href="#i-close"/></svg></button></div><div class="sbody" id="sbody"></div></section>
+<input type="file" id="file" accept="video/*,image/*,audio/*" multiple hidden>
+<input type="file" id="fileAudio" accept="audio/*,video/*" hidden>
+<div class="toast" id="toast" hidden role="status"></div>
+<div class="overlay" id="expBox" hidden><div class="dialog glass" id="expDlg"></div></div>
+<script>
+(function(){
+"use strict";
+/* ---------- Params & presets ---------- */
+const NEUTRAL = {exposure:0,contrast:0,highlights:0,shadows:0,fade:0,temp:0,tint:0,saturation:0,vibrance:0,bw:0,
+  shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0};
+const NOSCALE = new Set(["shHue","hiHue","grainSize","date"]);
+const Z9 = [0,0,0,0,0,0,0,0,0];
+const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["fuji","Fujifilm"],["nikon","Nikon"],["leica","Leica"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
+const MOODS = [["warm","Ấm"],["cool","Lạnh"],["pastel","Pastel"],["vivid","Rực"],["faded","Phai"],["contrast","Tương phản"],["grainy","Nhiều hạt"],["atmo","Huyền ảo"],["natural","Tự nhiên"],["mono","Đơn sắc"]];
+function D(id,name,fam,moods,desc,p,mix){return {id,name,fam,moods:moods.split(" ").filter(Boolean),desc,params:Object.assign({},NEUTRAL,p),mix:mix||Z9};}
+
+const PRESETS = [
+ D("none","Gốc","base","","Ảnh nguyên bản, không áp preset.",{}),
+ /* Nhật Bản */
+ D("tokyo400","Tokyo 400","jp","cool pastel natural","Sáng, trong, bóng đổ ngả xanh ngọc. Kiểu ảnh “airy” Nhật Bản, hợp chân dung và phố ban ngày.",
+  {exposure:18,contrast:-18,highlights:-25,shadows:30,fade:22,temp:-8,tint:-6,saturation:-15,vibrance:10,shHue:175,shAmt:30,hiHue:45,hiAmt:12,grain:18,grainSize:30,halation:5,bloom:15},[0,0,0,-0.03,0.02,0.04,0,0.05,0]),
+ D("shimokita","Shimokita","jp","faded cool grainy","Phố nhỏ Tokyo: màu trầm, ngả xanh lá, phai như cuộn film 400 rửa ở tiệm ảnh.",
+  {contrast:10,highlights:-30,shadows:15,fade:28,temp:10,tint:-12,saturation:-25,shHue:150,shAmt:35,hiHue:40,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:5,aberration:5,vignette:20},[0.04,0,-0.02,0,0,0,0,0,0]),
+ D("natsu","Natsu","jp","warm pastel atmo","Mùa hè Nhật Bản: nắng ấm, trời xanh pastel, vệt lóa sáng ở góc.",
+  {exposure:25,contrast:-10,highlights:-35,shadows:25,fade:15,temp:18,tint:4,saturation:5,vibrance:20,shHue:190,shAmt:25,hiHue:35,hiAmt:25,grain:15,grainSize:30,halation:15,bloom:25,leak:35}),
+ D("kissaten","Kissaten","jp","warm atmo grainy","Quán cà phê kiểu Showa: đèn vàng hổ phách, quầng sáng ấm quanh bóng đèn.",
+  {exposure:-5,contrast:15,highlights:-20,shadows:10,fade:12,temp:35,tint:8,saturation:-10,shHue:25,shAmt:25,hiHue:40,hiAmt:30,grain:30,grainSize:40,halation:30,bloom:20,vignette:35}),
+ D("kyoto","Kyoto Matcha","jp","faded cool natural","Xanh lá trầm, mềm, như chùa cổ và vườn rêu.",
+  {contrast:-5,highlights:-20,shadows:15,fade:20,temp:-5,tint:-18,saturation:-30,shHue:140,shAmt:30,hiHue:60,hiAmt:15,grain:25,grainSize:40,vignette:20},[0,0,0,0,0.04,0,0,0,0]),
+ D("sakura","Sakura","jp","pastel warm","Hồng pastel, vùng sáng trắng sữa, nhẹ như mùa hoa anh đào.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:5,tint:25,saturation:-10,vibrance:10,shHue:330,shAmt:20,hiHue:350,hiAmt:25,grain:12,grainSize:30,bloom:25}),
+ D("showa","Showa Diary","jp","faded warm grainy","Album gia đình Nhật thập niên 70: ngả vàng nâu, phai, có in ngày.",
+  {contrast:5,highlights:-25,shadows:10,fade:35,temp:32,tint:5,saturation:-25,shHue:35,shAmt:25,hiHue:40,hiAmt:30,grain:40,grainSize:50,vignette:35,date:1}),
+ D("harajuku","Harajuku Pop","jp","vivid pastel","Màu kẹo rực rỡ, tương phản vừa, rất đường phố Harajuku.",
+  {exposure:12,contrast:15,highlights:-10,shadows:10,fade:8,tint:12,saturation:30,vibrance:25,shHue:270,shAmt:20,hiHue:330,hiAmt:15,grain:10,grainSize:30,bloom:15}),
+ D("kamakura","Kamakura Sea","jp","cool natural","Biển xanh ngọc, nắng trưa trong vắt.",
+  {exposure:15,contrast:5,highlights:-30,shadows:15,fade:10,temp:-20,tint:-8,saturation:5,vibrance:20,shHue:185,shAmt:35,hiHue:50,hiAmt:10,grain:15,grainSize:30}),
+ D("yugure","Yūgure","jp","warm atmo","Hoàng hôn cam tím, quầng sáng nhẹ quanh nguồn sáng.",
+  {exposure:-5,contrast:15,highlights:-25,shadows:5,fade:10,temp:25,tint:20,saturation:10,vibrance:10,shHue:260,shAmt:35,hiHue:25,hiAmt:35,grain:25,grainSize:40,halation:25,bloom:30,vignette:25}),
+ /* Hong Kong */
+ D("kowloon","Kowloon Neon","hk","cool contrast atmo","Đêm Cửu Long: bóng ngả xanh lục, vùng sáng đỏ son, quầng neon lan. Chất điện ảnh Hong Kong thập niên 90.",
+  {exposure:-8,contrast:30,highlights:-15,shadows:-5,fade:10,temp:-5,tint:15,saturation:15,vibrance:10,shHue:165,shAmt:55,hiHue:15,hiAmt:35,grain:45,grainSize:50,halation:55,bloom:30,aberration:15,vignette:35},[0.05,0,0,0,-0.05,0.05,0,0,0]),
+ D("chungking","Chungking","hk","vivid contrast grainy","Vàng lục gắt, nhòe sáng, lệch màu ở rìa. Như máy quay cầm tay giữa phố đêm.",
+  {exposure:5,contrast:40,shadows:-10,fade:5,temp:15,tint:-30,saturation:20,shHue:90,shAmt:40,hiHue:55,hiAmt:30,grain:55,grainSize:55,halation:35,bloom:35,aberration:45,vignette:30}),
+ D("mongkok","Mong Kok 800","hk","cool atmo","Film tungsten chụp đêm: tông xanh lạnh, đèn đường tỏa quầng đỏ mạnh.",
+  {contrast:25,highlights:-20,shadows:5,fade:8,temp:-35,tint:10,saturation:10,vibrance:15,shHue:210,shAmt:35,hiHue:20,hiAmt:10,grain:35,grainSize:40,halation:75,bloom:25,aberration:5,vignette:25}),
+ D("hk97","Hong Kong '97","hk","warm faded","Phim truyền hình Hong Kong cuối thập niên 90: vàng ấm, phớt hồng, mềm và hơi mờ.",
+  {exposure:5,contrast:-5,highlights:-25,shadows:15,fade:30,temp:25,tint:18,saturation:-15,vibrance:5,shHue:290,shAmt:20,hiHue:35,hiAmt:35,grain:30,grainSize:45,halation:20,bloom:30,aberration:10,vignette:20}),
+ D("temple","Temple Street","hk","warm contrast atmo","Chợ đêm đỏ vàng, đèn lồng tỏa quầng mạnh.",
+  {exposure:-5,contrast:35,highlights:-15,shadows:-10,fade:5,temp:25,tint:10,saturation:25,shHue:10,shAmt:25,hiHue:40,hiAmt:25,grain:40,grainSize:45,halation:60,bloom:30,vignette:35}),
+ D("starferry","Star Ferry","hk","cool natural","Bến cảng xanh lơ, bóng đổ ngả xanh lục.",
+  {exposure:5,contrast:10,highlights:-20,shadows:10,fade:12,temp:-25,tint:-10,saturation:-5,vibrance:10,shHue:170,shAmt:40,hiHue:195,hiAmt:15,grain:25,grainSize:35,bloom:10,vignette:20}),
+ D("chachaan","Cha Chaan Teng","hk","warm faded","Quán trà kiểu Hong Kong dưới đèn huỳnh quang vàng xanh.",
+  {exposure:5,contrast:10,highlights:-20,shadows:15,fade:25,temp:15,tint:-25,saturation:-10,shHue:100,shAmt:30,hiHue:60,hiAmt:30,grain:30,grainSize:40,halation:15,bloom:15,vignette:20}),
+ D("rainykowloon","Rainy Kowloon","hk","cool atmo","Mưa đêm xanh dương, đèn đường nhòe sáng.",
+  {exposure:-10,contrast:20,highlights:-15,fade:10,temp:-30,tint:8,saturation:10,vibrance:15,shHue:215,shAmt:40,hiHue:200,hiAmt:15,grain:35,grainSize:45,halation:35,bloom:45,aberration:10,vignette:30}),
+ D("redlantern","Red Lantern","hk","vivid contrast mono","Gần như đơn sắc đỏ, chỉ còn tông đỏ cam như dưới đèn lồng.",
+  {exposure:-5,contrast:40,highlights:-10,shadows:-15,saturation:20,bw:85,shHue:0,shAmt:70,hiHue:15,hiAmt:60,grain:35,grainSize:45,halation:30,bloom:20,vignette:35}),
+ /* Fujifilm */
+ D("f1","F1 Chuẩn","fuji","natural","Cảm hứng từ Provia của Fujifilm: màu trung thực, tương phản vừa, dùng được cho mọi cảnh.",{contrast:10,saturation:8,vibrance:5}),
+ D("f2","F2 Rực","fuji","vivid contrast","Cảm hứng từ Velvia: bão hòa cao, trời xanh và lá cây rất đậm. Hợp phong cảnh.",{contrast:30,shadows:-10,saturation:40,vibrance:20,vignette:5},[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05]),
+ D("f3","F3 Mềm","fuji","pastel natural","Cảm hứng từ Astia: tương phản mềm, da đẹp, màu dịu.",{contrast:-10,highlights:-15,shadows:10,saturation:5,vibrance:10,temp:3,tint:3}),
+ D("f4","F4 Chrome","fuji","faded contrast","Cảm hứng từ Classic Chrome: màu trầm, bóng đổ đậm, xanh ngả cyan. Rất hợp ảnh đường phố.",
+  {contrast:15,highlights:-15,shadows:-15,saturation:-30,vibrance:-5,temp:5,tint:-3,shHue:200,shAmt:20,hiHue:45,hiAmt:10,grain:15,grainSize:30},[-0.02,0.02,0,0,0,0,0,0.04,-0.02]),
+ D("f5","F5 Neg Cổ","fuji","cool contrast faded","Cảm hứng từ Classic Negative: tương phản gắt, bóng ngả xanh lục, đỏ đậm, như film màu bình dân.",
+  {contrast:30,highlights:-10,shadows:-5,fade:8,temp:-3,tint:8,saturation:5,shHue:175,shAmt:35,hiHue:340,hiAmt:15,grain:25,grainSize:35},[0.05,-0.02,0,0,0,0.03,0,0.04,0]),
+ D("f6","F6 Hoài niệm","fuji","warm faded","Cảm hứng từ Nostalgic Neg: vùng sáng hổ phách, bóng đổ mềm, như ảnh in thập niên 70.",
+  {highlights:-20,shadows:10,fade:10,temp:15,tint:5,saturation:5,shHue:20,shAmt:10,hiHue:38,hiAmt:35,grain:15,grainSize:30}),
+ D("f7","F7 Real","fuji","natural","Cảm hứng từ Reala Ace: trung thực, trong, tương phản rõ hơn một chút.",{contrast:12,highlights:-10,saturation:8,vibrance:10,temp:2,grain:5,grainSize:20}),
+ D("f8","F8 Pro Neg","fuji","natural faded","Cảm hứng từ Pro Neg: mềm, ít bão hòa, dành cho chân dung studio.",{contrast:-12,highlights:-15,shadows:10,saturation:-12,temp:4,grain:8,grainSize:20}),
+ D("f9","F9 Cine","fuji","cool faded atmo","Cảm hứng từ Eterna: phẳng, ít màu, bóng ngả xanh mòng két như film điện ảnh.",
+  {contrast:-30,highlights:-25,shadows:20,fade:10,saturation:-30,shHue:185,shAmt:30,hiHue:40,hiAmt:10,grain:15,grainSize:30}),
+ D("f10","F10 Cine Bạc","fuji","faded contrast","Cảm hứng từ Eterna Bleach Bypass: bạc màu, tương phản cao.",{contrast:40,shadows:-15,fade:5,saturation:-60,shHue:190,shAmt:20,grain:20,grainSize:30}),
+ D("f11","F11 Acr","fuji","mono natural","Cảm hứng từ Acros: đen trắng hạt mịn, dải xám giàu, đen sâu.",{bw:100,contrast:25,highlights:-5,shadows:-10,grain:25,grainSize:20}),
+ D("f12","F12 Acr Đỏ","fuji","mono contrast","Đen trắng kèm kính lọc đỏ: trời tối hẳn, da sáng, tương phản mạnh.",{bw:100,contrast:35,shadows:-15,grain:25,grainSize:20},[0,0,0,0.5,-0.4,0,0.6,0,-0.6]),
+ D("f13","F13 Sepia","fuji","mono warm","Đen trắng tông nâu sepia nhẹ.",{bw:100,contrast:5,fade:10,shHue:30,shAmt:40,hiHue:38,hiAmt:45,grain:15,grainSize:30}),
+ /* Nikon */
+ D("n1","N1 Chuẩn","nikon","natural","Cảm hứng từ Picture Control Standard của Nikon: cân bằng, hơi tươi.",{contrast:10,saturation:10,vibrance:5}),
+ D("n2","N2 Rực","nikon","vivid","Cảm hứng từ Picture Control Vivid: màu rực, tương phản rõ.",{contrast:22,saturation:30,vibrance:15}),
+ D("n3","N3 Chân dung","nikon","natural warm","Cảm hứng từ Picture Control Portrait: da mịn, ấm nhẹ, tương phản thấp.",{contrast:-8,highlights:-10,shadows:8,saturation:-5,temp:4,tint:4}),
+ D("n4","N4 Phong cảnh","nikon","vivid natural","Cảm hứng từ Picture Control Landscape: lá xanh và trời xanh đậm hơn.",{contrast:18,saturation:20,vibrance:25},[0,0,0,0,0.04,0,0,0,0.04]),
+ D("n5","N5 Mộng","nikon","pastel atmo","Cảm hứng từ Creative Picture Control Dream: sáng, mềm, phớt hồng, lan sáng.",{exposure:15,contrast:-25,highlights:-20,shadows:20,fade:15,saturation:-5,tint:6,hiHue:330,hiAmt:15,bloom:25}),
+ D("n6","N6 Ban mai","nikon","cool pastel","Cảm hứng từ Morning: lạnh, trong, nhẹ như sáng sớm.",{exposure:12,contrast:-15,fade:12,temp:-18,tint:-4,saturation:-15,shHue:190,shAmt:25}),
+ D("n7","N7 Pop","nikon","vivid","Cảm hứng từ Pop: màu đậm và tươi, nhất là hồng và đỏ.",{contrast:25,saturation:40,vibrance:25,tint:8}),
+ D("n8","N8 Chủ nhật","nikon","warm faded","Cảm hứng từ Sunday: ấm, mềm, thư thả.",{exposure:8,contrast:-10,fade:10,temp:22,tint:6,hiHue:40,hiAmt:25,bloom:10}),
+ D("n9","N9 U trầm","nikon","contrast vivid","Cảm hứng từ Somber: tối hơn, tương phản và bão hòa tăng.",{exposure:-12,contrast:30,shadows:-15,saturation:20,temp:-5,vignette:30}),
+ D("n10","N10 Kịch tính","nikon","contrast","Cảm hứng từ Dramatic: trời tối hẳn, tương phản mạnh, màu giảm.",{contrast:45,highlights:-40,shadows:-20,saturation:-15,grain:15,grainSize:30,vignette:35},[0,0,0,0,0,0,0,0,-0.15]),
+ D("n11","N11 Tĩnh lặng","nikon","faded cool","Cảm hứng từ Silence: trầm, lạnh, ít màu.",{contrast:-20,fade:20,saturation:-35,temp:-10,shHue:210,shAmt:15}),
+ D("n12","N12 Tẩy màu","nikon","faded contrast","Cảm hứng từ Bleached: bạc màu, tương phản cao.",{contrast:35,highlights:5,fade:8,saturation:-50}),
+ D("n13","N13 Sầu","nikon","cool faded","Cảm hứng từ Melancholic: ít màu, ngả xanh, buồn.",{exposure:-5,contrast:10,fade:12,saturation:-40,temp:-15,shHue:220,shAmt:30,vignette:20}),
+ D("n14","N14 Trong","nikon","faded pastel","Cảm hứng từ Pure: phai, nhạt màu, sạch.",{exposure:10,contrast:-15,fade:25,saturation:-30}),
+ D("n15","N15 Denim","nikon","cool mono","Cảm hứng từ Denim: gần đơn sắc, phủ xanh vải jean.",{contrast:10,bw:70,shHue:215,shAmt:55,hiHue:205,hiAmt:25}),
+ D("n16","N16 Đồ chơi","nikon","faded","Cảm hứng từ Toy: màu phai, tối góc nặng như máy ảnh đồ chơi.",{contrast:15,fade:20,temp:8,saturation:-15,grain:20,grainSize:40,vignette:70}),
+ D("n17","N17 Than","nikon","mono grainy","Cảm hứng từ Charcoal: đen trắng mềm, hạt thô như vẽ than.",{bw:100,contrast:-5,fade:15,grain:55,grainSize:55}),
+ D("n18","N18 Chì","nikon","mono contrast","Cảm hứng từ Graphite: đen trắng tương phản mạnh.",{bw:100,contrast:55,shadows:-20,grain:20,grainSize:30}),
+ D("n19","N19 Nhị phân","nikon","mono contrast","Cảm hứng từ Binary: gần như chỉ còn đen và trắng.",{exposure:5,bw:100,contrast:100,highlights:20,shadows:-50}),
+ /* Leica */
+ D("l1","L1 Chuẩn","leica","natural","Cảm hứng từ Leica Standard: đen sâu, màu cân bằng, tương phản vi mô rõ.",{contrast:15,shadows:-8,saturation:8,vignette:8}),
+ D("l2","L2 Tự nhiên","leica","natural","Cảm hứng từ Leica Natural: trung thực, nhẹ nhàng.",{contrast:8,shadows:-5,saturation:-5,vignette:6}),
+ D("l3","L3 Rực","leica","vivid","Cảm hứng từ Leica Vivid: màu đậm, đen sâu.",{contrast:25,shadows:-10,saturation:28,vibrance:10,vignette:10}),
+ D("l4","L4 Chrome","leica","contrast faded","Cảm hứng từ Leica Chrome: tinh tế, màu hơi trầm, khó nhận ra là đã chỉnh.",{contrast:18,shadows:-12,saturation:-18,temp:3,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,0,0]),
+ D("l5","L5 Cổ điển","leica","warm contrast","Cảm hứng từ Leica Classic: như film âm bản màu, đỏ đậm nhưng không gắt.",
+  {contrast:20,highlights:-10,shadows:-10,fade:6,temp:6,saturation:5,shHue:190,shAmt:15,hiHue:40,hiAmt:15,grain:15,grainSize:30,vignette:12},[0.06,-0.03,0,0,0,0,0,0,0]),
+ D("l6","L6 Đương đại","leica","cool natural","Cảm hứng từ Leica Contemporary: sạch, hiện đại, hơi lạnh.",{contrast:12,highlights:-15,temp:-8,saturation:-10,vibrance:10,shHue:205,shAmt:15}),
+ D("l7","L7 Vĩnh cửu","leica","atmo faded","Cảm hứng từ Leica Eternal: điện ảnh, ít màu, bóng ngả xanh, vùng sáng ấm.",
+  {contrast:-10,highlights:-20,shadows:5,fade:10,temp:8,saturation:-25,shHue:185,shAmt:25,hiHue:35,hiAmt:20,grain:12,grainSize:30}),
+ D("l8","L8 Đồng thau","leica","warm","Cảm hứng từ Leica Brass: ấm áp, hợp nhiều chủ đề.",{contrast:12,temp:22,tint:4,saturation:-5,shHue:30,shAmt:15,hiHue:40,hiAmt:30}),
+ D("l9","L9 Mòng két","leica","cool atmo","Cảm hứng từ Leica Teal: bóng xanh mòng két, vùng sáng ấm, hợp cảnh tối và đèn flash.",
+  {contrast:20,shadows:-10,temp:-10,saturation:-5,shHue:182,shAmt:50,hiHue:32,hiAmt:30,vignette:15}),
+ D("l10","L10 Cine","leica","atmo","Cảm hứng từ Leica Cine: tông điện ảnh, vùng sáng mềm, quầng nhẹ.",
+  {contrast:15,highlights:-25,shadows:-5,fade:8,saturation:-15,shHue:195,shAmt:30,hiHue:35,hiAmt:25,grain:18,grainSize:30,halation:10,vignette:15}),
+ D("l11","L11 Bạc","leica","faded cool","Cảm hứng từ Leica Silver: gần như hết màu, ánh bạc lạnh.",{contrast:10,highlights:-10,fade:10,saturation:-45,temp:-6}),
+ D("l12","L12 Mono","leica","mono","Cảm hứng từ Leica Monochrome: đen trắng sạch, đen sâu.",{bw:100,contrast:20,shadows:-10,grain:10,grainSize:20,vignette:10}),
+ D("l13","L13 Mono HC","leica","mono contrast","Cảm hứng từ Leica Monochrome High Contrast: đen trắng gắt, đen đặc.",{bw:100,contrast:60,highlights:10,shadows:-30,grain:12,grainSize:25,vignette:15}),
+ D("l14","L14 Xanh lam","leica","mono cool","Cảm hứng từ Leica Blue: đen trắng phủ xanh lam.",{bw:100,contrast:15,shHue:220,shAmt:45,hiHue:210,hiAmt:20}),
+ /* Film màu cổ điển */
+ D("gold200","Gold 200","color","warm natural","Film thường ngày giá bình dân: vàng óng, ấm, hợp nắng chiều.",
+  {exposure:8,contrast:12,highlights:-15,shadows:10,fade:10,temp:28,tint:4,saturation:15,vibrance:10,shHue:30,shAmt:15,hiHue:45,hiAmt:25,grain:25,grainSize:35,halation:10,bloom:10,vignette:15}),
+ D("chrome64","Chrome 64","color","vivid contrast","Film dương bản thập niên 60: đỏ đậm, xanh sâu, bóng tối dày.",
+  {exposure:-8,contrast:45,highlights:-10,shadows:-25,temp:8,saturation:30,vibrance:5,shHue:220,shAmt:15,hiHue:40,hiAmt:10,grain:20,grainSize:25,halation:5,vignette:25},[0.06,-0.03,0,0,0,0,0,-0.02,0.05]),
+ D("portrait160","Portrait 160","color","warm faded natural","Da mềm, màu tự nhiên, tương phản thấp. Hợp chân dung.",
+  {exposure:8,contrast:-15,highlights:-20,shadows:15,fade:10,temp:8,tint:4,saturation:-12,vibrance:5,shHue:200,shAmt:10,hiHue:35,hiAmt:12,grain:12,grainSize:25}),
+ D("portrait400","Portrait 400","color","warm natural","Sáng hơn, vùng sáng màu kem, hạt mịn.",
+  {exposure:15,contrast:-8,highlights:-25,shadows:15,fade:8,temp:10,tint:3,saturation:-5,vibrance:10,shHue:190,shAmt:12,hiHue:40,hiAmt:18,grain:18,grainSize:30,bloom:8}),
+ D("pastel400h","Pastel 400H","color","pastel cool","Xanh lá ngả cyan, pastel, kiểu ảnh cưới ngoài trời.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:-5,tint:-10,saturation:-15,vibrance:5,shHue:170,shAmt:30,hiHue:60,hiAmt:10,grain:15,grainSize:30,bloom:12},[0,0,0,0,0,0.03,0,0.06,-0.02]),
+ D("street200","Street 200","color","cool grainy","Xanh lá đặc trưng film bình dân, hơi lạnh, hạt rõ.",
+  {contrast:15,highlights:-15,shadows:5,fade:10,temp:-8,tint:-15,saturation:5,shHue:140,shAmt:25,hiHue:55,hiAmt:10,grain:35,grainSize:40,vignette:15}),
+ D("color400","Color 400","color","vivid warm","Rực, đậm, hợp ảnh du lịch và đường phố ban ngày.",
+  {exposure:5,contrast:20,highlights:-10,shadows:5,fade:5,temp:12,tint:2,saturation:25,vibrance:15,shHue:210,shAmt:10,hiHue:40,hiAmt:15,grain:25,grainSize:35,vignette:10}),
+ D("vivid100","Vivid 100","color","vivid natural","Bão hòa cao, hạt rất mịn, trời xanh đậm.",
+  {contrast:25,highlights:-15,shadows:-5,temp:5,saturation:35,vibrance:25,shHue:220,shAmt:10,hiHue:40,hiAmt:8,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,-0.02,0.04]),
+ D("slide50","Slide 50","color","vivid contrast","Dương bản phong cảnh: xanh lá và đỏ rất đậm.",
+  {exposure:-10,contrast:40,highlights:-10,shadows:-20,tint:-5,saturation:45,vibrance:15,shHue:230,shAmt:15,hiHue:50,hiAmt:5,grain:8,grainSize:20,vignette:20},[0.05,-0.03,0,-0.02,0.05,-0.02,0,-0.02,0.04]),
+ D("slide100","Slide 100","color","natural contrast","Dương bản cân bằng, trong và sạch.",
+  {exposure:-3,contrast:25,highlights:-15,shadows:-10,temp:-3,saturation:15,vibrance:10,shHue:210,shAmt:8,hiHue:50,hiAmt:5,grain:6,grainSize:20,vignette:8}),
+ /* Điện ảnh */
+ D("super8","Super 8","cine","warm grainy faded","Thước phim quay tay 8mm: hạt dày, tối góc mạnh, lóa sáng cam.",
+  {contrast:25,highlights:-10,shadows:-5,fade:15,temp:30,tint:5,saturation:10,shHue:15,shAmt:25,hiHue:45,hiAmt:20,grain:75,grainSize:70,halation:25,bloom:15,aberration:20,vignette:65,leak:45}),
+ D("tungsten500","Tungsten 500","cine","cool atmo","Film máy quay chụp dưới đèn: xanh lạnh, quầng đỏ quanh đèn.",
+  {contrast:15,highlights:-25,shadows:10,fade:8,temp:-40,tint:5,saturation:5,vibrance:10,shHue:210,shAmt:30,hiHue:30,hiAmt:10,grain:30,grainSize:35,halation:50,bloom:20}),
+ D("tealorange","Teal & Orange","cine","contrast warm","Da cam, bóng đổ xanh mòng két kiểu phim bom tấn.",
+  {contrast:30,highlights:-20,shadows:-5,fade:5,temp:10,saturation:15,shHue:185,shAmt:60,hiHue:30,hiAmt:45,grain:15,grainSize:30,vignette:25}),
+ D("bleach","Bleach Bypass","cine","faded contrast","Bạc màu, tương phản gắt, cảm giác kim loại.",
+  {contrast:55,highlights:5,shadows:-20,fade:5,temp:-5,saturation:-55,shHue:200,shAmt:10,grain:30,grainSize:35,vignette:30}),
+ D("nightdrive","Night Drive","cine","warm atmo contrast","Đèn đường natri cam, bóng đêm xanh đen.",
+  {exposure:-10,contrast:30,highlights:-10,shadows:-15,fade:5,temp:30,tint:5,saturation:10,shHue:205,shAmt:50,hiHue:30,hiAmt:40,grain:40,grainSize:45,halation:40,bloom:30,vignette:40}),
+ D("dayfornight","Day for Night","cine","cool atmo","Biến ảnh ban ngày thành đêm xanh, kỹ thuật cũ của điện ảnh.",
+  {exposure:-55,contrast:30,highlights:-30,shadows:-10,temp:-45,tint:5,saturation:-40,shHue:220,shAmt:40,hiHue:210,hiAmt:20,grain:25,grainSize:35,vignette:45}),
+ /* Retro / Y2K */
+ D("disposable98","Disposable '98","retro","vivid contrast grainy","Máy film dùng một lần cuối thập niên 90: màu rực, tối góc, hạt thô, in ngày màu cam.",
+  {exposure:5,contrast:35,highlights:10,shadows:-10,fade:8,temp:12,tint:6,saturation:25,vibrance:10,shHue:220,shAmt:15,hiHue:45,hiAmt:10,grain:45,grainSize:55,halation:12,bloom:10,aberration:25,vignette:45,leak:10,date:1}),
+ D("ccd2003","CCD 2003","retro","vivid cool","Máy ảnh số đời đầu: trời xanh gắt, viền sáng, in ngày ở góc.",
+  {exposure:10,contrast:25,highlights:15,shadows:-5,temp:-12,saturation:20,vibrance:15,shHue:220,shAmt:15,hiHue:200,hiAmt:10,bloom:20,aberration:15,chroma:20,lofi:10,date:1}),
+ D("dvcam","DV Cam","retro","faded grainy","Máy quay MiniDV: mềm, lệch màu nhẹ, in ngày giờ màu trắng.",
+  {exposure:5,contrast:5,highlights:-10,shadows:10,fade:15,temp:-5,tint:5,saturation:-5,shHue:210,shAmt:15,hiHue:50,hiAmt:10,bloom:20,aberration:30,chroma:35,lofi:20,vignette:15,date:2}),
+ D("flashparty","Flash Party","retro","contrast vivid","Đèn flash trực diện: nền tối, da sáng, góc tối.",
+  {exposure:10,contrast:45,highlights:5,shadows:-40,temp:5,saturation:15,vibrance:10,grain:25,grainSize:35,bloom:15,aberration:10,vignette:50,date:1}),
+ D("webcam2008","Webcam 2008","retro","cool grainy","Webcam laptop đời cũ: nhiễu màu, ngả xanh, độ phân giải thấp.",
+  {exposure:5,contrast:15,highlights:10,shadows:-10,fade:10,temp:-20,tint:-10,saturation:-20,shHue:190,shAmt:20,chroma:60,lofi:45,vignette:30}),
+ D("vhs","VHS Home","retro","faded warm","Băng video gia đình: mờ, tràn màu đỏ, in ngày giờ.",
+  {exposure:5,contrast:-10,highlights:-15,shadows:10,fade:25,temp:10,tint:10,saturation:15,shHue:300,shAmt:15,hiHue:20,hiAmt:20,bloom:35,aberration:55,chroma:40,lofi:30,vignette:25,date:2}),
+ /* Vintage */
+ D("faded70","Faded 70s","vintage","faded warm grainy","Ảnh gia đình bạc màu trong album cũ: phai, ngả cam, nhạt màu.",
+  {exposure:5,contrast:-25,highlights:-30,shadows:20,fade:45,temp:30,tint:10,saturation:-35,shHue:30,shAmt:30,hiHue:35,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:15,vignette:30}),
+ D("polar","Instant","vintage","faded pastel cool","Ảnh chụp lấy liền: bóng ngả xanh ngọc, vùng sáng màu kem, mềm.",
+  {exposure:10,contrast:-20,highlights:-35,shadows:25,fade:30,temp:5,tint:-10,saturation:-20,shHue:175,shAmt:40,hiHue:50,hiAmt:25,grain:15,grainSize:30,halation:5,bloom:20,vignette:30}),
+ D("sepia","Sepia Book","vintage","mono faded grainy","Trang sách cũ, báo xưa: tông nâu sepia, tương phản mềm.",
+  {exposure:5,contrast:10,highlights:-15,shadows:15,fade:25,bw:100,shHue:30,shAmt:35,hiHue:40,hiAmt:45,grain:40,grainSize:50,vignette:45}),
+ D("crossprocess","Cross Process","vintage","vivid contrast","Film tráng nhầm thuốc: vàng xanh gắt, da hồng.",
+  {exposure:5,contrast:35,highlights:-10,shadows:-10,temp:10,tint:-20,saturation:25,shHue:180,shAmt:40,hiHue:60,hiAmt:45,grain:25,grainSize:35,vignette:30},[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1]),
+ D("expired","Expired Film","vintage","faded grainy","Film hết hạn: ám tím đỏ, phai, hạt to, lóa sáng.",
+  {exposure:5,contrast:-10,highlights:-25,shadows:15,fade:35,temp:15,tint:30,saturation:-20,shHue:300,shAmt:35,hiHue:20,hiAmt:30,grain:55,grainSize:60,halation:15,leak:25,vignette:35}),
+ D("autochrome","Autochrome","vintage","pastel faded grainy","Ảnh màu thập niên 1910: pastel, chấm hạt màu li ti.",
+  {exposure:5,contrast:-15,highlights:-25,shadows:15,fade:30,temp:15,tint:5,saturation:-25,shHue:120,shAmt:20,hiHue:45,hiAmt:30,grain:70,grainSize:75,chroma:50,vignette:45}),
+ /* Đen trắng */
+ D("shinjuku","Shinjuku Noir","bw","mono contrast grainy","Đen trắng tương phản gắt, hạt thô, kiểu nhiếp ảnh đường phố Shinjuku thập niên 70.",
+  {exposure:-5,contrast:70,highlights:10,shadows:-35,bw:100,grain:65,grainSize:60,bloom:10,vignette:40}),
+ D("silver400","Silver 400","bw","mono natural","Đen trắng cổ điển, dải xám giàu sắc độ.",
+  {contrast:20,highlights:-10,shadows:5,bw:100,grain:30,grainSize:35,vignette:15}),
+ D("softmono","Soft Mono","bw","mono faded","Đen trắng mềm, màu đen được nâng nhẹ.",
+  {exposure:8,contrast:-20,highlights:-25,shadows:20,fade:25,bw:100,grain:20,grainSize:35,bloom:10,vignette:20}),
+ D("push3200","Push 3200","bw","mono contrast grainy","Film đẩy ISO: hạt rất to, đen sâu.",
+  {contrast:60,highlights:5,shadows:-40,bw:100,grain:85,grainSize:80,vignette:35}),
+ D("cyanotype","Cyanotype","bw","mono cool","Ảnh in xanh lam kiểu bản vẽ kỹ thuật cũ.",
+  {exposure:5,contrast:15,highlights:-15,shadows:10,fade:15,bw:100,duo:90,shHue:215,hiHue:195,grain:20,grainSize:35,vignette:25}),
+ D("selenium","Selenium","bw","mono cool contrast","Đen trắng ngả tím lạnh ở vùng tối.",
+  {contrast:30,highlights:-10,shadows:-10,bw:100,shHue:275,shAmt:30,hiHue:40,hiAmt:8,grain:30,grainSize:35,vignette:20}),
+ /* Đặc biệt */
+ D("irpink","Infrared Pink","special","vivid","Hồng ngoại: lá cây chuyển hồng đỏ, trời tím nhạt.",
+  {exposure:5,contrast:15,saturation:20,hiHue:330,hiAmt:15,grain:20,grainSize:35},[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0]),
+ D("irgold","Infrared Gold","special","vivid warm","Hồng ngoại vàng: lá cây chuyển vàng, trời xanh đậm.",
+  {contrast:20,temp:10,saturation:15,shHue:220,shAmt:20,grain:20,grainSize:35},[-0.3,0.7,0,0.3,0.1,-0.1,0,-0.3,0.2]),
+ D("duotone","Duotone","special","contrast vivid","Hai màu tím và cam cho vùng tối và vùng sáng. Đổi cặp màu ở mục Phủ màu.",
+  {contrast:20,duo:100,shHue:260,hiHue:30,grain:10,grainSize:30}),
+ D("lomo","Lomo","special","vivid contrast","Tối góc nặng, bão hòa cao, lệch màu kiểu máy đồ chơi.",
+  {contrast:40,shadows:-15,temp:5,saturation:40,vibrance:20,shHue:200,shAmt:25,hiHue:50,hiAmt:20,grain:25,grainSize:35,aberration:30,vignette:80}),
+];
+
+const GROUPS = [
+ {id:"light",tab:"adjust",title:"Ánh sáng",items:[["exposure","Phơi sáng",-100,100],["contrast","Tương phản",-100,100],["highlights","Vùng sáng",-100,100],["shadows","Vùng tối",-100,100],["fade","Phai màu",0,100]]},
+ {id:"color",tab:"adjust",title:"Màu sắc",items:[["temp","Nhiệt độ màu",-100,100],["tint","Tint",-100,100],["saturation","Độ bão hòa",-100,100],["vibrance","Độ tươi",-100,100],["bw","Đen trắng",0,100]]},
+ {id:"split",tab:"adjust",title:"Phủ màu",items:[["shHue","Màu vùng tối",0,360,"hue"],["shAmt","Độ đậm vùng tối",0,100],["hiHue","Màu vùng sáng",0,360,"hue"],["hiAmt","Độ đậm vùng sáng",0,100],["duo","Duotone",0,100]]},
+ {id:"grain",tab:"fx",title:"Hạt film",items:[["grain","Lượng hạt",0,100],["grainSize","Cỡ hạt",0,100]]},
+ {id:"glow",tab:"fx",title:"Ánh sáng film",items:[["halation","Halation",0,100],["bloom","Bloom",0,100],["leak","Light leak",0,100]]},
+ {id:"lens",tab:"fx",title:"Ống kính",items:[["aberration","Lệch màu viền",0,100],["vignette","Tối góc",0,100]]},
+ {id:"digital",tab:"fx",title:"Máy số đời đầu",items:[["lofi","Độ phân giải thấp",0,100],["chroma","Nhiễu màu",0,100]]},
+];
+
+/* ---------- VSCO-inspired presets (approximations; codes follow VSCO's official preset guide) ---------- */
+(function(){
+const SER={
+ LG:["vsco","Legacy","bộ màu gốc thời VSCO Cam 2012, đơn giản, bền"],
+ AR:["vsco","Archetype","pastel nhẹ, nâng trung tông, hơi dư sáng; hợp chân dung, nội thất, đồ ăn"],
+ AE:["vsco","Aesthetic","màu tự nhiên, lệch màu tinh tế, phai nhẹ"],
+ AN:["vsco","Analog","chất film analog phai và ấm"],
+ BC:["vsco","B&W Classic","đen trắng tinh tế, giữ chi tiết vùng tối"],
+ BM:["vsco","B&W Moody","đen trắng tương phản cao, u buồn; hợp chân dung"],
+ CV:["vsco","Vibrant Classic","tăng màu có kiểm soát, đa dụng"],
+ CC:["vsco","Chromatic","màu film giữa thế kỷ 20: màu cơ bản đậm, màu trung tính trầm"],
+ ES:["vsco","Essence","vùng sáng vàng óng, bóng đổ sâu"],
+ ME:["vsco","Mellow","nhạt màu, nhẹ nhàng, da đẹp; cho khoảnh khắc thường ngày"],
+ PO:["vsco","Portrait","chân dung tươi, da đều màu"],
+ PS:["vsco","Portrait","chân dung cho nhiều bối cảnh, sắc ấm, lạnh hoặc trung tính"],
+ PC:["vsco","Polychrome","đa dụng, phớt hồng, vàng hoặc tím"],
+ MI:["vsco","Minimalist","tĩnh lặng; hợp chân dung, kiến trúc"],
+ KC:["vsco","Analog Classic","tươi, rực, cảm hứng từ film Kodachrome"],
+ MU:["vsco","Mood","hơi thiếu sáng, phai nhẹ, tông nâu và xanh lá cho thiên nhiên"],
+ SF:["vsco","Subtle Fade","nhạt màu, êm, tông vintage thập niên 70"],
+ NM:["vsco","New Modern","đậm, hiện đại; hợp đèn flash hoặc nắng gắt"],
+ IW:["vsco","Instant + Warm","ảnh lấy liền ấm, mịn như kem"],
+ IC:["vsco","Instant + Cool","ảnh lấy liền lạnh, phai xanh"],
+ IK:["vsco","Instant Classic","ảnh lấy liền cổ điển ngả vàng hoặc xanh"],
+ AY:["vsco","Alchemy","kiểu tráng chéo: lệch màu mạnh, tương phản cao"],
+ BR:["vsco","Bright + Clean","sáng, sạch, da đẹp"],
+ BW:["vsco","Bright + Warm","sáng ấm mùa hè, tông cam vàng"],
+ HF:["vsco","Heavy Fade","phai đậm, sắc màu kịch tính cho cảnh tối"],
+ UR:["vsco","Urban","đời sống thành phố, mọi thời tiết"],
+ LC:["vsco","Low-Contrast","tương phản thấp, dải tông rộng, màu trầm"],
+ XF:["vsco","B&W Fade","đen trắng phai đậm, xám, kịch tính"],
+ FX:["vscofilm","Film X","mô phỏng film"],
+ CG:["vscolab","Color Grading","chỉnh màu kiểu điện ảnh"],
+ IR:["vscolab","Infrared","hiệu ứng hồng ngoại"],
+ AL:["vscolab","Artificial Light","xử lý ánh sáng nhân tạo: LED, huỳnh quang, đèn hỗn hợp"],
+ LS:["vscolab","Landscape","phong cảnh thiên nhiên"],
+ CO:["vscolab","Bộ cộng tác","bộ màu từ các chiến dịch cộng tác"],
+ WE:["vscolab","We The Creators","bộ màu cộng tác với nhiếp ảnh gia, chất analog"]
+};
+const MIX={red:[0.06,-0.03,0,0,0,0,0,-0.02,0.05],vivid:[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05],cyan:[0,0,0,0,0,0.03,0,0.06,-0.02],green:[0,0,0,0,0.04,0,0,0,0],
+ cross:[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1],q2:[-0.05,0.08,0,0,0,0.06,0.06,0,-0.08],q3:[0.08,0,0,-0.04,0.06,0,0,0.06,-0.12],
+ irp:[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0],irp2:[-0.2,0.5,0,0.25,-0.3,0.05,0,0,0],irw:[-0.3,0.9,0,-0.3,0.9,0,-0.3,0.9,0],irb:[0,0.25,0,0,-0.15,0,0,0.8,-0.1],irb2:[0,0.15,0,0,-0.1,0,0,0.5,-0.05],
+ d1:[-0.3,0.3,0,0,-0.3,0.3,0.3,0,-0.3],d2:[-0.2,0,0.2,0.2,-0.2,0,0,0.2,-0.2]};
+const K={e:"exposure",c:"contrast",h:"highlights",s:"shadows",f:"fade",t:"temp",n:"tint",sa:"saturation",v:"vibrance",bw:"bw",du:"duo",ha:"halation",bl:"bloom",lk:"leak",ab:"aberration",vg:"vignette",lo:"lofi",ch:"chroma"};
+const DATA=`01 LG bw100 c8 g10:30
+02 LG bw100 c30 s-10 g15:30
+03 LG bw100 f25 c-5 g20:35
+04 LG t10 f10 sa-5 hi40:15
+05 LG t-12 sh210:20 sa-8
+06 LG n-12 sh170:25 f8
+07 LG n12 hi340:20 f10 e5
+08 LG c30 sa10 vg15
+09 LG t15 f22 sa-15 hi35:20
+10 LG sa25 v15 c12
+A1 AR e15 c-10 s15 f12 t4 sa-5 hi40:10
+A2 AR e14 c-12 s15 f14 n8 sa-8 hi340:15
+A3 AR e12 c-10 s12 f14 t-8 sa-10 sh190:20
+A4 AE f12 t8 sa-10 c5 sh30:12 hi50:10
+A5 AE f12 t-3 n-5 sa-12 sh170:12
+A6 AN f25 t15 n6 sa-15 hi30:20 e5
+A7 AN f20 t-8 sa-20 sh200:20 e6
+A8 AN f15 t8 n10 sa-5 hi10:25 c8
+A9 AN f18 n-12 sa-15 sh160:25
+A10 AN e10 f15 c-8 sa-18
+B1 BC bw100 c10 s5
+B2 BC bw100 c20
+B3 BC bw100 c5 e8 f5
+B4 BM bw100 c40 e-8
+B5 BM bw100 c50 s-20
+B6 BM bw100 c35 vg25 f5
+C1 CV sa25 c15 v10
+C2 CV sa20 t8 c10
+C3 CV sa20 v20 n5
+C4 CC sa15 xred c12 hi45:10
+C5 CC sa10 t-6 c10 xred
+C6 CC n-8 sa12 xgreen c10
+C7 CC t5 sh210:25 hi35:20 sa10 c10
+C8 CC n12 sa15 hi330:15 c10
+C9 CC f15 sa5 xred c5
+E1 ES t12 hi40:30 s-10 c15 g15:30
+E2 ES t20 hi38:35 s-8 c12 g15:30
+E3 ES t10 n-10 hi45:25 s-10 c12 g15:30
+E4 ES t10 n10 hi30:30 s-10 c12 g15:30
+E5 ES t12 hi40:30 s-18 c25 g15:30
+E6 ES t12 hi40:25 f15 c8 g18:30
+E7 ES t12 hi40:30 sa15 c15 g15:30
+E8 ES t8 hi40:25 sh210:25 c15 g15:30
+F1 ME sa-25 f10 c-5
+F2 ME sa-22 f15 e10 c-8
+F3 ME sa-22 f10 t10
+G1 PO t15 n-5 v10 e5
+G2 PO e8 v15 c5
+G3 PO n6 v20 e6 c5
+G4 PS t12 v10 e5 f5
+G5 PS t-10 v10 e5
+G6 PS n-10 t8 v15 sa5 hi60:15
+G7 PS t10 f15 sa-10 e6
+G8 PS t-8 f15 sa-10 e6
+G9 PS e18 c-10 s10 sa-5
+H1 PC hi340:25 f8 e5
+H2 PC hi55:25 f8 e5
+H3 PC sh270:25 f8
+H4 PC hi340:25 c15
+H5 PC hi50:25 f18 sa-10
+H6 PC sh275:30 sa15 c10
+J1 MI c-12 sa-15 f8
+J2 MI c-12 sa-15 t-10 f8
+J3 MI c-12 sa-15 t10 f8
+J4 MI e12 c-15 f15 sa-20
+J5 MI c-10 sa-15 n-10 sh160:15
+J6 MI c-10 sa-15 n10 hi340:15
+K1 KC c25 sa25 xred s-5
+K2 KC c22 sa22 t10 xred
+K3 KC c32 sa25 s-12 xred
+M1 MU e-12 f12 sa-10 t8 sh30:20
+M2 MU e-12 f12 sa-10 n-10 sh150:20
+M3 MU e-10 f12 sa-12 sh180:15
+M4 SF f20 sa-25 t8
+M5 SF e6 t10 n5 sa-20 f15 hi25:15
+M6 SF f20 sa-25 t-6 sh200:15
+N1 NM c25 s-15 sa20
+N2 NM c25 s-12 sa15 t-10
+N3 NM c25 s-12 sa15 t12
+P1 IW e10 f20 t15 c-10 hi40:25
+P2 IW e12 f22 t18 n5 c-12 hi35:25
+P3 IW e8 f18 t12 c-8 hi45:20 sa-10
+P4 IC f22 t-15 sh200:30 c-10 e5
+P5 IC f20 t-12 c-15 sh210:30 sa-10
+P6 IC f25 t-18 sh190:35 e8
+P7 IK f15 t10 hi55:30 c5
+P8 IK f15 t-10 sh210:30 c5
+P9 IK f15 n-8 hi65:25 sh170:15
+Q1 AY c30 sa15 xcross sh180:30
+Q2 AY c30 sa10 xq2 hi60:20
+Q3 AY c28 sa15 xq3 sh220:25
+Q4 AY c32 sa10 n15 sh280:25 hi50:20
+Q5 AY c30 sa20 xcross hi30:25 t10
+Q6 AY c30 sa5 n-20 sh160:30 hi60:25
+Q7 AY c35 sa15 xq2 t-10
+Q8 AY c30 sa15 sh300:30 hi45:30
+Q9 AY c28 sa10 xq3 f8
+Q10 AY c35 sa20 t15 sh200:35 hi20:20
+S1 BR e12 c-5 sa-5 n3
+S2 BR e15 c-8 sa-8 f5
+S3 BR e10 c-3 sa-3 t-5
+S4 BW e10 t20 hi35:25
+S5 BW e12 t25 hi40:30 sa5
+S6 BW e8 t18 hi30:25 f8
+T1 HF f35 c10 e-5 sa-15 t-6
+T2 HF f35 c10 e-5 sa-15 t10
+T3 HF f35 c10 e-5 sa-15 n-10
+U1 UR c15 sa-5
+U2 UR t-20 sh220:25 c10 e-5
+U3 UR t-10 n-10 sh180:30 f8
+U4 UR t25 c15 sh210:30 e-8 ha20
+U5 UR f18 sa-25 c5
+U6 UR n18 sa15 hi320:25 bl15
+V1 LC c-20 t-6 sa-8 e5
+V2 LC c-20 t20 g25:40
+V3 LC c-20 t12 sa-5
+V4 LC c-15 n10 hi5:30 xred
+V5 LC c-20 t12 e10
+V6 LC c-22 sa-25
+V7 LC c-18 n-10 sh150:20
+V8 LC c-25 f15 sa-10
+X1 XF bw100 f30 c15
+X2 XF bw100 f35 c15 e-8
+X3 XF bw100 f25 c10 g30:40
+X4 XF bw100 f15 e8 c-10
+X5 XF bw100 f12 e10 c-5 g15:30
+X6 XF bw100 f18 c-12 e5
+AU1 FX sa30 v15 c15 xvivid t4 #Agfa Ultra 100: màu rất đậm, xanh dương, vàng, xanh lá nổi, da ấm
+AU5 FX sa40 c30 xvivid s-10 #Agfa Ultra 50: màu dày, tương phản sâu
+AV4 FX t12 c8 s8 sa10 hi40:15 g20:35 #Agfa Vista 400: ấm, hoài niệm, trời xanh đậm hơn
+AV8 FX f25 sa-20 bl10 ha10 g25:40 #Agfa Vista 800: phai, nhạt, nhẹ nhàng
+FN16 FX bw100 e-10 c30 g45:45 #Fuji Neopan 1600: đen trắng tối, hạt rõ
+FP1 FX c-15 sa-5 h-10 e5 #Fuji 160S: tương phản thấp, màu tự nhiên
+FP2 FX c-8 sa3 h-10 e5 g8:20 #Fuji 160S: giống FP1, tương phản nhỉnh hơn
+FP4 FX e15 h-25 n-6 c-8 xcyan #Fuji Pro 400H: vùng sáng mềm, thoáng, ngả xanh mát
+FP8 FX e8 c18 sa-10 xred #Fuji Pro 800Z: sáng, tương phản, đỏ nổi
+FR4 FX n8 s15 f8 c10 sa10 g15:30 #Fuji Provia 400X: phớt hồng, bóng đổ nâng
+FS1 FX t-3 n-6 c10 g10:25 #Fuji Superia 100: tự nhiên, hơi xanh lá
+FS4 FX n-12 sh150:20 c10 g20:35 #Fuji Superia 400: xanh lá thập niên 90
+FS16 FX n-10 g50:50 c20 f8 #Fuji Superia 1600: hạt to, tương phản
+FT6 FX t-30 c15 sh210:20 #film cân bằng đèn tungsten: lạnh
+FV5 FX sa45 c30 xvivid #Fuji Velvia 50: rực, đậm
+IH5 FX bw100 c25 s-10 g30:35 #Ilford HP5: tương phản vừa, đen sâu
+KA1 FX c20 sa15 t-5 sh210:20 #Kodak Ektachrome: chất thập niên 80
+KA3 FX c22 sa22 t-8 xcyan #Kodak Ektachrome: rực, ngả cyan
+KC25 FX c30 sa25 t5 xred s-10 #Kodachrome 25: đỏ sâu, tương phản
+KCP2 FX t15 sa10 f5 g25:40 #Kodak ColorPlus 200: ấm, bình dân
+KE1 FX sa35 c20 xred #Kodak Ektar 100: rực, đỏ mạnh
+KG1 FX t15 sa15 g20:35 #Kodak Gold 100: màu đậm, ấm
+KG2 FX t25 sa12 hi40:25 g22:35 #Kodak Gold 200: vàng ấm
+KP1 FX t8 e8 c10 g18:30 #Kodak Portra 160: ấm, sáng, dịu với da
+KP2 FX t8 e8 c8 sa-10 g15:30 #Kodak Portra 160 NC: ít bão hòa
+KP3 FX t8 e8 c12 sa12 g15:30 #Kodak Portra 160 VC: tươi hơn
+KP4 FX t10 h5 s-5 g18:30 #Kodak Portra 400: ấm, đa dụng
+KP5 FX t10 sa-10 g18:30 #Kodak Portra 400 NC: nhạt màu
+KP6 FX t10 sa20 c12 g18:30 #Kodak Portra 400 UC: rất tươi
+KP7 FX t10 sa12 c6 g18:30 #Kodak Portra 400 VC: tươi
+KP8 FX t8 c18 sa10 sh210:15 g25:35 #Kodak Portra 800: ấm, tương phản vừa, ánh xanh nhẹ
+KP9 FX t8 c25 sa10 g25:35 #Kodak Portra 800 HC: tương phản cao
+KT32 FX bw100 e10 s15 c30 g70:60 #Kodak T-Max 3200: sáng, hạt rất dày
+KU1 FX t12 sa15 g20:30 #Kodak UltraMax 100: ấm, tiêu dùng
+KU4 FX t15 sa15 g25:35 #Kodak UltraMax 400: ấm, có hạt
+KU8 FX t15 c10 sa12 g40:45 #Kodak UltraMax 800: hạt to
+KX4 FX bw100 s20 c5 g40:40 #Kodak Tri-X 400: bóng đổ nâng, mềm
+CG1 CG c-15 sh210:45 hi35:35 #duotone mềm, bóng lạnh, vùng sáng ấm
+CG2 CG c15 sa15 sh210:60 hi35:50 #duotone đậm, tương phản hơn
+CG3 CG t-15 c-10 sa-10 sh220:40 hi200:15 #xanh dương tĩnh lặng
+CG4 CG c20 sa10 sh220:55 hi195:20 #xanh dương mạnh mẽ
+CG5 CG t15 sa-20 f10 sh35:20 hi40:40 #vàng trầm, hoài niệm
+CG6 CG t20 sa10 hi40:50 bl20 #vàng rực rỡ
+CG7 CG n-15 sa-10 sh150:35 #xanh lá dịu
+CG8 CG n-30 c20 sh140:55 hi80:25 #xanh lá cường độ cao
+IR1 IR xirp sa20 c15 #phong cảnh: lá cây hồng và đỏ thẫm
+IR2 IR xirp2 sa10 c10 #chân dung: lá hồng, giữ màu da
+IR3 IR xirw bw100 bl30 c15 #đen trắng, lá phát sáng
+IR4 IR xirp sa10 e8 f8 #phong cảnh hồng
+IR5 IR xirp2 e5 f5 #chân dung hồng
+IR6 IR xirb e8 t-10 #phong cảnh xanh lạnh
+IR7 IR xirb2 c10 #chân dung xanh
+AL1 AL t-25 c8 #giảm ám vàng đèn sợi đốt
+AL2 AL t15 n12 #cân lại đèn huỳnh quang
+AL3 AL c20 s-5 sa10 #cảnh đêm, tăng tương phản
+AL4 AL t-12 sh180:30 c12 #đêm ngả mòng két
+AL5 AL n15 sa15 hi320:20 bl10 #làm nổi đèn neon
+AL6 AL t10 f8 c-5 #trong nhà ấm, mềm
+L1 LS sa15 xvivid t-5 #bầu trời
+L2 LS t-10 sa12 sh190:20 #biển
+L3 LS n-12 sa15 xgreen #rừng
+L4 LS c15 t-5 sa8 h-15 #núi
+L5 LS t25 sa15 hi30:25 #sa mạc
+L6 LS e10 t-15 sa-10 #tuyết
+L7 LS t20 n10 hi20:30 sa10 #hoàng hôn
+L8 LS f25 c-15 sa-15 #sương mù
+L9 LS c15 sa-5 sh210:15 #thành phố
+L10 LS n-6 t12 sa15 #đồng cỏ
+L11 LS n-8 t-8 sh180:25 sa10 #hồ nước
+L12 LS t20 sa15 hi25:25 xred #mùa thu
+ACG CO c25 sa-10 t-10 #phố thị, thời tiết khắc nghiệt
+AGA1 CO sa20 v15 f10 sh180:25 hi340:20 #màu ngọc, pastel đậm
+AGA2 CO sa20 v15 f10 sh270:25 #ngọc tím
+AGA3 CO sa20 v15 f10 n-10 sh150:25 #ngọc lục bảo
+BBMA CO t-25 n4 sh215:30 c10 #xanh lạnh cho chân dung
+D1 CO sa20 xd1 #màu khác thường
+D2 CO sa15 xd2 c15 #màu đảo lạ
+DOG1 CO t15 sa-15 f10 hi40:20 #hổ phách trầm
+DOG2 CO t-10 sa-20 f10 sh210:20 #xám xanh
+DOG3 CO n-10 t10 sa-10 hi60:25 #vàng lục
+HB1 CO e-8 t-12 sa-15 vg20 c10 #lạnh, tối nhẹ, góc tối
+HB2 CO e-5 t-20 sa-20 vg15 c12 #rất lạnh, hợp cảnh tuyết
+HB3 CO e-10 sa-15 vg25 c15 #trung tính, tối
+IND1 CO t-30 sh230:40 #xanh chàm
+IND2 CO t-35 sh230:55 c10 #chàm đậm
+INF CO t10 sa20 v15 e6 c10 #món ăn
+JM1 CO c35 sa20 e5 #đậm, tương phản, nắng gắt
+KK1 CO sa20 t15 #rực, ấm
+KK2 CO sa15 t20 f10 #ấm, phai
+LV1 CO sa20 c15 #rực cho đường phố
+LV2 CO bw100 c20 #đen trắng cổ điển
+LV3 CO t10 sa-12 #ấm tự nhiên, nhạt nhẹ
+MTV CO sa35 v20 c15 n10 #vui, rực, retro thập niên 90
+NC CO t12 sa8 hi30:15 #đỏ, cam, vàng ấm nhẹ
+OAK1 CO c25 sa15 t8 xvivid #rõ nét, ấm
+OAK2 CO c25 sa10 t-10 #rõ nét, lạnh
+OAK3 CO c25 sa15 sh200:20 xvivid #rõ nét, cảnh nước
+OC CO sa-35 c15 e-6 vg20 #nhạt màu, u trầm
+SE1 CO e-10 c25 sa-5 f8 #tối, gai góc, retro
+SE2 CO e-10 c25 sa20 #tối, màu đậm nhất bộ
+SE3 CO e-8 c20 sa-8 f10 t6 #tối, retro
+SS1 CO sa-15 v30 #điểm màu trên nền trầm
+SS2 CO sa-20 v35 c10 #điểm màu, tương phản
+SS3 CO sa-10 v25 t8 #điểm màu ấm
+SUM1 CO t18 xred sa10 #đỏ sâu, cam cháy
+SUM2 CO t22 xred sa5 f10 #cam cháy phai
+TECH CO bw100 hi0:80 c40 #đen và đỏ
+TK CO sa-15 c20 sh215:40 hi345:30 #vùng sáng hồng, bóng xanh
+WE1 WE t10 e6 g18:30 f6 #ấm kiểu Portra
+WE2 WE t-10 f8 g18:30 #lạnh, analog
+WE3 WE n-10 sh150:20 g20:35 #xanh lá kiểu Superia
+WE4 WE t15 hi40:30 c10 g18:30 #vàng óng
+WE5 WE f18 n10 hi340:20 e6 g15:30 #hồng phai
+WE6 WE c25 s-10 sa10 g20:35 #tương phản
+WE7 WE sh185:40 hi30:30 c15 #mòng két và cam
+WE8 WE bw100 c20 g30:35 #đen trắng analog`;
+function moods(p){const m=[];if(p.bw>=80)m.push("mono");
+  const warm=p.temp>=8||(p.hiAmt>=20&&(p.hiHue<70||p.hiHue>330)),cool=p.temp<=-8||(p.shAmt>=25&&p.shHue>=170&&p.shHue<=250);
+  if(warm&&p.bw<80)m.push("warm");if(cool&&p.bw<80)m.push("cool");if(p.fade>=15)m.push("faded");if(p.saturation>=20||p.vibrance>=25)m.push("vivid");
+  if(p.contrast>=25)m.push("contrast");if(p.grain>=35)m.push("grainy");if(p.bloom>=20||p.halation>=30)m.push("atmo");
+  if(p.exposure>=8&&p.contrast<=0&&p.saturation<=0&&p.bw<80)m.push("pastel");if(!m.length)m.push("natural");return m;}
+DATA.split("\n").forEach(line=>{
+  const [spec,note]=line.split("#"),tk=spec.trim().split(/\s+/),code=tk[0],ser=SER[tk[1]],p=Object.assign({},NEUTRAL);let mix=Z9;
+  tk.slice(2).forEach(t=>{if(t[0]==="x"&&MIX[t.slice(1)]){mix=MIX[t.slice(1)];return;}const m=t.match(/^([a-z]+?)(-?\d+)(?::(-?\d+))?$/);if(!m)return;const k=m[1],a=+m[2],b=m[3]!=null?+m[3]:null;
+    if(k==="sh"){p.shHue=a;p.shAmt=b;}else if(k==="hi"){p.hiHue=a;p.hiAmt=b;}else if(k==="g"){p.grain=a;if(b!=null)p.grainSize=b;}else if(K[k])p[K[k]]=a;});
+  const desc="Mô phỏng "+code+" của VSCO ("+ser[1]+"): "+(note?note.trim():ser[2])+".";
+  PRESETS.push({id:"v_"+code,name:code,fam:ser[0],moods:moods(p),desc,params:p,mix});
+});
+FAMS.push(["vsco","VSCO Cổ điển"],["vscofilm","VSCO Film X"],["vscolab","VSCO Đặc biệt"]);
+})();
+
+/* ---------- WebGL engine ---------- */
+const glc = document.createElement("canvas");
+const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
+const VS = "attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
+const HEAD = "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\nvarying vec2 v;float luma(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}\n";
+const FS_COLOR = HEAD+`
+uniform sampler2D u_src;uniform float u_exp,u_con,u_hl,u_sh,u_fade,u_temp,u_tint,u_sat,u_vib,u_bw,u_shAmt,u_hiAmt,u_duo;
+uniform vec3 u_shCol,u_hiCol;uniform mat3 u_mix;
+void main(){
+  vec3 c=texture2D(u_src,v).rgb;
+  c=pow(max(c,0.0),vec3(2.2));
+  c*=exp2(u_exp);
+  c*=vec3(1.0+u_temp*0.25+u_tint*0.04,1.0-u_tint*0.14,1.0-u_temp*0.25+u_tint*0.04);
+  c=pow(max(c,0.0),vec3(1.0/2.2));
+  c=max(u_mix*c,0.0);
+  float l=luma(c);
+  c+=u_sh*0.32*(1.0-smoothstep(0.0,0.55,l));
+  c+=u_hl*0.28*smoothstep(0.45,1.0,l);
+  c=clamp(c,0.0,1.0);
+  if(u_con>=0.0){vec3 s=c*c*(3.0-2.0*c);c=mix(c,s,u_con*1.15);}
+  else{c=mix(c,0.5+(c-0.5)*0.45,-u_con);}
+  l=luma(c);
+  float sm=max(max(c.r,c.g),c.b)-min(min(c.r,c.g),c.b);
+  c=mix(vec3(l),c,max(0.0,1.0+u_sat+u_vib*(1.0-sm)*1.2));
+  c=mix(c,vec3(dot(c,vec3(0.30,0.59,0.11))),u_bw);
+  l=luma(c);
+  c+=(u_shCol-luma(u_shCol))*u_shAmt*0.4*(1.0-smoothstep(0.0,0.7,l));
+  c+=(u_hiCol-luma(u_hiCol))*u_hiAmt*0.35*smoothstep(0.3,1.0,l);
+  if(u_duo>0.001){float ld=clamp(luma(c),0.0,1.0);vec3 dk=u_shCol*0.16+0.02;vec3 lt=mix(u_hiCol,vec3(1.0),0.72);c=mix(c,mix(dk,lt,smoothstep(0.02,0.98,ld)),u_duo);}
+  c=u_fade*0.17+c*(1.0-u_fade*0.23);
+  gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
+}`;
+const FS_BRIGHT = HEAD+`
+uniform sampler2D u_src;uniform vec2 u_tx;
+void main(){
+  vec3 c=(texture2D(u_src,v+u_tx*vec2(-1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(-1.0,1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,1.0)).rgb)*0.25;
+  gl_FragColor=vec4(c*smoothstep(0.55,0.95,luma(c)),1.0);
+}`;
+const FS_BLUR = HEAD+`
+uniform sampler2D u_src;uniform vec2 u_dir;
+void main(){
+  vec3 c=texture2D(u_src,v).rgb*0.227027;
+  c+=(texture2D(u_src,v+u_dir).rgb+texture2D(u_src,v-u_dir).rgb)*0.1945946;
+  c+=(texture2D(u_src,v+u_dir*2.0).rgb+texture2D(u_src,v-u_dir*2.0).rgb)*0.1216216;
+  c+=(texture2D(u_src,v+u_dir*3.0).rgb+texture2D(u_src,v-u_dir*3.0).rgb)*0.054054;
+  c+=(texture2D(u_src,v+u_dir*4.0).rgb+texture2D(u_src,v-u_dir*4.0).rgb)*0.016216;
+  gl_FragColor=vec4(c,1.0);
+}`;
+const FS_COMP = HEAD+`
+uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed,u_lofi,u_chroma;uniform vec2 u_res;
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+  float a=hash(i+u_seed),b=hash(i+vec2(1.0,0.0)+u_seed),c=hash(i+vec2(0.0,1.0)+u_seed),d=hash(i+vec2(1.0,1.0)+u_seed);
+  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+void main(){
+  float L=max(u_res.x,u_res.y);float sc=max(L/1500.0,0.08);
+  vec2 uv=v;
+  if(u_lofi>0.001){vec2 cells=u_res/(mix(1.0,9.0,u_lofi)*sc);uv=(floor(v*cells)+0.5)/cells;}
+  vec2 d=uv-0.5;
+  vec2 off=d*u_ab*0.014;
+  vec3 c=vec3(texture2D(u_a,uv+off).r,texture2D(u_a,uv).g,texture2D(u_a,uv-off).b);
+  vec3 b=texture2D(u_b,uv).rgb;
+  c=1.0-(1.0-c)*(1.0-clamp(b*u_bloom*1.5,0.0,1.0));
+  float hb=luma(b);
+  c+=vec3(1.0,0.28,0.10)*hb*u_hal*1.7*(1.0-smoothstep(0.75,1.0,luma(c))*0.6);
+  float lk=smoothstep(0.5,1.08,v.x)*(0.55+0.45*sin(v.y*4.0+1.3));
+  vec3 lc=mix(vec3(1.0,0.22,0.08),vec3(1.0,0.62,0.22),v.y);
+  c=1.0-(1.0-c)*(1.0-clamp(lc*lk*u_leak*1.1,0.0,1.0));
+  float r=length((v-0.5)*vec2(u_aspect,1.0))/(0.5*sqrt(u_aspect*u_aspect+1.0));
+  c*=1.0-u_vig*0.85*pow(r,2.3);
+  float cell=mix(0.8,3.6,u_gsize)*sc;
+  vec2 px=v*u_res/cell;
+  float n=(vn(px)+0.5*vn(px*2.13+17.0))/1.5-0.5;
+  float l=luma(c);
+  c+=n*u_grain*0.3*(0.35+0.65*(1.0-abs(l-0.5)*2.0));
+  if(u_chroma>0.001){vec2 q=v*u_res/(cell*1.6+sc);c+=(vec3(vn(q+31.0),vn(q+57.0),vn(q+91.0))-0.5)*u_chroma*0.32;}
+  gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
+}`;
+
+function compile(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));return s;}
+function program(fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,VS));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,fs));
+  gl.bindAttribLocation(p,0,"p");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}
+  return {p,u};}
+let PR=null, maxTex=4096;
+function initGL(){
+  if(!gl) throw new Error("no webgl");
+  PR={color:program(FS_COLOR),bright:program(FS_BRIGHT),blur:program(FS_BLUR),comp:program(FS_COMP)};
+  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+  maxTex=gl.getParameter(gl.MAX_TEXTURE_SIZE)||4096;
+}
+function makeTex(w,h,src){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  if(src){gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);}
+  else gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+  return t;}
+function makeTarget(w,h){const tex=makeTex(w,h,null);const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);return {tex,fb,w,h};}
+function freeTarget(t){if(t){gl.deleteTexture(t.tex);gl.deleteFramebuffer(t.fb);}}
+let TA=null,TB1=null,TB2=null;
+function ensureTargets(w,h){
+  if(!TA||TA.w!==w||TA.h!==h){freeTarget(TA);TA=makeTarget(w,h);}
+  const sw=Math.max(1,Math.ceil(w/4)),sh=Math.max(1,Math.ceil(h/4));
+  if(!TB1||TB1.w!==sw||TB1.h!==sh){freeTarget(TB1);freeTarget(TB2);TB1=makeTarget(sw,sh);TB2=makeTarget(sw,sh);}
+}
+function pass(prog,target,w,h,texs){
+  gl.useProgram(prog.p);gl.bindFramebuffer(gl.FRAMEBUFFER,target?target.fb:null);gl.viewport(0,0,w,h);
+  texs.forEach((t,i)=>{gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t[1]);gl.uniform1i(prog.u[t[0]],i);});
+}
+function hue2rgb(h){h=((h%360)+360)%360/60;const x=1-Math.abs(h%2-1);return [[1,x,0],[x,1,0],[0,1,x],[0,x,1],[x,0,1],[1,0,x]][Math.floor(h)%6];}
+let seed=Math.random()*100;
+
+function render(srcTex,W,H,e){
+  if(glc.width!==W)glc.width=W; if(glc.height!==H)glc.height=H;
+  ensureTargets(W,H);
+  const c=PR.color; pass(c,TA,W,H,[["u_src",srcTex]]);
+  gl.uniform1f(c.u.u_exp,e.exposure/100*1.5);gl.uniform1f(c.u.u_con,e.contrast/100);
+  gl.uniform1f(c.u.u_hl,e.highlights/100);gl.uniform1f(c.u.u_sh,e.shadows/100);gl.uniform1f(c.u.u_fade,e.fade/100);
+  gl.uniform1f(c.u.u_temp,e.temp/100);gl.uniform1f(c.u.u_tint,e.tint/100);gl.uniform1f(c.u.u_sat,e.saturation/100);
+  gl.uniform1f(c.u.u_vib,e.vibrance/100);gl.uniform1f(c.u.u_bw,e.bw/100);gl.uniform1f(c.u.u_duo,e.duo/100);
+  gl.uniform1f(c.u.u_shAmt,e.shAmt/100);gl.uniform1f(c.u.u_hiAmt,e.hiAmt/100);
+  gl.uniform3fv(c.u.u_shCol,hue2rgb(e.shHue));gl.uniform3fv(c.u.u_hiCol,hue2rgb(e.hiHue));
+  const m=e.mix;
+  gl.uniformMatrix3fv(c.u.u_mix,false,new Float32Array([1+m[0],m[3],m[6],m[1],1+m[4],m[7],m[2],m[5],1+m[8]]));
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  const needGlow=e.bloom>0.5||e.halation>0.5;
+  if(needGlow){
+    const sw=TB1.w,sh=TB1.h,b=PR.bright;
+    pass(b,TB1,sw,sh,[["u_src",TA.tex]]);gl.uniform2f(b.u.u_tx,1/W,1/H);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    const bl=PR.blur;
+    [[1,0,1,TB1,TB2],[0,1,1,TB2,TB1],[1,0,2.6,TB1,TB2],[0,1,2.6,TB2,TB1]].forEach(s=>{
+      pass(bl,s[4],sw,sh,[["u_src",s[3].tex]]);gl.uniform2f(bl.u.u_dir,s[0]*s[2]/sw,s[1]*s[2]/sh);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);});
+  }
+  const k=PR.comp; pass(k,null,W,H,[["u_a",TA.tex],["u_b",TB1.tex]]);
+  gl.uniform1f(k.u.u_bloom,needGlow?e.bloom/100:0);gl.uniform1f(k.u.u_hal,needGlow?e.halation/100:0);
+  gl.uniform1f(k.u.u_ab,e.aberration/100);gl.uniform1f(k.u.u_vig,e.vignette/100);gl.uniform1f(k.u.u_grain,e.grain/100);
+  gl.uniform1f(k.u.u_gsize,e.grainSize/100);gl.uniform1f(k.u.u_leak,e.leak/100);gl.uniform1f(k.u.u_aspect,W/H);
+  gl.uniform1f(k.u.u_lofi,e.lofi/100);gl.uniform1f(k.u.u_chroma,e.chroma/100);
+  gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+}
+
+/* ================= IOHK Video — CapCut-style editor ================= */
+const $=id=>document.getElementById(id);
+function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+const store={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+let custom=[];try{custom=(JSON.parse(store.get("tiemphim.custom")||"[]")||[]).filter(p=>p&&p.id&&p.params).map(p=>({id:p.id,name:p.name,fam:"mine",params:Object.assign({},NEUTRAL,p.params),mix:Array.isArray(p.mix)&&p.mix.length===9?p.mix:Z9.slice()}));}catch(e){}
+const allP=()=>PRESETS.concat(custom);
+const findP=id=>allP().find(p=>p.id===id)||PRESETS[0];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=t=>{t=Math.max(0,t);const m=Math.floor(t/60),s=t-m*60;return String(m).padStart(2,"0")+":"+s.toFixed(1).padStart(4,"0");};
+let tt=null;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400);}
+const isDesk=()=>window.matchMedia("(min-width: 900px)").matches;
+
+/* ---------- Project state ---------- */
+const media=new Map();
+let P={ratio:"9:16",bg:"blur",bgColor:"#000000",clips:[],texts:[],audios:[]};
+let sel=null,T=0,playing=false,total=0,pps=60,dirty=true;
+const RATIOS=[["9:16","9:16"],["16:9","16:9"],["1:1","1:1"],["4:5","4:5"],["3:4","3:4"],["21:9","21:9"],["orig","Gốc"]];
+const TRANS=[["none","Không","∅"],["fade","Hoà tan","◐"],["black","Qua đen","●"],["white","Loé trắng","○"],["slideL","Trượt ngang","⇠"],["slideU","Trượt dọc","⇡"],["zoom","Phóng","⊕"],["blur","Nhoè","≋"],["spin","Xoay","↻"]];
+const FXS=[["none","Không","∅"],["shake","Rung máy","≈"],["flash","Nháy sáng","✦"],["rgb","Lệch RGB","◑"],["vhs","VHS","▤"],["glitch","Glitch","▚"],["pulse","Nhịp zoom","◎"],["burn","Cháy film","☼"],["dreamy","Mơ màng","❋"],["bw","Đen trắng","◧"],["date","In ngày","⌚"]];
+const MOTIONS=[["none","Đứng yên"],["zoomin","Phóng vào"],["zoomout","Lùi ra"],["panL","Lia trái"],["panR","Lia phải"]];
+const TFONTS={modern:['800','"Inter",system-ui,sans-serif',"Hiện đại"],display:['400','"Bebas Neue","Inter",sans-serif',"Tiêu đề"],serif:['600','"Cormorant Garamond",Georgia,serif',"Serif"],hand:['700','"Dancing Script",cursive',"Viết tay"],round:['400','"Pacifico",cursive',"Tròn"],pixel:['400','"DotGothic16",monospace',"Pixel"]};
+const TANIM=[["none","Không"],["fade","Mờ dần"],["pop","Bật lên"],["slide","Trượt lên"],["type","Gõ chữ"],["zoom","Phóng to"]];
+const TCOL=["#ffffff","#111111","#f4d35e","#ff5a5f","#ff9ecf","#7ad7ff","#7ee081","#e9b45c"];
+const EMO=["❤️","✨","⭐","🔥","🌸","🎬","📷","🎞️","😎","😂","🥰","👑","💫","🌙","☀️","🎉","🍜","🧋","🐱","🌈","💥","👀","✅","📍"];
+const ADJ=[["exposure","Phơi sáng",-100,100],["contrast","Tương phản",-100,100],["highlights","Vùng sáng",-100,100],["shadows","Vùng tối",-100,100],["saturation","Bão hoà",-100,100],["vibrance","Sống động",-100,100],["temp","Nhiệt độ",-100,100],["tint","Tông màu",-100,100],["fade","Phai",0,100],["grain","Hạt film",0,100],["vignette","Tối góc",0,100],["bloom","Toả sáng",0,100],["halation","Quầng đỏ",0,100]];
+
+function newClip(m){return {id:uid(),mid:m.id,kind:m.kind,in:0,out:m.kind==="video"?m.dur:3,speed:1,vol:100,fadeIn:0,fadeOut:0,preset:"none",strength:100,adj:{},fit:"fit",zoom:100,x:0,y:0,rot:0,motion:m.kind==="image"?"zoomin":"none",fx:"none",fxAmt:60,trans:{type:"none",dur:0.5}};}
+
+/* ---------- Layout of the main track ---------- */
+function layout(){let t=0;P.clips.forEach((c,i)=>{const d=(c.out-c.in)/c.speed;let td=0;
+  if(i>0&&c.trans.type!=="none"){const pd=P.clips[i-1]._dur;td=Math.min(c.trans.dur,d*0.45,pd*0.45);}
+  c._td=td;c._start=Math.max(0,t-td);c._dur=d;t=c._start+d;});
+  let end=t;if(!P.clips.length){P.texts.forEach(x=>end=Math.max(end,x.start+x.dur));P.audios.forEach(a=>end=Math.max(end,a.start+(a.out-a.in)));}
+  total=end;}
+function activeAt(t){const r=[];for(const c of P.clips){if(t>=c._start-1e-6&&t<c._start+c._dur)r.push(c);}if(!r.length&&P.clips.length&&t>=total-1e-3)r.push(P.clips[P.clips.length-1]);return r.slice(-2);}
+
+/* ---------- Media import ---------- */
+function importFiles(files,toTimeline){[...files].forEach(f=>addMedia(f,toTimeline));}
+function addMedia(f,toTimeline){
+  const kind=/^video\//.test(f.type)?"video":/^image\//.test(f.type)?"image":/^audio\//.test(f.type)?"audio":null;
+  if(!kind){toast("Không nhận định dạng: "+f.name);return;}
+  const m={id:uid(),kind,name:f.name.replace(/\.[^.]+$/,""),file:f,url:URL.createObjectURL(f),w:0,h:0,dur:0,thumbs:[],peaks:null,ready:false};
+  media.set(m.id,m);renderMedia();
+  const done=()=>{m.ready=true;renderMedia();if(toTimeline)addToTimeline(m);};
+  if(kind==="image"){const img=new Image();img.onload=()=>{const s=Math.min(1,2560/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
+      c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);m.canvas=c;m.w=c.width;m.h=c.height;m.dur=3;
+      const th=document.createElement("canvas");th.height=72;th.width=Math.round(72*c.width/c.height);th.getContext("2d").drawImage(c,0,0,th.width,th.height);m.thumbs=[th];done();};
+    img.onerror=()=>{media.delete(m.id);renderMedia();toast("Không đọc được ảnh "+f.name);};img.src=m.url;}
+  else if(kind==="video"){const v=document.createElement("video");v.preload="auto";v.muted=true;v.playsInline=true;v.src=m.url;
+    v.onloadedmetadata=()=>{m.w=v.videoWidth;m.h=v.videoHeight;m.dur=isFinite(v.duration)?v.duration:10;done();makeThumbs(m,v);decodePeaks(m);};
+    v.onerror=()=>{media.delete(m.id);renderMedia();toast("Trình duyệt không mở được video "+f.name+". Thử MP4 (H.264) hoặc WebM.");};}
+  else{const a=document.createElement("audio");a.preload="auto";a.src=m.url;
+    a.onloadedmetadata=()=>{m.dur=isFinite(a.duration)?a.duration:30;done();decodePeaks(m);};
+    a.onerror=()=>{media.delete(m.id);renderMedia();toast("Không đọc được file âm thanh "+f.name);};}
+}
+async function makeThumbs(m,v){const n=Math.max(4,Math.min(24,Math.ceil(m.dur/1.5)));const H=72,W=Math.max(1,Math.round(H*m.w/m.h));
+  for(let i=0;i<n;i++){const t=Math.min(m.dur-0.05,(i+0.5)*m.dur/n);await new Promise(r=>{let done=false;const fin=()=>{if(!done){done=true;r();}};v.onseeked=fin;setTimeout(fin,1500);v.currentTime=t;});
+    const c=document.createElement("canvas");c.width=W;c.height=H;try{c.getContext("2d").drawImage(v,0,0,W,H);}catch(e){}m.thumbs[i]=c;if(i===0||i===n-1){renderMedia();dirtyTL();}}
+  m.thumbsN=n;v.removeAttribute("src");v.load();dirtyTL();}
+const bufCache=new Map();
+async function decodeBuf(m){if(bufCache.has(m.id))return bufCache.get(m.id);const pr=(async()=>{try{const ab=await m.file.arrayBuffer();const oc=new OfflineAudioContext(2,1,48000);return await oc.decodeAudioData(ab);}catch(e){return null;}})();bufCache.set(m.id,pr);return pr;}
+async function decodePeaks(m){if(m.file.size>400e6)return;const b=await decodeBuf(m);if(!b){m.silent=m.kind==="video";return;}const ch=b.getChannelData(0),N=600,st=Math.max(1,Math.floor(ch.length/N)),pk=new Float32Array(N);
+  for(let i=0;i<N;i++){let mx=0;for(let j=i*st,e=Math.min(ch.length,(i+1)*st);j<e;j+=4){const a=Math.abs(ch[j]);if(a>mx)mx=a;}pk[i]=mx;}m.peaks=pk;dirtyTL();}
+
+function addToTimeline(m){
+  if(m.kind==="audio"){const a={id:uid(),mid:m.id,start:P.clips.length?Math.min(T,Math.max(0,total-0.5)):0,in:0,out:m.dur,vol:100,fadeIn:0,fadeOut:1};P.audios.push(a);sel={type:"audio",id:a.id};}
+  else{const c=newClip(m);const at=P.clips.findIndex(x=>T<x._start+x._dur/2);if(at<0||!P.clips.length)P.clips.push(c);else P.clips.splice(at,0,c);sel={type:"clip",id:c.id};}
+  commit();toast("Đã thêm “"+m.name+"”");
+}
+
+/* ---------- Rendering ---------- */
+const pv=$("pv"),pctx=pv.getContext("2d");
+const vtex=(()=>{return null;})();
+let vTex=null;const imgTex=new Map();
+function upload(tex,src){gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);}
+function baseDims(){if(P.ratio==="orig"){const c=P.clips[0],m=c&&media.get(c.mid);if(m&&m.w)return [m.w,m.h];return [1080,1920];}const [a,b]=P.ratio.split(":").map(Number);return [a,b];}
+function outDims(short){const [a,b]=baseDims(),r=a/b;let W,H;if(r<1){W=short;H=Math.round(short/r);}else{H=short;W=Math.round(short*r);}return [W&~1,H&~1];}
+function effFor(c,lt){const p=findP(c.preset),s=c.strength/100,e={};
+  for(const k in NEUTRAL){const v=p.params[k]==null?NEUTRAL[k]:p.params[k];e[k]=NOSCALE.has(k)?v:NEUTRAL[k]+(v-NEUTRAL[k])*s;}
+  e.mix=(p.mix||Z9).map(x=>x*s);
+  for(const k in c.adj)e[k]=clamp((e[k]||0)+c.adj[k],-100,100);
+  const a=c.fxAmt/100;
+  if(c.fx==="rgb")e.aberration=Math.min(100,e.aberration+90*a);
+  else if(c.fx==="vhs"){e.chroma=Math.min(100,e.chroma+55*a);e.aberration=Math.min(100,e.aberration+35*a);e.grain=Math.min(100,e.grain+35*a);e.saturation=e.saturation-15*a;}
+  else if(c.fx==="burn")e.leak=Math.min(100,e.leak+90*a*(0.55+0.45*Math.sin(lt*1.9)));
+  else if(c.fx==="dreamy"){e.bloom=Math.min(100,e.bloom+60*a);e.halation=Math.min(100,e.halation+25*a);e.highlights-=10*a;}
+  else if(c.fx==="bw")e.bw=100;
+  return e;}
+function srcOf(c){const m=media.get(c.mid);if(!m)return null;if(c.kind==="image")return m.canvas?{s:m.canvas,w:m.w,h:m.h,img:true}:null;
+  const v=els.get(c.id);if(!v||v.readyState<2||!v.videoWidth)return null;return {s:v,w:v.videoWidth,h:v.videoHeight};}
+function motionK(c,lt){const p=c._dur>0?clamp(lt/c._dur,0,1):0;switch(c.motion){case "zoomin":return {s:1+0.14*p,x:0};case "zoomout":return {s:1.14-0.14*p,x:0};case "panL":return {s:1.12,x:0.05-0.1*p};case "panR":return {s:1.12,x:-0.05+0.1*p};default:return {s:1,x:0};}}
+const bgc=document.createElement("canvas");bgc.width=48;bgc.height=48;const bgx=bgc.getContext("2d");
+function noise(x){return Math.sin(x*12.9898)*43758.5453%1;}
+function drawClip(ctx,W,H,c,t,alpha,xf){
+  const S=srcOf(c);if(!S)return false;const lt=t-c._start,mk=motionK(c,lt),a=c.fxAmt/100;
+  let base=c.fit==="fill"?Math.max(W/S.w,H/S.h):Math.min(W/S.w,H/S.h);
+  let s=base*(c.zoom/100)*mk.s*(xf.scale||1);
+  if(c.fx==="pulse")s*=1+0.07*a*Math.pow(Math.abs(Math.sin(lt*Math.PI*2)),3);
+  const dw=S.w*s,dh=S.h*s,gw=Math.max(2,Math.round(Math.min(S.w,dw*1.02,4096))),gh=Math.max(2,Math.round(gw*S.h/S.w));
+  let tex;if(S.img){tex=imgTex.get(c.mid);if(!tex){tex=makeTex(0,0,S.s);imgTex.set(c.mid,tex);}}else{if(!vTex)vTex=makeTex(2,2,null);upload(vTex,S.s);tex=vTex;}
+  seed=(Math.floor(t*24)%97)*1.31+3;render(tex,gw,gh,effFor(c,lt));
+  ctx.save();ctx.globalAlpha=alpha;
+  if(xf.bg!==false&&(dw<W-1||dh<H-1||c.rot)){
+    if(P.bg==="blur"){bgx.drawImage(glc,0,0,gw,gh,0,0,48,48);ctx.imageSmoothingEnabled=true;ctx.filter="blur(1px)";const k=Math.max(W,H);ctx.drawImage(bgc,(W-k)/2-k*0.05,(H-k)/2-k*0.05,k*1.1,k*1.1);ctx.filter="none";ctx.fillStyle="rgba(0,0,0,.28)";ctx.fillRect(0,0,W,H);}
+    else{ctx.fillStyle=P.bg==="white"?"#f4f1ea":P.bg==="color"?P.bgColor:"#000";ctx.fillRect(0,0,W,H);}}
+  let ox=W/2+(c.x/100+mk.x)*W+(xf.dx||0),oy=H/2+(c.y/100)*H+(xf.dy||0),rot=(c.rot+(xf.rot||0))*Math.PI/180;
+  if(c.fx==="shake"||c.fx==="vhs"){const k=(c.fx==="vhs"?0.004:0.014)*a*Math.min(W,H),f=Math.floor(lt*24);ox+=(noise(f+.3)-.5)*2*k;oy+=(noise(f+7.7)-.5)*2*k;if(c.fx==="shake")rot+=(noise(f+3.1)-.5)*0.02*a;}
+  ctx.translate(ox,oy);ctx.rotate(rot);ctx.imageSmoothingQuality="high";
+  if(c.fx==="glitch"&&noise(Math.floor(lt*12))>1-0.45*a-0.2){const n=7;for(let i=0;i<n;i++){const sy=gh*i/n,sh=gh/n,off=(noise(i*3.3+Math.floor(lt*12))-.5)*0.08*W*a;
+      ctx.drawImage(glc,0,sy,gw,sh,-dw/2+off,-dh/2+dh*i/n,dw,dh/n+1);}}
+  else ctx.drawImage(glc,0,0,gw,gh,-dw/2,-dh/2,dw,dh);
+  ctx.restore();
+  if(c.fx==="flash"){const ph=(lt*2)%1,v=Math.max(0,1-ph*4)*0.75*a;if(v>0.01){ctx.save();ctx.globalAlpha=v*alpha;ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);ctx.restore();}}
+  if(c.fx==="vhs"){ctx.save();ctx.globalAlpha=0.12*a*alpha;ctx.fillStyle="#000";const step=Math.max(2,Math.round(H/240));for(let y=0;y<H;y+=step*2)ctx.fillRect(0,y,W,step);ctx.restore();}
+  if(c.fx==="date"){const d=new Date(),txt="'"+String(d.getFullYear()).slice(2)+" "+(d.getMonth()+1)+" "+d.getDate(),fs=Math.round(Math.min(W,H)*0.045);
+    ctx.save();ctx.globalAlpha=alpha;ctx.font=fs+'px "DotGothic16",monospace';ctx.textAlign="right";ctx.textBaseline="bottom";ctx.fillStyle="#ff9a3c";ctx.shadowColor="rgba(255,100,20,.8)";ctx.shadowBlur=fs*0.4;ctx.fillText(txt,W*0.93,H*0.94);ctx.restore();}
+  return true;}
+function fade(ctx,W,H,col,a){if(a<=0.001)return;ctx.save();ctx.globalAlpha=Math.min(1,a);ctx.fillStyle=col;ctx.fillRect(0,0,W,H);ctx.restore();}
+function drawFrame(ctx,W,H,t){
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.fillStyle=P.bg==="white"?"#f4f1ea":P.bg==="color"?P.bgColor:"#000";ctx.fillRect(0,0,W,H);
+  const act=activeAt(t);let ok=true;
+  if(act.length===1)ok=drawClip(ctx,W,H,act[0],t,1,{});
+  else if(act.length===2){const [a,b]=act,p=clamp((t-b._start)/Math.max(1e-3,b._td),0,1),ty=b.trans.type,e=p*p*(3-2*p);
+    if(ty==="fade"){ok=drawClip(ctx,W,H,a,t,1,{});drawClip(ctx,W,H,b,t,e,{});}
+    else if(ty==="black"||ty==="white"){const col=ty==="black"?"#000":"#fff";if(p<0.5){ok=drawClip(ctx,W,H,a,t,1,{});fade(ctx,W,H,col,p*2);}else{ok=drawClip(ctx,W,H,b,t,1,{});fade(ctx,W,H,col,(1-p)*2);}}
+    else if(ty==="slideL"){ok=drawClip(ctx,W,H,a,t,1,{dx:-e*W});drawClip(ctx,W,H,b,t,1,{dx:(1-e)*W});}
+    else if(ty==="slideU"){ok=drawClip(ctx,W,H,a,t,1,{dy:-e*H});drawClip(ctx,W,H,b,t,1,{dy:(1-e)*H});}
+    else if(ty==="zoom"){ok=drawClip(ctx,W,H,a,t,1-e,{scale:1+e*0.6});drawClip(ctx,W,H,b,t,e,{scale:0.7+0.3*e});}
+    else if(ty==="spin"){ok=drawClip(ctx,W,H,a,t,1-e,{rot:e*90,scale:1-0.3*e});drawClip(ctx,W,H,b,t,e,{rot:(e-1)*90,scale:0.7+0.3*e});}
+    else if(ty==="blur"){ctx.filter="blur("+Math.round(Math.sin(p*Math.PI)*Math.min(W,H)*0.02)+"px)";ok=drawClip(ctx,W,H,p<0.5?a:b,t,1,{});ctx.filter="none";}
+    else ok=drawClip(ctx,W,H,b,t,1,{});}
+  for(const c of act){const lt=t-c._start,end=c._start+c._dur-t;if(c.fadeIn>0&&lt<c.fadeIn)fade(ctx,W,H,"#000",1-lt/c.fadeIn);if(c.fadeOut>0&&end<c.fadeOut)fade(ctx,W,H,"#000",1-end/c.fadeOut);}
+  drawTexts(ctx,W,H,t);return ok;}
+const tBoxes=new Map();
+function drawTexts(ctx,W,H,t){
+  for(const x of P.texts){if(t<x.start||t>x.start+x.dur)continue;const lt=t-x.start,rt=x.start+x.dur-t,D=0.35;
+    let al=1,sc=1,dy=0,txt=x.text;const inP=clamp(lt/D,0,1),outP=clamp(rt/D,0,1);
+    if(x.anim==="fade")al=Math.min(inP,outP);
+    else if(x.anim==="pop"){const q=inP;sc=q<1?(0.6+0.55*q-0.15*q*q*q*1.0):1;al=Math.min(1,inP*2,outP);}
+    else if(x.anim==="slide"){dy=(1-inP)*(1-inP)*H*0.05;al=Math.min(inP,outP);}
+    else if(x.anim==="zoom"){sc=0.85+0.15*Math.min(1,lt/1.2)+0.05*lt/x.dur;al=Math.min(inP,outP);}
+    else if(x.anim==="type"){const n=Math.ceil(txt.length*clamp(lt/Math.min(1.6,x.dur*0.5),0,1));txt=txt.slice(0,n);al=outP;}
+    const f=TFONTS[x.font]||TFONTS.modern,fs=Math.max(8,x.size/100*Math.min(W,H)*1.6),lines=txt.split("\n"),lh=fs*1.18;
+    ctx.save();ctx.globalAlpha=al;ctx.translate(x.x*W,x.y*H+dy);ctx.scale(sc,sc);ctx.font=f[0]+" "+fs+"px "+f[1];ctx.textAlign="center";ctx.textBaseline="middle";
+    let mw=0;lines.forEach(l=>mw=Math.max(mw,ctx.measureText(l).width));const bh=lh*lines.length;
+    tBoxes.set(x.id,{x:x.x*W,y:x.y*H,w:mw*sc+fs*0.6,h:bh*sc+fs*0.4,W,H});
+    if(x.style==="box"){ctx.fillStyle=x.boxColor||"rgba(0,0,0,.6)";const p=fs*0.35;rr(ctx,-mw/2-p,-bh/2-p*0.6,mw+p*2,bh+p*1.2,fs*0.25);ctx.fill();}
+    lines.forEach((l,i)=>{const y=-bh/2+lh*(i+0.5);
+      if(x.style==="shadow"){ctx.shadowColor="rgba(0,0,0,.55)";ctx.shadowBlur=fs*0.25;ctx.shadowOffsetY=fs*0.05;}
+      if(x.style==="outline"){ctx.lineJoin="round";ctx.lineWidth=fs*0.14;ctx.strokeStyle=x.color==="#111111"?"#fff":"#111";ctx.strokeText(l,0,y);}
+      if(x.style==="neon"){ctx.shadowColor=x.color;ctx.shadowBlur=fs*0.5;}
+      ctx.fillStyle=x.style==="box"&&x.color===(x.boxColor||"")?"#fff":x.color;ctx.fillText(l,0,y);ctx.shadowBlur=0;ctx.shadowOffsetY=0;});
+    if(sel&&sel.type==="text"&&sel.id===x.id&&ctx===pctx&&!playing){ctx.globalAlpha=1;ctx.setLineDash([6,4]);ctx.strokeStyle="rgba(255,255,255,.8)";ctx.lineWidth=1.5/sc;ctx.strokeRect(-mw/2-fs*0.3,-bh/2-fs*0.2,mw+fs*0.6,bh+fs*0.4);}
+    ctx.restore();}}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+
+/* ---------- Media elements & audio graph ---------- */
+const els=new Map(),aus=new Map(),gains=new Map();let AC=null,master=null,recDest=null;
+function elFor(c){let v=els.get(c.id);if(!v){const m=media.get(c.mid);if(!m||c.kind!=="video")return null;v=document.createElement("video");v.preload="auto";v.playsInline=true;v.src=m.url;
+  v.addEventListener("seeked",()=>{if(!playing)requestDraw();});v.addEventListener("loadeddata",()=>requestDraw());els.set(c.id,v);hook(v,c.id);}return v;}
+function auFor(a){let e=aus.get(a.id);if(!e){const m=media.get(a.mid);if(!m)return null;e=document.createElement("audio");e.preload="auto";e.src=m.url;aus.set(a.id,e);hook(e,a.id);}return e;}
+function hook(e,id){if(!AC||gains.has(id))return;try{const s=AC.createMediaElementSource(e),g=AC.createGain();s.connect(g);g.connect(master);gains.set(id,g);}catch(err){}}
+function ensureAudio(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.connect(AC.destination);recDest=AC.createMediaStreamDestination();master.connect(recDest);
+  els.forEach((v,id)=>hook(v,id));aus.forEach((v,id)=>hook(v,id));}catch(e){AC=null;}}
+function setVol(id,e,v){const g=gains.get(id);v=clamp(v,0,4);if(g)g.gain.value=v;else e.volume=clamp(v,0,1);}
+function envelope(t,start,dur,fi,fo){let k=1;if(fi>0&&t-start<fi)k*=clamp((t-start)/fi,0,1);const r=start+dur-t;if(fo>0&&r<fo)k*=clamp(r/fo,0,1);return k;}
+function syncMedia(t,run){
+  const live=new Set();
+  P.clips.forEach((c,i)=>{if(c.kind!=="video")return;const v=elFor(c);if(!v)return;live.add(c.id);
+    const active=t>=c._start-1e-3&&t<c._start+c._dur,soon=!active&&c._start>t&&c._start-t<0.8,st=c.in+clamp(t-c._start,0,c._dur)*c.speed;
+    if(active){const nt=P.clips[i+1],fo=Math.max(c.fadeOut,nt&&nt._td||0);setVol(c.id,v,c.vol/100*envelope(t,c._start,c._dur,Math.max(c.fadeIn,c._td),fo));
+      if(run){if(v.playbackRate!==c.speed)v.playbackRate=c.speed;if(v.paused){if(Math.abs(v.currentTime-st)>0.05)v.currentTime=st;v.play().catch(()=>{});}else if(Math.abs(v.currentTime-st)>0.3)v.currentTime=st;}
+      else{if(!v.paused)v.pause();if(Math.abs(v.currentTime-st)>0.02&&!v.seeking)v.currentTime=st;}}
+    else{if(!v.paused)v.pause();if(soon&&Math.abs(v.currentTime-c.in)>0.05&&!v.seeking)v.currentTime=c.in;}});
+  els.forEach((v,id)=>{if(!live.has(id)){v.pause();}});
+  P.audios.forEach(a=>{const e=auFor(a);if(!e)return;const d=a.out-a.in,active=t>=a.start&&t<a.start+d,st=a.in+(t-a.start);
+    if(active&&run){setVol(a.id,e,a.vol/100*envelope(t,a.start,d,a.fadeIn,a.fadeOut));if(e.paused){e.currentTime=st;e.play().catch(()=>{});}else if(Math.abs(e.currentTime-st)>0.3)e.currentTime=st;}
+    else if(!e.paused)e.pause();});
+}
+
+/* ---------- Preview & transport ---------- */
+let raf=0,lastNow=0,drawReq=false;
+function fitPreview(){const wrap=$("prevWrap"),r=wrap.getBoundingClientRect(),pad=isDesk()?28:16,[a,b]=baseDims(),k=Math.min((r.width-pad)/a,(r.height-pad)/b);
+  const cw=Math.max(40,Math.floor(a*k)),ch=Math.max(40,Math.floor(b*k)),dpr=Math.min(2,window.devicePixelRatio||1);
+  let W=Math.round(cw*dpr),H=Math.round(ch*dpr);const lim=1600/Math.max(W,H);if(lim<1){W=Math.round(W*lim);H=Math.round(H*lim);}
+  pv.style.width=cw+"px";pv.style.height=ch+"px";if(pv.width!==W||pv.height!==H){pv.width=W;pv.height=H;}requestDraw();}
+function requestDraw(){if(drawReq||playing)return;drawReq=true;requestAnimationFrame(()=>{drawReq=false;syncMedia(T,false);drawFrame(pctx,pv.width,pv.height,T);updTime();});}
+function updTime(){$("tCur").textContent=fmt(T);$("tDur").textContent=fmt(total);}
+function play(){if(!P.clips.length&&!P.texts.length&&!P.audios.length)return;ensureAudio();if(AC&&AC.state==="suspended")AC.resume();if(T>=total-0.05)T=0;playing=true;lastNow=performance.now();setPlayIcon();raf=requestAnimationFrame(tick);}
+function pause(){playing=false;cancelAnimationFrame(raf);els.forEach(v=>v.pause());aus.forEach(a=>a.pause());setPlayIcon();requestDraw();}
+function setPlayIcon(){$("play").innerHTML='<svg><use href="#i-'+(playing?"pause":"play")+'"/></svg>';}
+function tick(now){if(!playing)return;const dt=Math.min(0.1,(now-lastNow)/1000);lastNow=now;T+=dt;if(T>=total){T=total;syncMedia(T,false);drawFrame(pctx,pv.width,pv.height,T);pause();scrollToT();return;}
+  syncMedia(T,true);drawFrame(pctx,pv.width,pv.height,T);updTime();scrollToT();raf=requestAnimationFrame(tick);}
+function seek(t){T=clamp(t,0,total);if(playing){syncMedia(T,true);}else requestDraw();updTime();}
+
+/* ---------- Timeline ---------- */
+const tl=$("tl"),tls=$("tlScroll"),tli=$("tlInner");let ignoreScroll=false,tlDirtyF=true;
+const ROW={ruler:[0,22],v:[28,64],t:[98,26],a:[130,40]};
+function rowsMob(){return isDesk()?ROW:{ruler:[0,20],v:[24,56],t:[86,24],a:[116,36]};}
+function half(){return tls.clientWidth/2;}
+function dirtyTL(){tlDirtyF=true;requestAnimationFrame(()=>{if(tlDirtyF)renderTL();});}
+function scrollToT(){ignoreScroll=true;tls.scrollLeft=T*pps;requestAnimationFrame(()=>{ignoreScroll=false;});}
+tls.addEventListener("scroll",()=>{if(ignoreScroll||playing)return;seek(tls.scrollLeft/pps);});
+function renderTL(){tlDirtyF=false;layout();const R=rowsMob(),h=half(),w=Math.max(total,1)*pps;tli.style.width=(w+h*2)+"px";tli.innerHTML="";
+  $("tlEmpty").hidden=!!(P.clips.length||P.texts.length||P.audios.length);$("vEmpty").hidden=!!(P.clips.length||P.texts.length);
+  const ru=el("div","ruler");ru.style.top=R.ruler[0]+"px";const step=pps>=120?0.5:pps>=50?1:pps>=20?2:pps>=10?5:10;
+  for(let s=0;s<=Math.max(total,1)+step;s+=step){const i=el("i",Math.round(s/step)%2===0?"maj":"");i.style.left=(h+s*pps)+"px";ru.appendChild(i);if(Math.round(s/step)%2===0){const b=el("b",null,fmtS(s));b.style.left=(h+s*pps)+"px";ru.appendChild(b);}}
+  tli.appendChild(ru);
+  const row=(k,cls)=>{const d=el("div","track "+cls);d.style.top=R[k][0]+"px";d.style.height=R[k][1]+"px";tli.appendChild(d);return d;};
+  const vr=row("v","tv"),tr=row("t","tt"),ar=row("a","ta");
+  P.clips.forEach((c,i)=>{const b=blk(vr,"v",c.id,c._start,c._dur,"clip");const m=media.get(c.mid);
+    const cv=document.createElement("canvas");const bw=Math.max(2,Math.round(c._dur*pps)),bh=R.v[1];cv.width=Math.min(4000,bw);cv.height=bh;paintStrip(cv,c,m);b.prepend(cv);
+    b.appendChild(el("span","bl",(c.preset!=="none"?findP(c.preset).name+" · ":"")+(c.speed!==1?c.speed+"x · ":"")+(m?m.name:"")));b.appendChild(el("span","bd",c._dur.toFixed(1)+"s"));
+    if(i>0){const tb=el("button","tr"+(c.trans.type==="none"?" off":""),(TRANS.find(x=>x[0]===c.trans.type)||TRANS[0])[2]);tb.type="button";tb.title="Chuyển cảnh";
+      tb.style.left=(h+(c._start+c._td/2)*pps)+"px";tb.style.top=(R.v[0]+R.v[1]/2-11)+"px";tb.onclick=e=>{e.stopPropagation();sel={type:"clip",id:c.id};openPanel("trans");renderTL();};tli.appendChild(tb);}});
+  P.texts.forEach(x=>{const b=blk(tr,x.kind==="emoji"?"s":"t",x.id,x.start,x.dur,"text");b.appendChild(el("span",null,x.text.replace(/\n/g," ")));});
+  P.audios.forEach(a=>{const b=blk(ar,"a",a.id,a.start,a.out-a.in,"audio");const m=media.get(a.mid);
+    if(m&&m.peaks){const cv=document.createElement("canvas");cv.width=Math.min(4000,Math.max(2,Math.round((a.out-a.in)*pps)));cv.height=R.a[1];paintWave(cv,m,a.in,a.out);b.prepend(cv);}
+    b.appendChild(el("span","bl","♪ "+(m?m.name:"")));});
+  scrollToT();updTime();}
+function fmtS(s){const m=Math.floor(s/60),r=s-m*60;return m?m+":"+String(Math.round(r)).padStart(2,"0"):(Number.isInteger(r)?r+"s":r.toFixed(1)+"s");}
+function blk(row,cls,id,start,dur,type){const h=half(),b=el("div","blk "+cls);b.style.left=(h+start*pps)+"px";b.style.width=Math.max(4,dur*pps)+"px";b.dataset.id=id;
+  if(sel&&sel.id===id)b.classList.add("sel");const hl=el("i","h l"),hr=el("i","h r");b.append(hl,hr);row.appendChild(b);dragBlk(b,type,id,hl,hr);return b;}
+function paintStrip(cv,c,m){const x=cv.getContext("2d");x.fillStyle="#1a1a1c";x.fillRect(0,0,cv.width,cv.height);if(!m||!m.thumbs.length)return;
+  const th=m.thumbs.find(Boolean);const tw=Math.max(8,Math.round(cv.height*(th.width/th.height)));
+  for(let px=0;px<cv.width;px+=tw){const st=c.kind==="image"?0:c.in+(px+tw/2)/cv.width*(c.out-c.in);const n=m.thumbs.length;let i=c.kind==="image"?0:clamp(Math.floor(st/m.dur*(m.thumbsN||n)),0,n-1);
+    let t=m.thumbs[i];if(!t){for(let k=1;k<n&&!t;k++)t=m.thumbs[i-k]||m.thumbs[i+k];}if(t)x.drawImage(t,px,0,tw,cv.height);}
+  x.fillStyle="rgba(0,0,0,.15)";for(let px=tw;px<cv.width;px+=tw)x.fillRect(px,0,1,cv.height);}
+function paintWave(cv,m,a0,a1){const x=cv.getContext("2d"),pk=m.peaks,N=pk.length,H=cv.height;x.fillStyle="rgba(180,255,235,.55)";
+  for(let px=0;px<cv.width;px+=2){const t=a0+(px/cv.width)*(a1-a0),i=clamp(Math.floor(t/m.dur*N),0,N-1),v=pk[i]*H*0.42;x.fillRect(px,H/2-v,1.5,v*2+1);}}
+function dragBlk(b,type,id,hl,hr){
+  let st=null;
+  b.addEventListener("pointerdown",e=>{if(e.button>0)return;e.stopPropagation();const mode=e.target===hl?"l":e.target===hr?"r":"move";
+    const wasSel=sel&&sel.id===id;sel={type,id};
+    st={mode,x:e.clientX,y:e.clientY,moved:false,wasSel,snap:JSON.parse(JSON.stringify(item(type,id)))};
+    if(mode!=="move"||type!=="clip"||isDesk())b.setPointerCapture(e.pointerId);
+    if(!wasSel){document.querySelectorAll(".blk.sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");showInspector();}});
+  b.addEventListener("pointermove",e=>{if(!st)return;const dx=e.clientX-st.x;if(!st.moved&&Math.abs(dx)<4)return;
+    if(st.mode==="move"&&type==="clip"&&!isDesk())return;
+    st.moved=true;const it=item(type,id),s0=st.snap,dt=dx/pps;if(!it)return;
+    if(type==="clip"){const m=media.get(it.mid);
+      if(st.mode==="l"){if(it.kind==="video"){it.in=clamp(s0.in+dt*it.speed,0,it.out-0.1);}else{it.out=clamp(s0.out-dt,0.3,60);} }
+      else if(st.mode==="r"){if(it.kind==="video"){it.out=clamp(s0.out+dt*it.speed,it.in+0.1,m?m.dur:s0.out);}else it.out=clamp(s0.out+dt,0.3,60);}
+      else{b.style.transform="translateX("+dx+"px)";b.style.zIndex=9;b.style.opacity=.85;return;}}
+    else if(type==="text"){if(st.mode==="l"){const ns=clamp(s0.start+dt,0,s0.start+s0.dur-0.2);it.dur=s0.dur-(ns-s0.start);it.start=ns;}else if(st.mode==="r")it.dur=clamp(s0.dur+dt,0.2,600);else it.start=Math.max(0,s0.start+dt);}
+    else if(type==="audio"){const m=media.get(it.mid);if(st.mode==="l"){const d=clamp(dt,-s0.in,s0.out-s0.in-0.2);it.in=s0.in+d;it.start=Math.max(0,s0.start+d);}else if(st.mode==="r")it.out=clamp(s0.out+dt,it.in+0.2,m?m.dur:s0.out);else it.start=Math.max(0,s0.start+dt);}
+    layout();const w=type==="clip"?it._dur:type==="text"?it.dur:it.out-it.in,s=type==="clip"?it._start:it.start;b.style.left=(half()+s*pps)+"px";b.style.width=Math.max(4,w*pps)+"px";
+    if(type==="clip"&&st.mode!=="move"){T=clamp(st.mode==="l"?it._start:it._start+it._dur-0.04,0,total);}requestDraw();});
+  const up=e=>{if(!st)return;const s=st;st=null;
+    if(s.moved&&s.mode==="move"&&type==="clip"){const dt=(e.clientX-s.x)/pps,c=item("clip",id),from=P.clips.indexOf(c),centre=c._start+c._dur/2+dt;
+      let to=P.clips.filter(x=>x!==c&&x._start+x._dur/2<centre).length;P.clips.splice(from,1);P.clips.splice(to,0,c);}
+    if(s.moved)commit();else{renderTL();if(s.wasSel&&!isDesk())openPanel(defPanel());}};
+  b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);}
+function item(type,id){const L=type==="clip"?P.clips:type==="text"?P.texts:P.audios;return L.find(x=>x.id===id);}
+function selItem(){return sel?item(sel.type,sel.id):null;}
+tli.addEventListener("pointerdown",e=>{if(e.target===tli||e.target.classList.contains("track")||e.target.classList.contains("ruler")){if(sel){sel=null;renderTL();showInspector();}}});
+tl.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();setPps(pps*Math.exp(-e.deltaY*0.01));}},{passive:false});
+let pinch=null;const tp=new Map();
+tls.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")return;tp.set(e.pointerId,e.clientX);if(tp.size===2){const [a,b]=[...tp.values()];pinch={d:Math.abs(a-b)||1,p:pps};}});
+tls.addEventListener("pointermove",e=>{if(!tp.has(e.pointerId))return;tp.set(e.pointerId,e.clientX);if(pinch&&tp.size===2){const [a,b]=[...tp.values()];setPps(pinch.p*Math.abs(a-b)/pinch.d);}});
+const tpEnd=e=>{tp.delete(e.pointerId);if(tp.size<2)pinch=null;};tls.addEventListener("pointerup",tpEnd);tls.addEventListener("pointercancel",tpEnd);
+function setPps(v){pps=clamp(v,4,400);$("tZoom").value=Math.round(Math.log(pps/4)/Math.log(100)*100);renderTL();}
+
+/* ---------- History ---------- */
+let hist=[],hIdx=-1;
+function snapshot(){return JSON.stringify({P,sel},(k,v)=>k[0]==="_"?undefined:v);}
+function commit(){layout();const s=snapshot();if(hist[hIdx]!==s){hist=hist.slice(0,hIdx+1);hist.push(s);if(hist.length>80)hist.shift();hIdx=hist.length-1;}T=clamp(T,0,total);renderTL();showInspector();requestDraw();fitPreviewIfRatio();updHist();}
+function restore(i){if(i<0||i>=hist.length)return;hIdx=i;const o=JSON.parse(hist[i]);P=o.P;sel=o.sel;layout();T=clamp(T,0,total);renderTL();showInspector();fitPreview();updHist();}
+function updHist(){$("bUndo").disabled=hIdx<=0;$("bRedo").disabled=hIdx>=hist.length-1;}
+let lastRatio=null;function fitPreviewIfRatio(){const k=P.ratio+"|"+(P.ratio==="orig"&&P.clips[0]?P.clips[0].mid:"");if(k!==lastRatio){lastRatio=k;fitPreview();}}
+let liveT=null;function live(){layout();requestDraw();clearTimeout(liveT);liveT=setTimeout(()=>{renderTL();},120);}
+
+/* ---------- Edit operations ---------- */
+function splitAt(){const it=selItem();const t=T;
+  if(sel&&sel.type==="text"){if(t<=it.start+0.1||t>=it.start+it.dur-0.1)return toast("Đặt đầu phát vào giữa khối chữ để tách");const b=JSON.parse(JSON.stringify(it));b.id=uid();b.start=t;b.dur=it.start+it.dur-t;it.dur=t-it.start;P.texts.push(b);commit();return;}
+  if(sel&&sel.type==="audio"){const d=it.out-it.in;if(t<=it.start+0.1||t>=it.start+d-0.1)return toast("Đặt đầu phát vào giữa đoạn nhạc để tách");const b=JSON.parse(JSON.stringify(it));b.id=uid();const off=t-it.start;b.in=it.in+off;b.start=t;it.out=it.in+off;P.audios.push(b);commit();return;}
+  const c=P.clips.find(x=>t>x._start+0.05&&t<x._start+x._dur-0.05);if(!c)return toast("Đặt đầu phát vào giữa một clip để tách");
+  const i=P.clips.indexOf(c),b=JSON.parse(JSON.stringify(c));b.id=uid();b.trans={type:"none",dur:0.5};
+  if(c.kind==="video"){const mid=c.in+(t-c._start)*c.speed;b.in=mid;c.out=mid;}else{const off=t-c._start;b.out=c.out-off;c.out=off;}
+  b.fadeIn=0;c.fadeOut=0;P.clips.splice(i+1,0,b);sel={type:"clip",id:b.id};commit();toast("Đã tách clip");}
+function delSel(){if(!sel)return;const L=sel.type==="clip"?P.clips:sel.type==="text"?P.texts:P.audios;const i=L.findIndex(x=>x.id===sel.id);if(i<0)return;L.splice(i,1);
+  if(sel.type==="clip"){const v=els.get(sel.id);if(v){v.pause();}if(P.clips[0])P.clips[0].trans.type="none";}sel=null;closeSheet();commit();}
+function dupSel(){const it=selItem();if(!it)return;const b=JSON.parse(JSON.stringify(it));b.id=uid();
+  if(sel.type==="clip"){P.clips.splice(P.clips.indexOf(it)+1,0,b);}else if(sel.type==="text"){b.start=it.start+it.dur;P.texts.push(b);}else{b.start=it.start+(it.out-it.in);P.audios.push(b);}sel={type:sel.type,id:b.id};commit();}
+function moveClip(d){if(!sel||sel.type!=="clip")return;const i=P.clips.findIndex(x=>x.id===sel.id),j=i+d;if(j<0||j>=P.clips.length)return;const [c]=P.clips.splice(i,1);P.clips.splice(j,0,c);if(P.clips[0])P.clips[0].trans.type="none";commit();}
+function addText(emoji){const x={id:uid(),kind:emoji?"emoji":"text",text:emoji||"Nhập chữ",start:Math.min(T,Math.max(0,total-0.5)),dur:3,font:"modern",size:emoji?14:7,color:"#ffffff",style:emoji?"none":"shadow",boxColor:"rgba(0,0,0,.6)",x:0.5,y:emoji?0.4:0.72,anim:emoji?"pop":"fade"};
+  P.texts.push(x);sel={type:"text",id:x.id};commit();openPanel(emoji?"sticker":"text");}
+
+/* ---------- Inspector panels ---------- */
+let curPanel=null;
+function panelsFor(){if(!sel)return [["project","Dự án"],["media","Media"]];
+  if(sel.type==="clip"){const c=selItem();const L=[["filter","Bộ lọc"],["adjust","Chỉnh màu"],["fx","Hiệu ứng"],["speed","Tốc độ"],["volume","Âm thanh"],["frame","Khung hình"]];if(P.clips.indexOf(c)>0)L.push(["trans","Chuyển cảnh"]);return L;}
+  if(sel.type==="text"){const x=selItem();return x&&x.kind==="emoji"?[["sticker","Sticker"],["anim","Hoạt ảnh"]]:[["text","Chữ"],["tstyle","Kiểu"],["anim","Hoạt ảnh"]];}
+  return [["audio","Âm thanh"]];}
+function defPanel(){return panelsFor()[0][0];}
+function showInspector(){if(!selItem())sel=null;const L=panelsFor();if(!L.some(p=>p[0]===curPanel))curPanel=L[0][0];
+  if(isDesk()){const tabs=$("itabs");tabs.innerHTML="";L.forEach(([k,l])=>{const b=el("button","itab",l);b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(k===curPanel));b.onclick=()=>{curPanel=k;showInspector();};tabs.appendChild(b);});
+    const body=$("ibody");body.innerHTML="";body.appendChild(buildPanel(curPanel));}
+  else{buildMTools();if($("sheet").classList.contains("open")){if(L.some(p=>p[0]===curPanel))openPanel(curPanel);else closeSheet();}}}
+function openPanel(k){curPanel=k;if(isDesk()){showInspector();return;}const L=panelsFor().concat([["project","Dự án"],["media","Media"]]);$("sTitle").textContent=(L.find(p=>p[0]===k)||["",""])[1];
+  const b=$("sbody");b.innerHTML="";b.appendChild(buildPanel(k));const s=$("sheet");s.classList.add("open");s.setAttribute("aria-hidden","false");buildMTools();}
+function closeSheet(){const s=$("sheet");s.classList.remove("open");s.setAttribute("aria-hidden","true");buildMTools();}
+function sec(t){const s=el("div","sec");if(t)s.appendChild(el("h4",null,t));return s;}
+function chipRow(opts,cur,on){const r=el("div","chips");opts.forEach(([v,l])=>{const b=el("button","chip",l);b.type="button";b.setAttribute("aria-pressed",String(v===cur));b.onclick=()=>{on(v);r.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});return r;}
+function sld(label,min,max,step,val,fmtf,onIn,onCh){const row=el("div","row"),lb=el("label",null,label),v=el("span","val"),i=document.createElement("input");i.type="range";i.min=min;i.max=max;i.step=step;i.value=val;
+  const show=()=>v.textContent=fmtf?fmtf(+i.value):String(Math.round(+i.value));show();i.addEventListener("input",()=>{onIn(+i.value);show();});i.addEventListener("change",()=>{if(onCh)onCh(+i.value);else commit();});
+  row.addEventListener("dblclick",e=>{if(e.target===i)return;});row.append(lb,v,i);return row;}
+function swRow(cols,cur,on){const r=el("div","swatches");cols.forEach(c=>{const b=el("button","swatch");b.type="button";b.style.background=c;b.setAttribute("aria-pressed",String(c===cur));b.onclick=()=>{on(c);r.querySelectorAll(".swatch").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});
+  const ci=document.createElement("input");ci.type="color";ci.value=/^#[0-9a-f]{6}$/i.test(cur)?cur:"#ffffff";ci.oninput=()=>on(ci.value);ci.onchange=()=>commit();r.appendChild(ci);return r;}
+function tbtn(label,on,cls){const b=el("button","tbtn"+(cls?" "+cls:""),label);b.type="button";b.onclick=on;return b;}
+const thumbCache=new Map();let thumbKey="";
+function presetThumb(cv,id,c){const S=srcOf(c);const key=c.id+"|"+(S?S.w:0)+"|"+Math.round((T-c._start)*2);if(key!==thumbKey){thumbCache.clear();thumbKey=key;}
+  if(thumbCache.has(id)){cv.getContext("2d").drawImage(thumbCache.get(id),0,0);return;}if(!S)return;
+  let tex;if(S.img)tex=imgTex.get(c.mid)||(imgTex.set(c.mid,makeTex(0,0,S.s)),imgTex.get(c.mid));else{if(!vTex)vTex=makeTex(2,2,null);upload(vTex,S.s);tex=vTex;}
+  const p=findP(id),e=Object.assign({},p.params);e.mix=(p.mix||Z9).slice();const s=Math.min(S.w,S.h),gw=Math.round(96*S.w/s),gh=Math.round(96*S.h/s);render(tex,gw,gh,e);
+  const t=document.createElement("canvas");t.width=t.height=96;t.getContext("2d").drawImage(glc,(gw-96)/2,(gh-96)/2,96,96,0,0,96,96);thumbCache.set(id,t);cv.getContext("2d").drawImage(t,0,0);}
+let famSel="all";
+function buildPanel(k){const box=el("div","sec");box.style.gap="16px";const it=selItem();
+  if(k==="media"){const s=sec("Thêm vào dự án");const r=el("div","btnrow chips");r.append(tbtn("Nhập video / ảnh",()=>$("file").click(),"primary"),tbtn("Thêm nhạc",()=>$("fileAudio").click()));s.appendChild(r);
+    s.appendChild(el("p","note","Bấm vào một media để thêm vào dòng thời gian tại đầu phát. Video, ảnh và nhạc đều xử lý ngay trên máy của bạn, không tải lên đâu cả."));box.appendChild(s);
+    if(!isDesk()){const g=el("div","mlist");g.style.padding="0";media.forEach(m=>g.appendChild(mediaItem(m)));box.appendChild(g);}return box;}
+  if(k==="project"){const s=sec("Tỉ lệ khung hình");s.appendChild(chipRow(RATIOS,P.ratio,v=>{P.ratio=v;commit();}));box.appendChild(s);
+    const s2=sec("Nền (khi video không phủ kín khung)");s2.appendChild(chipRow([["blur","Mờ ảo"],["black","Đen"],["white","Trắng"],["color","Màu"]],P.bg,v=>{P.bg=v;commit();}));
+    if(P.bg==="color")s2.appendChild(swRow(["#000000","#f4f1ea","#e9b45c","#ff5a5f","#7ad7ff","#2b2236","#1f6f63"],P.bgColor,v=>{P.bgColor=v;requestDraw();}));box.appendChild(s2);
+    const s3=sec("Áp bộ lọc cho mọi clip");const r=el("div","btnrow chips");r.append(tbtn("Chọn clip đầu để đổi bộ lọc",()=>{if(P.clips[0]){sel={type:"clip",id:P.clips[0].id};openPanel("filter");renderTL();}}));s3.appendChild(r);box.appendChild(s3);
+    box.appendChild(el("p","note","Mẹo: Space để phát/dừng · S để tách · Delete để xoá · Ctrl+D nhân đôi · ← → lùi/tiến 1 khung hình. Kéo mép clip để cắt, kéo thân clip để đổi thứ tự."));return box;}
+  if(!it)return box;
+  if(k==="filter"){const s=sec();const fams=[["all","Tất cả"]].concat(custom.length?[["mine","Của tôi"]]:[]).concat(FAMS);
+    s.appendChild(chipRow(fams,famSel,v=>{famSel=v;renderGrid();}));const g=el("div","pgrid");s.appendChild(g);
+    function renderGrid(){g.innerHTML="";const list=famSel==="all"?[PRESETS[0]].concat(custom,PRESETS.slice(1)):famSel==="mine"?custom:PRESETS.filter(p=>p.fam===famSel);
+      list.slice(0,famSel==="all"?60:400).forEach(p=>{const b=el("button","ptile");b.type="button";b.setAttribute("aria-pressed",String(p.id===it.preset));const cv=document.createElement("canvas");cv.width=cv.height=96;b.append(cv,el("span",null,p.name));
+        b.onclick=()=>{it.preset=p.id;g.querySelectorAll(".ptile").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));commit();};g.appendChild(b);requestAnimationFrame(()=>presetThumb(cv,p.id,it));});
+      if(famSel==="all")g.appendChild(el("p","note","Chọn một họ ở trên để xem đủ "+(PRESETS.length-1)+" preset."));}
+    renderGrid();box.appendChild(s);
+    box.appendChild(sld("Độ mạnh",0,100,1,it.strength,null,v=>{it.strength=v;live();}));
+    const r=el("div","btnrow chips");r.append(tbtn("Áp cho mọi clip",()=>{P.clips.forEach(c=>{c.preset=it.preset;c.strength=it.strength;});commit();toast("Đã áp “"+findP(it.preset).name+"” cho "+P.clips.length+" clip");}));box.appendChild(r);return box;}
+  if(k==="adjust"){ADJ.forEach(([key,l,mn,mx])=>box.appendChild(sld(l,mn,mx,1,it.adj[key]||0,v=>(v>0&&mn<0?"+":"")+v,v=>{if(v)it.adj[key]=v;else delete it.adj[key];live();})));
+    box.appendChild(el("div","btnrow chips")).append(tbtn("Đặt lại",()=>{it.adj={};commit();}),tbtn("Áp cho mọi clip",()=>{P.clips.forEach(c=>c.adj=Object.assign({},it.adj));commit();toast("Đã áp chỉnh màu cho mọi clip");}));return box;}
+  if(k==="fx"){const g=el("div","fxgrid");FXS.forEach(([v,l,ic])=>{const b=el("button","fx");b.type="button";b.innerHTML="<b>"+ic+"</b>"+l;b.setAttribute("aria-pressed",String(it.fx===v));b.onclick=()=>{it.fx=v;g.querySelectorAll(".fx").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));commit();};g.appendChild(b);});
+    box.appendChild(g);box.appendChild(sld("Cường độ",0,100,1,it.fxAmt,null,v=>{it.fxAmt=v;live();}));return box;}
+  if(k==="speed"){const lg=v=>Math.round(Math.log2(v)*100)/100;box.appendChild(sld("Tốc độ",-2,2,0.01,lg(it.speed),v=>(Math.round(Math.pow(2,v)*100)/100)+"x",v=>{it.speed=Math.round(Math.pow(2,v)*100)/100;live();}));
+    box.appendChild(chipRow([[0.25,"0.25x"],[0.5,"0.5x"],[1,"1x"],[1.5,"1.5x"],[2,"2x"],[3,"3x"],[4,"4x"]],it.speed,v=>{it.speed=v;commit();}));
+    box.appendChild(el("p","note",it.kind==="image"?"Ảnh tĩnh: tốc độ thay đổi thời lượng hiển thị.":"Thời lượng sau khi đổi tốc độ: "+((it.out-it.in)/it.speed).toFixed(1)+" giây."));
+    if(it.kind==="image")box.appendChild(sld("Thời lượng ảnh",0.5,15,0.1,it.out,v=>v.toFixed(1)+"s",v=>{it.out=v;live();}));return box;}
+  if(k==="volume"){if(it.kind==="image"){box.appendChild(el("p","note","Ảnh tĩnh không có âm thanh. Thêm nhạc nền bằng nút Nhạc."));return box;}
+    const m=media.get(it.mid);if(m&&m.silent)box.appendChild(el("p","note","Video này không có tiếng."));
+    box.appendChild(sld("Âm lượng",0,200,1,it.vol,v=>v+"%",v=>{it.vol=v;}));box.appendChild(sld("Hiện dần",0,3,0.1,it.fadeIn,v=>v.toFixed(1)+"s",v=>{it.fadeIn=v;live();}));box.appendChild(sld("Tắt dần",0,3,0.1,it.fadeOut,v=>v.toFixed(1)+"s",v=>{it.fadeOut=v;live();}));
+    box.appendChild(el("div","btnrow chips")).append(tbtn(it.vol?"Tắt tiếng":"Bật tiếng",()=>{it.vol=it.vol?0:100;commit();}),tbtn("Tắt tiếng mọi clip",()=>{P.clips.forEach(c=>c.vol=0);commit();}));return box;}
+  if(k==="frame"){const s=sec("Vừa khung");s.appendChild(chipRow([["fit","Vừa (giữ trọn)"],["fill","Phủ kín"]],it.fit,v=>{it.fit=v;commit();}));box.appendChild(s);
+    box.appendChild(sld("Thu phóng",50,300,1,it.zoom,v=>v+"%",v=>{it.zoom=v;live();}));box.appendChild(sld("Vị trí ngang",-50,50,1,it.x,null,v=>{it.x=v;live();}));box.appendChild(sld("Vị trí dọc",-50,50,1,it.y,null,v=>{it.y=v;live();}));
+    const r=el("div","btnrow chips");r.append(tbtn("Xoay 90°",()=>{it.rot=(it.rot+90)%360;commit();}),tbtn("Đặt lại",()=>{it.zoom=100;it.x=it.y=0;it.rot=0;commit();}));box.appendChild(r);
+    const s2=sec("Chuyển động (Ken Burns)");s2.appendChild(chipRow(MOTIONS,it.motion,v=>{it.motion=v;commit();}));box.appendChild(s2);return box;}
+  if(k==="trans"){const g=el("div","fxgrid");TRANS.forEach(([v,l,ic])=>{const b=el("button","fx");b.type="button";b.innerHTML="<b>"+ic+"</b>"+l;b.setAttribute("aria-pressed",String(it.trans.type===v));b.onclick=()=>{it.trans.type=v;g.querySelectorAll(".fx").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));commit();const c=selItem();if(c&&v!=="none")seek(c._start-0.3);};g.appendChild(b);});
+    box.appendChild(el("p","note","Chuyển cảnh vào clip này từ clip trước."));box.appendChild(g);box.appendChild(sld("Thời lượng",0.2,2,0.1,it.trans.dur,v=>v.toFixed(1)+"s",v=>{it.trans.dur=v;live();}));
+    box.appendChild(el("div","btnrow chips")).append(tbtn("Áp cho mọi điểm nối",()=>{P.clips.forEach((c,i)=>{if(i>0)c.trans=Object.assign({},it.trans);});commit();}));return box;}
+  if(k==="text"||k==="sticker"){if(k==="text"){const ta=document.createElement("textarea");ta.className="field";ta.value=it.text;ta.rows=3;ta.oninput=()=>{it.text=ta.value||" ";live();};ta.onchange=()=>commit();box.appendChild(ta);setTimeout(()=>{if(isDesk()){ta.focus();ta.select();}},30);}
+    else{const g=el("div","fxgrid");g.style.gridTemplateColumns="repeat(6,minmax(0,1fr))";EMO.forEach(e=>{const b=el("button","fx");b.type="button";b.style.height="44px";b.innerHTML="<b>"+e+"</b>";b.onclick=()=>{it.text=e;commit();};g.appendChild(b);});box.appendChild(g);}
+    box.appendChild(sld("Cỡ",2,30,0.5,it.size,v=>v.toFixed(1),v=>{it.size=v;live();}));
+    if(k==="text"){const s=sec("Font");s.appendChild(chipRow(Object.keys(TFONTS).map(f=>[f,TFONTS[f][2]]),it.font,v=>{it.font=v;commit();}));box.appendChild(s);
+      const s2=sec("Màu chữ");s2.appendChild(swRow(TCOL,it.color,v=>{it.color=v;requestDraw();}));box.appendChild(s2);}
+    box.appendChild(sld("Thời lượng",0.3,30,0.1,it.dur,v=>v.toFixed(1)+"s",v=>{it.dur=v;live();}));
+    box.appendChild(el("p","note","Kéo chữ trên khung xem trước để đổi vị trí."));
+    box.appendChild(el("div","btnrow chips")).append(tbtn("Căn giữa",()=>{it.x=0.5;commit();}),tbtn("Xoá",delSel,"warn"));return box;}
+  if(k==="tstyle"){const s=sec("Kiểu");s.appendChild(chipRow([["none","Trơn"],["shadow","Đổ bóng"],["outline","Viền"],["box","Nền"],["neon","Neon"]],it.style,v=>{it.style=v;commit();}));box.appendChild(s);
+    const s2=sec("Màu nền chữ");s2.appendChild(swRow(["rgba(0,0,0,.6)","#ffffff","#111111","#e9b45c","#ff5a5f","#7ad7ff"],it.boxColor,v=>{it.boxColor=v;if(it.style!=="box")it.style="box";requestDraw();}));box.appendChild(s2);
+    const s3=sec("Mẫu nhanh");s3.appendChild(chipRow([["sub","Phụ đề"],["title","Tiêu đề lớn"],["vlog","Vlog"],["cine","Điện ảnh"]],"",v=>{Object.assign(it,v==="sub"?{font:"modern",size:4.5,style:"box",boxColor:"rgba(0,0,0,.6)",color:"#ffffff",y:0.86}:v==="title"?{font:"display",size:12,style:"shadow",color:"#ffffff",y:0.45}:v==="vlog"?{font:"hand",size:9,style:"shadow",color:"#f4d35e",y:0.3}:{font:"serif",size:7,style:"none",color:"#f4f1ea",y:0.5,anim:"fade"});commit();}));box.appendChild(s3);return box;}
+  if(k==="anim"){const s=sec("Hoạt ảnh vào / ra");s.appendChild(chipRow(TANIM,it.anim,v=>{it.anim=v;commit();seek(it.start);}));box.appendChild(s);return box;}
+  if(k==="audio"){const m=media.get(it.mid);box.appendChild(el("p","note","♪ "+(m?m.name:"")+" · "+(it.out-it.in).toFixed(1)+" giây"));
+    box.appendChild(sld("Âm lượng",0,200,1,it.vol,v=>v+"%",v=>{it.vol=v;}));box.appendChild(sld("Hiện dần",0,5,0.1,it.fadeIn,v=>v.toFixed(1)+"s",v=>{it.fadeIn=v;}));box.appendChild(sld("Tắt dần",0,5,0.1,it.fadeOut,v=>v.toFixed(1)+"s",v=>{it.fadeOut=v;}));
+    box.appendChild(el("div","btnrow chips")).append(tbtn("Khớp độ dài video",()=>{if(total>0){it.start=0;it.out=Math.min(m?m.dur:it.out,it.in+total);commit();}}),tbtn("Xoá",delSel,"warn"));return box;}
+  return box;}
+function mediaItem(m){const b=el("button","mitem"+(m.kind==="audio"?" audio":""));b.type="button";b.title="Thêm “"+m.name+"” vào dòng thời gian";
+  if(m.kind!=="audio"&&m.thumbs[0]){const c=document.createElement("canvas");c.width=m.thumbs[0].width;c.height=m.thumbs[0].height;c.getContext("2d").drawImage(m.thumbs[0],0,0);b.appendChild(c);}
+  b.appendChild(el("span","lb",(m.kind==="audio"?"♪ ":"")+m.name));if(m.kind!=="image"&&m.dur)b.appendChild(el("span","du",fmt(m.dur).replace(/^00:/,"")));b.appendChild(el("span","add","+"));
+  b.onclick=()=>{if(!m.ready)return toast("Đang đọc file…");addToTimeline(m);if(!isDesk())closeSheet();};return b;}
+function renderMedia(){const box=$("mlist");box.innerHTML="";media.forEach(m=>box.appendChild(mediaItem(m)));$("mCount").textContent=media.size?media.size+" mục":"";}
+
+/* ---------- Mobile tool row ---------- */
+function buildMTools(){if(isDesk())return;const box=$("mtools");box.innerHTML="";const open=$("sheet").classList.contains("open");
+  const B=(ic,l,on,k)=>{const b=el("button","mt"+(open&&k&&curPanel===k?" on":""));b.type="button";b.innerHTML='<svg class="i"><use href="#i-'+ic+'"/></svg>'+l;b.onclick=on;box.appendChild(b);};
+  if(!sel){B("plus","Thêm",()=>$("file").click());B("music","Nhạc",()=>$("fileAudio").click());B("text","Chữ",()=>addText());B("sticker","Sticker",()=>addText("✨"));B("ratio","Tỉ lệ",()=>openPanel("project"),"project");B("filter","Bộ lọc",()=>{if(!P.clips[0])return toast("Thêm clip trước");sel={type:"clip",id:P.clips[0].id};renderTL();openPanel("filter");});B("bg","Media",()=>openPanel("media"),"media");return;}
+  B("left","Bỏ chọn",()=>{sel=null;closeSheet();renderTL();showInspector();});
+  if(sel.type==="clip"){B("split","Tách",splitAt);B("filter","Bộ lọc",()=>openPanel("filter"),"filter");B("adj","Chỉnh",()=>openPanel("adjust"),"adjust");B("fx","Hiệu ứng",()=>openPanel("fx"),"fx");B("speed","Tốc độ",()=>openPanel("speed"),"speed");B("vol","Âm thanh",()=>openPanel("volume"),"volume");B("frame","Khung",()=>openPanel("frame"),"frame");
+    if(P.clips.indexOf(selItem())>0)B("trans","Chuyển cảnh",()=>openPanel("trans"),"trans");B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}
+  else if(sel.type==="text"){const x=selItem();if(x&&x.kind==="emoji")B("sticker","Sticker",()=>openPanel("sticker"),"sticker");else{B("text","Sửa chữ",()=>openPanel("text"),"text");B("adj","Kiểu",()=>openPanel("tstyle"),"tstyle");}
+    B("fx","Hoạt ảnh",()=>openPanel("anim"),"anim");B("split","Tách",splitAt);B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}
+  else{B("vol","Âm thanh",()=>openPanel("audio"),"audio");B("split","Tách",splitAt);B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}}
+
+/* ---------- Drag text on preview ---------- */
+let tdrag=null;
+pv.addEventListener("pointerdown",e=>{const r=pv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*pv.width,py=(e.clientY-r.top)/r.height*pv.height;
+  for(let i=P.texts.length-1;i>=0;i--){const x=P.texts[i];if(T<x.start||T>x.start+x.dur)continue;const b=tBoxes.get(x.id);if(!b)continue;
+    if(Math.abs(px-b.x)<b.w/2+10&&Math.abs(py-b.y)<b.h/2+10){if(playing)pause();sel={type:"text",id:x.id};tdrag={x,ox:x.x,oy:x.y,sx:e.clientX,sy:e.clientY,moved:false};pv.setPointerCapture(e.pointerId);renderTL();showInspector();requestDraw();return;}}
+  if(sel&&sel.type==="text"){sel=null;renderTL();showInspector();requestDraw();}});
+pv.addEventListener("pointermove",e=>{if(!tdrag)return;const r=pv.getBoundingClientRect();tdrag.moved=true;tdrag.x.x=clamp(tdrag.ox+(e.clientX-tdrag.sx)/r.width,0,1);tdrag.x.y=clamp(tdrag.oy+(e.clientY-tdrag.sy)/r.height,0,1);requestDraw();});
+const tdEnd=()=>{if(tdrag){const m=tdrag.moved;tdrag=null;if(m)commit();}};pv.addEventListener("pointerup",tdEnd);pv.addEventListener("pointercancel",tdEnd);
+
+/* ---------- Export ---------- */
+let expCancel=false,expBusy=false,dlP=null;
+function getDownloads(){if(!dlP){try{dlP=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads").catch(()=>null):Promise.resolve(null);}catch(e){dlP=Promise.resolve(null);}}return dlP;}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("load "+src));document.head.appendChild(s);});}
+function openExport(){if(!P.clips.length)return toast("Thêm ít nhất một clip để xuất video");if(playing)pause();
+  const d=$("expDlg");d.innerHTML="";d.appendChild(el("h3",null,"Xuất video"));
+  let res=1080,fps=30,q="high";const s1=sec("Độ phân giải");s1.appendChild(chipRow([[720,"720p"],[1080,"1080p"],[1440,"2K"],[2160,"4K"]],res,v=>{res=v;info();}));d.appendChild(s1);
+  const s2=sec("Khung hình / giây");s2.appendChild(chipRow([[24,"24"],[30,"30"],[60,"60"]],fps,v=>{fps=v;info();}));d.appendChild(s2);
+  const s3=sec("Chất lượng");s3.appendChild(chipRow([["std","Tiêu chuẩn"],["high","Cao"],["max","Tối đa"]],q,v=>{q=v;info();}));d.appendChild(s3);
+  const inf=el("p","note");d.appendChild(inf);function info(){const [W,H]=outDims(res);inf.textContent=W+"×"+H+" · "+fmt(total)+" · ước tính "+Math.round(bitrate(W,H,fps,q)*total/8/1e6)+" MB · MP4";}info();
+  const r=el("div","btnrow chips");r.append(tbtn("Huỷ",()=>{$("expBox").hidden=true;}),tbtn("Xuất video",()=>runExport(res,fps,q),"primary"));d.appendChild(r);$("expBox").hidden=false;}
+function bitrate(W,H,fps,q){return W*H*fps*({std:0.07,high:0.12,max:0.2}[q]);}
+async function runExport(res,fps,q){if(expBusy)return;expBusy=true;expCancel=false;const [W,H]=outDims(res),d=$("expDlg");d.innerHTML="";
+  d.appendChild(el("h3",null,"Đang xuất…"));const bar=el("div","bar"),bi=el("i");bar.appendChild(bi);const st=el("p","note","Chuẩn bị…");d.append(bar,st);
+  const cb=tbtn("Huỷ",()=>{expCancel=true;});d.appendChild(cb);
+  const prog=(p,m)=>{bi.style.width=Math.round(p*100)+"%";if(m)st.textContent=m;};
+  let blob=null,ext="mp4";
+  try{blob=await exportWebCodecs(W,H,fps,bitrate(W,H,fps,q),prog);}
+  catch(e){if(expCancel){finishExp(null);return;}console.warn("WebCodecs export failed, falling back",e);
+    try{const r=await exportRealtime(W,H,fps,bitrate(W,H,fps,q),prog);blob=r.blob;ext=r.ext;}catch(e2){if(!expCancel){console.error(e2);toast("Không xuất được video trên trình duyệt này: "+(e2.message||e2));}finishExp(null);return;}}
+  finishExp(blob,ext,W,H);}
+async function finishExp(blob,ext,W,H){expBusy=false;seek(T);if(!blob){$("expBox").hidden=true;if(expCancel)toast("Đã huỷ xuất video");return;}
+  const name="IOHK-"+new Date().toISOString().slice(0,19).replace(/[:T]/g,"")+"."+ext,d=$("expDlg");d.innerHTML="";d.appendChild(el("h3",null,"Xong rồi"));
+  d.appendChild(el("p","note",W+"×"+H+" · "+(blob.size/1e6).toFixed(1)+" MB · "+ext.toUpperCase()));
+  const v=document.createElement("video");v.src=URL.createObjectURL(blob);v.controls=true;v.playsInline=true;v.style.cssText="width:100%;max-height:46vh;border-radius:10px;background:#000";d.appendChild(v);
+  const save=async()=>{const dl=await getDownloads();if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu "+name);return;}catch(err){if(err&&err.code==="declined"){toast("Đã huỷ lưu");return;}}}
+    const file=new File([blob],name,{type:blob.type});if(/iPhone|iPad|Android/.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return;}catch(e){}}
+    const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);toast("Đã tải "+name);};
+  const r=el("div","btnrow chips");r.append(tbtn("Đóng",()=>{$("expBox").hidden=true;}),tbtn("Lưu video",save,"primary"));d.appendChild(r);save();}
+const MUXER_URL="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js";
+async function pickVideoCodec(W,H,fps,br){if(!("VideoEncoder" in window))throw new Error("no VideoEncoder");
+  const cands=[["avc","avc1.640033"],["avc","avc1.640028"],["avc","avc1.4d0028"],["hevc","hvc1.1.6.L123.B0"],["vp9","vp09.00.41.08"],["vp9","vp09.00.10.08"],["av1","av01.0.08M.08"]];
+  for(const [k,codec] of cands){const cfg={codec,width:W,height:H,bitrate:Math.round(br),framerate:fps,latencyMode:"quality"};if(k==="avc")cfg.avc={format:"avc"};
+    try{const r=await VideoEncoder.isConfigSupported(cfg);if(r&&r.supported)return {k,cfg:r.config||cfg};}catch(e){}}throw new Error("no codec");}
+async function pickAudioCodec(){if(!("AudioEncoder" in window))return null;for(const [k,codec] of [["aac","mp4a.40.2"],["opus","opus"]]){const cfg={codec,sampleRate:48000,numberOfChannels:2,bitrate:192000};
+  try{const r=await AudioEncoder.isConfigSupported(cfg);if(r&&r.supported)return {k,cfg};}catch(e){}}return null;}
+function seekEl(v,t){return new Promise(r=>{if(Math.abs(v.currentTime-t)<0.001&&v.readyState>=2){r();return;}let done=false;const fin=()=>{if(done)return;done=true;v.removeEventListener("seeked",fin);
+  if(v.requestVideoFrameCallback){let k=false;v.requestVideoFrameCallback(()=>{if(!k){k=true;r();}});setTimeout(()=>{if(!k){k=true;r();}},120);}else r();};v.addEventListener("seeked",fin);setTimeout(fin,3000);v.currentTime=t;});}
+async function mixAudio(){const has=P.clips.some(c=>c.kind==="video"&&c.vol>0)||P.audios.length;if(!has)return null;
+  const sr=48000,oc=new OfflineAudioContext(2,Math.max(1,Math.ceil(total*sr)),sr);let any=false;
+  const env=(g,start,dur,vol,fi,fo)=>{g.gain.setValueAtTime(fi>0?0:vol,start);if(fi>0)g.gain.linearRampToValueAtTime(vol,start+fi);if(fo>0){g.gain.setValueAtTime(vol,Math.max(start+fi,start+dur-fo));g.gain.linearRampToValueAtTime(0,start+dur);}};
+  for(let i=0;i<P.clips.length;i++){const c=P.clips[i];if(c.kind!=="video"||c.vol<=0)continue;const m=media.get(c.mid),b=m&&await decodeBuf(m);if(!b)continue;any=true;
+    const s=oc.createBufferSource();s.buffer=b;s.playbackRate.value=c.speed;const g=oc.createGain();const nt=P.clips[i+1];env(g,c._start,c._dur,c.vol/100,Math.max(c.fadeIn,c._td),Math.max(c.fadeOut,nt&&nt._td||0));
+    s.connect(g);g.connect(oc.destination);s.start(c._start,c.in);s.stop(c._start+c._dur);}
+  for(const a of P.audios){const m=media.get(a.mid),b=m&&await decodeBuf(m);if(!b)continue;any=true;const d=Math.min(a.out-a.in,total-a.start);if(d<=0)continue;
+    const s=oc.createBufferSource();s.buffer=b;const g=oc.createGain();env(g,a.start,d,a.vol/100,a.fadeIn,Math.min(a.fadeOut,d));s.connect(g);g.connect(oc.destination);s.start(a.start,a.in);s.stop(a.start+d);}
+  if(!any)return null;return await oc.startRendering();}
+async function exportWebCodecs(W,H,fps,br,prog){
+  const vc=await pickVideoCodec(W,H,fps,br);if(!window.Mp4Muxer){prog(0,"Tải bộ đóng gói MP4…");await loadScript(MUXER_URL);}
+  prog(0,"Trộn âm thanh…");const ab=await mixAudio();if(expCancel)throw new Error("cancel");const ac=ab?await pickAudioCodec():null;
+  const target=new Mp4Muxer.ArrayBufferTarget();
+  const mux=new Mp4Muxer.Muxer({target,video:{codec:vc.k,width:W,height:H,frameRate:fps},audio:ac?{codec:ac.k,numberOfChannels:2,sampleRate:48000}:undefined,fastStart:"in-memory",firstTimestampBehavior:"offset"});
+  let err=null,nOut=0;const ve=new VideoEncoder({output:(ch,meta)=>{nOut++;mux.addVideoChunk(ch,meta);},error:e=>{err=e;}});ve.configure(vc.cfg);
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{alpha:false});
+  const N=Math.max(1,Math.round(total*fps));els.forEach(v=>v.pause());aus.forEach(a=>a.pause());
+  for(let f=0;f<N;f++){if(expCancel){try{ve.close();}catch(e){}throw new Error("cancel");}if(err)throw err;const t=Math.min(total-1e-3,f/fps);
+    const act=activeAt(t),liveSet=new Set();
+    for(const c of act){if(c.kind!=="video")continue;const v=elFor(c);liveSet.add(v);if(v.readyState<1)await new Promise(r=>{v.addEventListener("loadeddata",r,{once:true});setTimeout(r,5000);});
+      const stt=clamp(c.in+(t-c._start)*c.speed,0,Math.max(0,(v.duration||c.out)-0.03));v.muted=true;
+      if(v.paused||Math.abs(v.currentTime-stt)>0.35||v.readyState<2){v.pause();await seekEl(v,stt);v.playbackRate=c.speed;try{await v.play();}catch(e){}}
+      const t0=performance.now();while(v.currentTime<stt-0.5/fps&&!v.ended&&performance.now()-t0<2500)await new Promise(r=>setTimeout(r,3));}
+    els.forEach(v=>{if(!liveSet.has(v)&&!v.paused)v.pause();});
+    drawFrame(cx,W,H,t);const vf=new VideoFrame(cv,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});ve.encode(vf,{keyFrame:f%(fps*2)===0});vf.close();
+    while(ve.encodeQueueSize>6)await new Promise(r=>setTimeout(r,4));
+    if(f%3===0){prog(f/N*0.92,"Khung "+(f+1)+" / "+N);pctx.drawImage(cv,0,0,pv.width,pv.height);await new Promise(r=>setTimeout(r,0));}}
+  els.forEach(v=>{v.pause();v.muted=false;});
+  await ve.flush();ve.close();if(err)throw err;window.__vstats={frames:N,chunks:nOut,codec:vc.cfg.codec};
+  if(ac&&ab){prog(0.94,"Mã hoá âm thanh…");let aerr=null;const ae=new AudioEncoder({output:(ch,meta)=>mux.addAudioChunk(ch,meta),error:e=>{aerr=e;}});ae.configure(ac.cfg);
+    const L=ab.getChannelData(0),R=ab.numberOfChannels>1?ab.getChannelData(1):L,n=ab.length,CH=1024;
+    for(let i=0;i<n;i+=CH){const k=Math.min(CH,n-i),buf=new Float32Array(k*2);buf.set(L.subarray(i,i+k),0);buf.set(R.subarray(i,i+k),k);
+      const ad=new AudioData({format:"f32-planar",sampleRate:48000,numberOfFrames:k,numberOfChannels:2,timestamp:Math.round(i*1e6/48000),data:buf});ae.encode(ad);ad.close();if(ae.encodeQueueSize>40)await new Promise(r=>setTimeout(r,2));}
+    await ae.flush();ae.close();if(aerr)console.warn(aerr);}
+  mux.finalize();prog(1,"Hoàn tất");return new Blob([target.buffer],{type:"video/mp4"});}
+async function exportRealtime(W,H,fps,br,prog){if(!("MediaRecorder" in window))throw new Error("no MediaRecorder");
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{alpha:false});ensureAudio();if(AC&&AC.state==="suspended")await AC.resume();
+  const stream=cv.captureStream(fps);if(recDest)recDest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+  const types=["video/mp4;codecs=avc1.640028,mp4a.40.2","video/mp4;codecs=avc1,mp4a","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+  const mime=types.find(t=>MediaRecorder.isTypeSupported(t))||"";const rec=new MediaRecorder(stream,{mimeType:mime||undefined,videoBitsPerSecond:Math.round(br),audioBitsPerSecond:192000});
+  const chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+  prog(0,"Đang ghi theo thời gian thực — giữ tab này mở");
+  await new Promise((res,rej)=>{let t0=0;T=0;syncMedia(0,true);rec.onstop=res;rec.onerror=e=>rej(e.error||e);rec.start(500);playing=true;
+    const step=now=>{if(!t0)t0=now;if(expCancel){rec.stop();playing=false;return;}T=(now-t0)/1000;if(T>=total){T=total;drawFrame(cx,W,H,T);playing=false;els.forEach(v=>v.pause());aus.forEach(a=>a.pause());setTimeout(()=>rec.stop(),150);return;}
+      syncMedia(T,true);drawFrame(cx,W,H,T);pctx.drawImage(cv,0,0,pv.width,pv.height);prog(T/total,"Đang ghi "+fmt(T)+" / "+fmt(total));requestAnimationFrame(step);};requestAnimationFrame(step);});
+  if(expCancel)throw new Error("cancel");const type=(mime||"video/webm").split(";")[0];return {blob:new Blob(chunks,{type}),ext:type.includes("mp4")?"mp4":"webm"};}
+
+/* ---------- Wiring ---------- */
+function wire(){
+  $("bImport").onclick=()=>$("file").click();$("vEmpty").onclick=()=>$("file").click();$("file").onchange=e=>{importFiles(e.target.files,true);e.target.value="";};
+  $("fileAudio").onchange=e=>{importFiles(e.target.files,true);e.target.value="";};
+  $("play").onclick=()=>playing?pause():play();$("bExport").onclick=openExport;
+  $("bUndo").onclick=()=>restore(hIdx-1);$("bRedo").onclick=()=>restore(hIdx+1);
+  $("tSplit").onclick=splitAt;$("tDel").onclick=delSel;$("tDup").onclick=dupSel;$("tLeft").onclick=()=>moveClip(-1);$("tRight").onclick=()=>moveClip(1);
+  $("tText").onclick=()=>addText();$("tSticker").onclick=()=>addText("✨");$("tMusic").onclick=()=>$("fileAudio").click();
+  $("tZoom").oninput=e=>{pps=4*Math.pow(100,+e.target.value/100);renderTL();};
+  $("bFull").onclick=()=>{const w=$("prevWrap");if(document.fullscreenElement)document.exitFullscreen();else if(w.requestFullscreen)w.requestFullscreen().catch(()=>{});};
+  document.addEventListener("fullscreenchange",()=>setTimeout(fitPreview,60));
+  $("sClose").onclick=closeSheet;
+  $("mMode").onclick=e=>{e.stopPropagation();$("modeMenu").hidden=!$("modeMenu").hidden;};document.addEventListener("click",e=>{if(!e.target.closest("#modeMenu,#mMode"))$("modeMenu").hidden=true;});
+  const dz=document.body;dz.addEventListener("dragover",e=>{e.preventDefault();});dz.addEventListener("drop",e=>{e.preventDefault();if(e.dataTransfer.files.length)importFiles(e.dataTransfer.files,true);});
+  document.addEventListener("keydown",e=>{const tg=e.target;if(tg&&(tg.tagName==="TEXTAREA"||tg.tagName==="INPUT"&&tg.type!=="range"))return;
+    const k=e.key.toLowerCase();
+    if((e.ctrlKey||e.metaKey)&&k==="z"){e.preventDefault();e.shiftKey?restore(hIdx+1):restore(hIdx-1);return;}
+    if((e.ctrlKey||e.metaKey)&&k==="d"){e.preventDefault();dupSel();return;}
+    if((e.ctrlKey||e.metaKey)&&k==="e"){e.preventDefault();openExport();return;}
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    if(e.key===" "){e.preventDefault();playing?pause():play();}else if(k==="s")splitAt();else if(e.key==="Delete"||e.key==="Backspace"){if(sel){e.preventDefault();delSel();}}
+    else if(e.key==="ArrowLeft"){e.preventDefault();seek(T-(e.shiftKey?1:1/30));scrollToT();}else if(e.key==="ArrowRight"){e.preventDefault();seek(T+(e.shiftKey?1:1/30));scrollToT();}
+    else if(e.key==="Home"){seek(0);scrollToT();}else if(e.key==="End"){seek(total);scrollToT();}else if(e.key==="Escape"){if(!$("expBox").hidden&&!expBusy)$("expBox").hidden=true;else{sel=null;closeSheet();renderTL();showInspector();}}});
+  let rz=null;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{fitPreview();renderTL();showInspector();},120);});
+}
+try{initGL();wire();setPps(60);commit();fitPreview();renderMedia();showInspector();setPlayIcon();
+  window.__VDEBUG={P:()=>P,media:()=>media,T:()=>T,total:()=>total,seek:t=>{seek(t);scrollToT();},sel:(type,id)=>{sel={type,id};renderTL();showInspector();},exportWC:(r,f)=>exportWebCodecs(...outDims(r||720),f||30,4e6,()=>{}),exportRT:(r,f)=>exportRealtime(...outDims(r||720),f||30,4e6,()=>{}),drawAt:t=>{T=t;syncMedia(t,false);return drawFrame(pctx,pv.width,pv.height,t);}};
+}catch(err){document.body.innerHTML='<div style="padding:40px;color:#ddd;font:15px system-ui">Trình duyệt này chưa bật WebGL nên trình dựng video không chạy được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';console.error(err);}
+
+})();
+</script>
+<script>if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+</body>
+</html>

@@ -1,0 +1,1670 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IOHK Studio Pro</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IOHK">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Dancing+Script:wght@700&family=Pacifico&family=DotGothic16&family=Bebas+Neue&family=Playfair+Display:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#0a0a0b;--fg:#f4f1ea;--muted:rgba(244,241,234,.64);--faint:rgba(244,241,234,.40);--line:rgba(255,255,255,.09);
+  --glass:rgba(22,23,26,.72);--glass-solid:#16171a;--panel:#121315;--well:rgba(255,255,255,.05);--well-hi:rgba(255,255,255,.10);
+  --accent:#e9b45c;--sel:#f4f1ea;--danger:#ff7a6b;
+  --font-ui:"Inter",system-ui,-apple-system,"SF Pro Text","Segoe UI",sans-serif;
+  --font-display:"Cormorant Garamond","Cormorant",Georgia,serif;
+  --topbar:56px;color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:13px/1.45 var(--font-ui);letter-spacing:-.006em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overscroll-behavior:none;font-feature-settings:"cv05","cv11"}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.num{font-variant-numeric:tabular-nums}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 50px rgba(0,0,0,.45)}
+.ib{width:34px;height:34px;border-radius:9px;display:inline-grid;place-items:center;color:var(--muted);flex:none}
+.ib:hover{background:var(--well-hi);color:var(--fg)}
+.ib[aria-pressed="true"]{background:var(--fg);color:#121212}
+.ib[disabled]{opacity:.3;cursor:default;background:none}
+.pbtn{height:34px;border-radius:999px;padding:0 18px;background:var(--fg);color:#121212;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;flex:none}
+.pbtn:hover{filter:brightness(.92)}
+.pbtn[disabled]{opacity:.55;cursor:progress}
+.tbtn{height:30px;border-radius:8px;padding:0 12px;background:var(--well);border:1px solid var(--line);font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.tbtn:hover{background:var(--well-hi)}
+.tbtn[aria-pressed="true"],.tbtn.on{background:var(--fg);color:#121212;border-color:var(--fg)}
+.tbtn.primary{background:var(--fg);color:#121212;border-color:var(--fg);font-weight:600}
+.tbtn.warn{color:var(--danger)}
+.sep{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+.brand{display:flex;align-items:baseline;gap:10px;flex:none}
+.wm-name{font-family:var(--font-display);font-weight:500;font-size:24px;letter-spacing:.14em;display:flex;align-items:center;line-height:1}
+.wm-o{width:.72em;height:.72em;margin:0 .14em 0 .02em;display:block}
+.wm-sub{font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--faint)}
+.modes{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--well);border:1px solid var(--line);flex:none}
+.mode{height:28px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:500;color:var(--muted)}
+.mode:hover{color:var(--fg)}
+.mode[aria-current="page"]{background:var(--fg);color:#121212}
+.topbar{height:var(--topbar);display:flex;align-items:center;gap:16px;padding:0 14px 0 20px;box-sizing:border-box;border-bottom:1px solid var(--line);background:#0d0d0f;flex:none}
+.topbar .mid{display:flex;align-items:center;gap:2px;margin:0 auto}
+.topbar .right{display:flex;align-items:center;gap:8px}
+.mbrand{display:none;align-items:center;gap:8px;height:38px;padding:0 10px 0 4px;border-radius:19px;font-size:13px;font-weight:600}
+.mbrand img{width:28px;height:28px;border-radius:8px}
+.mbrand svg.i{width:14px;height:14px;color:var(--faint)}
+.modemenu{position:fixed;z-index:60;top:52px;left:10px;border-radius:16px;padding:6px;display:flex;flex-direction:column;min-width:200px}
+.modemenu a{display:flex;flex-direction:column;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}
+.modemenu a small{font-weight:400;font-size:11.5px;color:var(--faint)}
+.modemenu a[aria-current="page"]{background:var(--well-hi)}
+@media (max-width:899px){.topbar{padding:0 8px;gap:4px}.topbar .brand,.topbar .modes{display:none}.mbrand{display:flex}.topbar .mid{margin:0 0 0 auto}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:28px;padding:0 11px;border-radius:999px;background:var(--well);border:1px solid var(--line);font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.chip:hover{color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--fg);color:#121212;border-color:var(--fg)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 8px}
+.row label{font-size:12.5px;color:var(--muted)}
+.row .val{font-size:12px;font-variant-numeric:tabular-nums;color:var(--fg);min-width:40px;text-align:right}
+.row input[type=range]{grid-column:1/-1}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:2px;border-radius:1px;background:var(--track,rgba(255,255,255,.18))}
+input[type=range]::-moz-range-track{height:2px;border-radius:1px;background:var(--track,rgba(255,255,255,.18))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;margin-top:-6px;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff}
+.field{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0;color:var(--fg);box-sizing:border-box}
+select.field{padding:5px 8px;height:30px}
+textarea.field{resize:vertical;min-height:64px;width:100%}
+.swatches{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.swatch{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.swatch[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;border-radius:50%;cursor:pointer}
+.sec{display:flex;flex-direction:column;gap:8px}
+.sec h4{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ptitle{margin:0;font:500 22px/1.15 var(--font-display)}
+.note{font-size:12px;color:var(--faint);margin:0;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(244,241,234,.96);color:#121212;padding:9px 16px;border-radius:999px;font-weight:500;font-size:12.5px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:80;max-width:calc(100% - 32px);text-align:center}
+.overlay{position:fixed;inset:0;background:rgba(8,8,9,.88);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px}
+.dialog{border-radius:20px;padding:22px 24px;width:min(460px,100%);box-sizing:border-box;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow:auto}
+.dialog h3{margin:0;font:500 24px var(--font-display)}
+.bar{height:4px;border-radius:2px;background:var(--well-hi);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--fg);transition:width .2s}
+.scroll{overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+
+/* Studio Pro: Photoshop-style workspace. Menu bar + options bar on top, tool column left, canvas centre, Properties / Layers / History right. */
+#app{position:fixed;inset:0;display:grid;grid-template-columns:52px minmax(0,1fr) 312px;grid-template-rows:var(--topbar) 42px minmax(0,1fr) 26px;grid-template-areas:"top top top" "opts opts opts" "tools stage side" "status status side"}
+.topbar{grid-area:top}
+.menus{display:flex;gap:0;margin-left:4px}
+.menu{position:relative}
+.menu>button{height:30px;padding:0 10px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.menu>button:hover,.menu>button[aria-expanded="true"]{background:var(--well-hi);color:var(--fg)}
+.drop{position:absolute;top:34px;left:0;z-index:50;min-width:250px;border-radius:12px;padding:5px;display:flex;flex-direction:column;background:rgba(24,25,28,.98);border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.55)}
+.drop button{display:flex;justify-content:space-between;gap:16px;align-items:center;height:30px;padding:0 10px;border-radius:7px;font-size:12.5px;text-align:left;color:var(--fg)}
+.drop button:hover{background:rgba(255,255,255,.08)}
+.drop button[disabled]{opacity:.35}
+.drop button kbd{font:11px var(--font-ui);color:var(--faint)}
+.drop hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.drop .sub{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:6px 10px 2px}
+#opts{grid-area:opts;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:#111214;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+#opts::-webkit-scrollbar{display:none}
+#opts .ot{font:500 17px var(--font-display);margin-right:6px}
+#opts label{font-size:11.5px;color:var(--faint);display:flex;align-items:center;gap:6px}
+#opts input[type=range]{width:110px}
+#opts .v{font-size:11.5px;color:var(--fg);min-width:30px;font-variant-numeric:tabular-nums}
+#opts .seg{display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.3)}
+#opts .seg button{height:26px;padding:0 9px;border-radius:6px;font-size:11.5px;color:var(--muted)}
+#opts .seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--fg)}
+#tools{grid-area:tools;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-right:1px solid var(--line);background:#111214;overflow-y:auto;scrollbar-width:none}
+#tools::-webkit-scrollbar{display:none}
+.tl{width:38px;height:36px;border-radius:9px;display:grid;place-items:center;color:var(--muted);flex:none}
+.tl:hover{background:var(--well-hi);color:var(--fg)}
+.tl[aria-pressed="true"]{background:var(--fg);color:#121212}
+.tl svg.i{width:19px;height:19px}
+.colors{position:relative;width:40px;height:40px;margin:8px 0 4px;flex:none}
+.colors .c{position:absolute;width:24px;height:24px;border-radius:5px;border:1.5px solid rgba(255,255,255,.75);box-shadow:0 0 0 1px rgba(0,0,0,.6);cursor:pointer;padding:0}
+.colors .fg{left:0;top:0;z-index:2}.colors .bg{right:0;bottom:0}
+.colors input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.swap{font-size:10px;color:var(--faint);flex:none}
+#stage{grid-area:stage;position:relative;overflow:hidden;background:#1b1c1f;touch-action:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.welcome{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+.wcard{width:min(560px,100%);border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box}
+.wcard h1{margin:0;font:500 34px/1.1 var(--font-display)}
+.wcard p{margin:0;color:var(--muted)}
+.wgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wgrid button{height:62px;border-radius:12px;background:var(--well);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600}
+.wgrid button small{font-weight:400;font-size:10.5px;color:var(--faint)}
+.wgrid button:hover{background:var(--well-hi)}
+#side{grid-area:side;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#121315}
+.pn{display:flex;flex-direction:column;min-height:0;border-bottom:1px solid var(--line)}
+.pn>header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px 14px;flex:none}
+.pn>header h3{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+#props{flex:0 1 auto;max-height:46%}
+#propsBody{padding:2px 14px 14px;display:flex;flex-direction:column;gap:12px}
+#layersPn{flex:1 1 auto;min-height:180px}
+#histPn{flex:0 0 auto;max-height:24%}
+.lctl{display:flex;gap:8px;align-items:center;padding:0 12px 8px}
+.lctl select{flex:1}
+.lctl .op{display:flex;align-items:center;gap:6px;width:120px;font-size:11px;color:var(--faint)}
+#llist{flex:1;min-height:0;padding:0 8px 6px}
+.lrow{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer;user-select:none}
+.lrow:hover{background:var(--well)}
+.lrow.on{background:rgba(255,255,255,.11)}
+.lrow .eye{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;color:var(--muted);flex:none}
+.lrow .eye.off{color:rgba(255,255,255,.2)}
+.lrow canvas{width:38px;height:28px;border-radius:4px;flex:none;background:#fff;background-image:linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%);background-size:8px 8px;background-position:0 0,4px 4px;outline:1.5px solid transparent;outline-offset:1px}
+.lrow canvas.sel{outline-color:var(--fg)}
+.lrow .ico{width:38px;height:28px;border-radius:4px;flex:none;display:grid;place-items:center;background:var(--well-hi);font-size:14px}
+.lrow .nm{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .nm small{display:block;font-size:10px;color:var(--faint)}
+.lrow.drag{opacity:.4}
+.lbtns{display:flex;justify-content:flex-end;gap:2px;padding:6px 8px;border-top:1px solid var(--line);flex:none}
+#hlist{padding:0 8px 8px;overflow:auto}
+.hrow{display:block;width:100%;text-align:left;padding:5px 8px;border-radius:6px;font-size:12px;color:var(--muted)}
+.hrow.on{background:var(--well-hi);color:var(--fg)}
+.hrow.fut{opacity:.4}
+#status{grid-area:status;display:flex;align-items:center;gap:16px;padding:0 12px;font-size:11px;color:var(--faint);border-top:1px solid var(--line);background:#111214;font-variant-numeric:tabular-nums}
+#status select{background:none;border:0;color:var(--faint);font-size:11px}
+.curve{width:100%;aspect-ratio:1;background:rgba(0,0,0,.35);border-radius:8px;touch-action:none;cursor:crosshair}
+#mbar{display:none}
+.mbtn{flex:none;width:58px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;color:var(--muted);border-radius:10px}
+.mbtn svg.i{width:21px;height:21px}
+.mbtn[aria-pressed="true"]{color:var(--fg);background:var(--well-hi)}
+.sheet{position:fixed;z-index:40;left:0;right:0;bottom:0;max-height:62dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(18,19,22,.98)}
+.sheet.open{transform:none}
+.sheet .shead{display:flex;align-items:center;gap:6px;padding:8px 10px 4px 14px}
+.sheet .sbody{overflow:auto;display:flex;flex-direction:column;min-height:0}
+.textedit{position:absolute;z-index:5;background:transparent;border:1px dashed rgba(255,255,255,.7);outline:0;resize:none;overflow:hidden;padding:0;margin:0;white-space:pre;color:transparent;caret-color:#fff}
+@media (max-width:899px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(50px + env(safe-area-inset-top,0px)) 42px minmax(0,1fr) calc(64px + env(safe-area-inset-bottom,0px));grid-template-areas:"top" "opts" "stage" "mbar"}
+  .topbar{padding-top:env(safe-area-inset-top,0px);height:auto}
+  .menus{display:none}
+  #tools,#side,#status{display:none}
+  #mbar{grid-area:mbar;display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding:3px 6px env(safe-area-inset-bottom,0px);border-top:1px solid var(--line);background:#111214}
+  #mbar::-webkit-scrollbar{display:none}
+  .sheet #side2{display:flex;flex-direction:column}
+  .wgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:900px){.sheet,#mMenuBtn{display:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M5 12h10a4 4 0 0 1 0 8h-3"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 8l4 4-4 4M19 12H9a4 4 0 0 0 0 8h3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 5v10M7.5 10.5L12 15l4.5-4.5M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-dup" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-mask" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" opacity=".5"/></symbol>
+  <symbol id="i-adj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8.5 4.5L12 13 3.5 8.5z"/><path d="M3.5 12.5L12 17l8.5-4.5M3.5 16.5L12 21l8.5-4.5"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.3" fill="#111214"/><circle cx="15" cy="17" r="2.3" fill="#111214"/></symbol>
+  <symbol id="t-move" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></symbol>
+  <symbol id="t-marquee" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1" stroke-dasharray="2.5 2.5"/></symbol>
+  <symbol id="t-ellipse" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8.5" ry="6.5" stroke-dasharray="2.5 2.5"/></symbol>
+  <symbol id="t-lasso" viewBox="0 0 24 24"><path d="M6 15c-2-2-1.5-6 2.5-8s9-1 10 2-3 6-7 6c-2 0-3.5-.5-5.5 0" stroke-dasharray="2.5 2.2"/><path d="M6.5 15c-1 1.5 0 3.5 1.5 3.5s1.5-2 0-2.5"/></symbol>
+  <symbol id="t-wand" viewBox="0 0 24 24"><path d="M5 19L15.5 8.5M14 4.5v2.5M19.5 10h-2.5M18 6l-1.6 1.6M11 7l1.2 1.2"/></symbol>
+  <symbol id="t-crop" viewBox="0 0 24 24"><path d="M7 3v14h14M3 7h14v14"/></symbol>
+  <symbol id="t-eyedrop" viewBox="0 0 24 24"><path d="M14.5 5.5l4 4M5 19l1-4 8.5-8.5 3 3L9 18z"/></symbol>
+  <symbol id="t-heal" viewBox="0 0 24 24"><rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M10.6 10.6h.01M13.4 13.4h.01M10.6 13.4h.01M13.4 10.6h.01"/></symbol>
+  <symbol id="t-clone" viewBox="0 0 24 24"><path d="M9 4h6v4l2 2v3H7v-3l2-2z"/><path d="M6 13h12v3H6zM8 16v4h8v-4"/></symbol>
+  <symbol id="t-brush" viewBox="0 0 24 24"><path d="M14.5 4.5l5 5-7 7-5-5z"/><path d="M7.5 11.5c-2 0-3.5 1.5-3.5 3.5 0 2-1 3-1 3s4 .5 6-1.5c1-1 1.5-2 1-3.5"/></symbol>
+  <symbol id="t-eraser" viewBox="0 0 24 24"><path d="M8 20h12M5.5 14.5l8-8a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L11 19H8.5z"/><path d="M9 11l5 5"/></symbol>
+  <symbol id="t-gradient" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M8 5v14M12 5v14M16 5v14" opacity=".55"/></symbol>
+  <symbol id="t-bucket" viewBox="0 0 24 24"><path d="M5 11l6-6 7 7-6 6z"/><path d="M5 11h13M19.5 15.5s1.5 2 1.5 3a1.5 1.5 0 0 1-3 0c0-1 1.5-3 1.5-3z"/></symbol>
+  <symbol id="t-dodge" viewBox="0 0 24 24"><circle cx="9" cy="9" r="5"/><path d="M12.5 12.5L20 20"/></symbol>
+  <symbol id="t-blurb" viewBox="0 0 24 24"><path d="M12 3.5s6 6.5 6 10.5a6 6 0 0 1-12 0c0-4 6-10.5 6-10.5z"/></symbol>
+  <symbol id="t-text" viewBox="0 0 24 24"><path d="M5 6.5V5h14v1.5M12 5v14M9 19h6"/></symbol>
+  <symbol id="t-shape" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="10" height="10" rx="1.5"/><circle cx="15" cy="15" r="5.5"/></symbol>
+  <symbol id="t-hand" viewBox="0 0 24 24"><path d="M8 13V6.5a1.5 1.5 0 0 1 3 0V12M11 11V5a1.5 1.5 0 0 1 3 0v6M14 11V6.5a1.5 1.5 0 0 1 3 0V14c0 4-2.5 7-6 7-2.5 0-4-1.2-5.5-3.5L3.8 14.8a1.4 1.4 0 0 1 2.2-1.7L8 15"/></symbol>
+  <symbol id="t-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8.5v5M8.5 11h5"/></symbol>
+</svg>
+<div id="app">
+  <header class="topbar">
+    <button class="mbrand" id="mMode" type="button" aria-haspopup="true"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSIwLjM1IiBjeT0iMC4yOCIgcj0iMC45NSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzIzMjYyZCIvPjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMTIxNDE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwYjBkIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE0IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjE0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjEwNCIgZmlsbD0idXJsKCNhZykiIG1hc2s9InVybCgjY3V0KSIvPgogIDxjaXJjbGUgY3g9IjM0NiIgY3k9IjE3MCIgcj0iMTMiIGZpbGw9IiNmMmEzM2EiLz4KPC9zdmc+Cg==" alt="" width="28" height="28">Studio<svg class="i"><use href="#i-chev"/></svg></button>
+    <div class="brand" role="img" aria-label="IOHK Film Lab"><span class="wm-name" aria-hidden="true">I<img class="wm-o" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ijg4IDg4IDMzNiAzMzYiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhZyIgeDE9IjAuMTUiIHkxPSIwLjA1IiB4Mj0iMC44NSIgeTI9IjAuOTUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmYmY4ZjIiLz48c3RvcCBvZmZzZXQ9IjAuMzgiIHN0b3AtY29sb3I9IiNkNmQyY2EiLz48c3RvcCBvZmZzZXQ9IjAuNTIiIHN0b3AtY29sb3I9IiM4ZjhiODQiLz48c3RvcCBvZmZzZXQ9IjAuNjYiIHN0b3AtY29sb3I9IiNjZmNhYzEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmMWVkZTUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bWFzayBpZD0iY3V0Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI5OCIgY3k9IjIyMiIgcj0iOTIiIGZpbGw9IiMwMDAiLz48L21hc2s+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTU2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYWcpIiBzdHJva2Utd2lkdGg9IjE0Ii8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxMDQiIGZpbGw9InVybCgjYWcpIiBtYXNrPSJ1cmwoI2N1dCkiLz4KICA8Y2lyY2xlIGN4PSIzNDYiIGN5PSIxNzAiIHI9IjE2IiBmaWxsPSIjZjJhMzNhIi8+Cjwvc3ZnPgo=" alt="">HK</span><span class="wm-sub" aria-hidden="true">Film Lab</span></div>
+    <nav class="modes" aria-label="Chế độ"><a class="mode" href="index.html">Ảnh</a><a class="mode" href="video.html">Video</a><a class="mode" href="studio.html" aria-current="page">Studio Pro</a></nav>
+    <nav class="menus" id="menus" aria-label="Menu"></nav>
+    <div class="mid">
+      <button class="ib" id="bUndo" type="button" aria-label="Hoàn tác" title="Hoàn tác (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button>
+      <button class="ib" id="bRedo" type="button" aria-label="Làm lại" title="Làm lại (Ctrl+Shift+Z)"><svg class="i"><use href="#i-redo"/></svg></button>
+      <button class="ib" id="mMenuBtn" type="button" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+    </div>
+    <div class="right"><button class="pbtn" id="bExport" type="button"><svg class="i"><use href="#i-save"/></svg>Xuất</button></div>
+  </header>
+  <div id="opts" aria-label="Tuỳ chọn công cụ"></div>
+  <nav id="tools" aria-label="Công cụ"></nav>
+  <main id="stage" aria-label="Vùng làm việc"><canvas id="cv"></canvas>
+    <div class="welcome" id="welcome"><div class="wcard glass">
+      <h1>Studio Pro</h1>
+      <p>Chỉnh ảnh nhiều lớp như Photoshop: layer, mask, vùng chọn, cọ, xoá vật thể, layer điều chỉnh và xuất PSD. Mọi thứ chạy ngay trên máy bạn.</p>
+      <div class="wgrid">
+        <button type="button" id="wOpen">Mở ảnh<small>JPG · PNG · WEBP</small></button>
+        <button type="button" id="wPsd">Mở PSD<small>Giữ nguyên layer</small></button>
+        <button type="button" data-new="1080x1350">Mới 4:5<small>1080×1350</small></button>
+        <button type="button" data-new="1080x1920">Mới 9:16<small>1080×1920</small></button>
+        <button type="button" data-new="1920x1080">Mới 16:9<small>1920×1080</small></button>
+        <button type="button" data-new="2480x3508">A4 in<small>300 dpi</small></button>
+        <button type="button" data-new="1080x1080">Vuông<small>1080×1080</small></button>
+        <button type="button" id="wSample">Ảnh mẫu<small>Thử ngay</small></button>
+      </div>
+    </div></div>
+  </main>
+  <aside id="side">
+    <section class="pn" id="props"><header><h3 id="propsTitle">Thuộc tính</h3></header><div class="scroll" id="propsBody"></div></section>
+    <section class="pn" id="layersPn"><header><h3>Layer</h3></header>
+      <div class="lctl"><select class="field" id="lBlend" aria-label="Chế độ hoà trộn"></select><label class="op">Mờ<input type="range" id="lOp" min="0" max="100" value="100" aria-label="Độ mờ layer"></label></div>
+      <div class="scroll" id="llist"></div>
+      <div class="lbtns">
+        <button class="ib" id="lAdj" type="button" title="Layer điều chỉnh" aria-label="Thêm layer điều chỉnh"><svg class="i"><use href="#i-adj"/></svg></button>
+        <button class="ib" id="lMask" type="button" title="Thêm mask" aria-label="Thêm mask"><svg class="i"><use href="#i-mask"/></svg></button>
+        <button class="ib" id="lDup" type="button" title="Nhân đôi layer (Ctrl+J)" aria-label="Nhân đôi layer"><svg class="i"><use href="#i-dup"/></svg></button>
+        <button class="ib" id="lNew" type="button" title="Layer mới (Ctrl+Shift+N)" aria-label="Layer mới"><svg class="i"><use href="#i-plus"/></svg></button>
+        <button class="ib" id="lDel" type="button" title="Xoá layer" aria-label="Xoá layer"><svg class="i"><use href="#i-trash"/></svg></button>
+      </div>
+    </section>
+    <section class="pn" id="histPn"><header><h3>Lịch sử</h3></header><div id="hlist"></div></section>
+  </aside>
+  <footer id="status"><span id="stZoom">100%</span><span id="stSize"></span><span id="stPos"></span><span id="stMsg" style="margin-left:auto"></span></footer>
+  <nav id="mbar" aria-label="Công cụ"></nav>
+</div>
+<nav class="modemenu glass" id="modeMenu" hidden aria-label="Chọn chế độ">
+  <a href="index.html">Ảnh<small>Preset film, chỉnh màu, làm đẹp</small></a>
+  <a href="video.html">Video<small>Dựng clip kiểu CapCut</small></a>
+  <a href="studio.html" aria-current="page">Studio Pro<small>Layer, vùng chọn, mask kiểu Photoshop</small></a>
+</nav>
+<section class="sheet glass" id="sheet" aria-hidden="true"><div class="shead"><h3 class="ptitle" id="sTitle" style="flex:1"></h3><button class="ib" id="sClose" type="button" aria-label="Đóng"><svg class="i"><use href="#i-close"/></svg></button></div><div class="sbody" id="sbody"></div></section>
+<input type="file" id="fOpen" accept="image/*,.psd" hidden>
+<input type="file" id="fPlace" accept="image/*" multiple hidden>
+<div class="toast" id="toast" hidden role="status"></div>
+<div class="overlay" id="dlgBox" hidden><div class="dialog glass" id="dlg"></div></div>
+<script>
+(function(){
+"use strict";
+/* ---------- Params & presets ---------- */
+const NEUTRAL = {exposure:0,contrast:0,highlights:0,shadows:0,fade:0,temp:0,tint:0,saturation:0,vibrance:0,bw:0,
+  shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0};
+const NOSCALE = new Set(["shHue","hiHue","grainSize","date"]);
+const Z9 = [0,0,0,0,0,0,0,0,0];
+const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["fuji","Fujifilm"],["nikon","Nikon"],["leica","Leica"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
+const MOODS = [["warm","Ấm"],["cool","Lạnh"],["pastel","Pastel"],["vivid","Rực"],["faded","Phai"],["contrast","Tương phản"],["grainy","Nhiều hạt"],["atmo","Huyền ảo"],["natural","Tự nhiên"],["mono","Đơn sắc"]];
+function D(id,name,fam,moods,desc,p,mix){return {id,name,fam,moods:moods.split(" ").filter(Boolean),desc,params:Object.assign({},NEUTRAL,p),mix:mix||Z9};}
+
+const PRESETS = [
+ D("none","Gốc","base","","Ảnh nguyên bản, không áp preset.",{}),
+ /* Nhật Bản */
+ D("tokyo400","Tokyo 400","jp","cool pastel natural","Sáng, trong, bóng đổ ngả xanh ngọc. Kiểu ảnh “airy” Nhật Bản, hợp chân dung và phố ban ngày.",
+  {exposure:18,contrast:-18,highlights:-25,shadows:30,fade:22,temp:-8,tint:-6,saturation:-15,vibrance:10,shHue:175,shAmt:30,hiHue:45,hiAmt:12,grain:18,grainSize:30,halation:5,bloom:15},[0,0,0,-0.03,0.02,0.04,0,0.05,0]),
+ D("shimokita","Shimokita","jp","faded cool grainy","Phố nhỏ Tokyo: màu trầm, ngả xanh lá, phai như cuộn film 400 rửa ở tiệm ảnh.",
+  {contrast:10,highlights:-30,shadows:15,fade:28,temp:10,tint:-12,saturation:-25,shHue:150,shAmt:35,hiHue:40,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:5,aberration:5,vignette:20},[0.04,0,-0.02,0,0,0,0,0,0]),
+ D("natsu","Natsu","jp","warm pastel atmo","Mùa hè Nhật Bản: nắng ấm, trời xanh pastel, vệt lóa sáng ở góc.",
+  {exposure:25,contrast:-10,highlights:-35,shadows:25,fade:15,temp:18,tint:4,saturation:5,vibrance:20,shHue:190,shAmt:25,hiHue:35,hiAmt:25,grain:15,grainSize:30,halation:15,bloom:25,leak:35}),
+ D("kissaten","Kissaten","jp","warm atmo grainy","Quán cà phê kiểu Showa: đèn vàng hổ phách, quầng sáng ấm quanh bóng đèn.",
+  {exposure:-5,contrast:15,highlights:-20,shadows:10,fade:12,temp:35,tint:8,saturation:-10,shHue:25,shAmt:25,hiHue:40,hiAmt:30,grain:30,grainSize:40,halation:30,bloom:20,vignette:35}),
+ D("kyoto","Kyoto Matcha","jp","faded cool natural","Xanh lá trầm, mềm, như chùa cổ và vườn rêu.",
+  {contrast:-5,highlights:-20,shadows:15,fade:20,temp:-5,tint:-18,saturation:-30,shHue:140,shAmt:30,hiHue:60,hiAmt:15,grain:25,grainSize:40,vignette:20},[0,0,0,0,0.04,0,0,0,0]),
+ D("sakura","Sakura","jp","pastel warm","Hồng pastel, vùng sáng trắng sữa, nhẹ như mùa hoa anh đào.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:5,tint:25,saturation:-10,vibrance:10,shHue:330,shAmt:20,hiHue:350,hiAmt:25,grain:12,grainSize:30,bloom:25}),
+ D("showa","Showa Diary","jp","faded warm grainy","Album gia đình Nhật thập niên 70: ngả vàng nâu, phai, có in ngày.",
+  {contrast:5,highlights:-25,shadows:10,fade:35,temp:32,tint:5,saturation:-25,shHue:35,shAmt:25,hiHue:40,hiAmt:30,grain:40,grainSize:50,vignette:35,date:1}),
+ D("harajuku","Harajuku Pop","jp","vivid pastel","Màu kẹo rực rỡ, tương phản vừa, rất đường phố Harajuku.",
+  {exposure:12,contrast:15,highlights:-10,shadows:10,fade:8,tint:12,saturation:30,vibrance:25,shHue:270,shAmt:20,hiHue:330,hiAmt:15,grain:10,grainSize:30,bloom:15}),
+ D("kamakura","Kamakura Sea","jp","cool natural","Biển xanh ngọc, nắng trưa trong vắt.",
+  {exposure:15,contrast:5,highlights:-30,shadows:15,fade:10,temp:-20,tint:-8,saturation:5,vibrance:20,shHue:185,shAmt:35,hiHue:50,hiAmt:10,grain:15,grainSize:30}),
+ D("yugure","Yūgure","jp","warm atmo","Hoàng hôn cam tím, quầng sáng nhẹ quanh nguồn sáng.",
+  {exposure:-5,contrast:15,highlights:-25,shadows:5,fade:10,temp:25,tint:20,saturation:10,vibrance:10,shHue:260,shAmt:35,hiHue:25,hiAmt:35,grain:25,grainSize:40,halation:25,bloom:30,vignette:25}),
+ /* Hong Kong */
+ D("kowloon","Kowloon Neon","hk","cool contrast atmo","Đêm Cửu Long: bóng ngả xanh lục, vùng sáng đỏ son, quầng neon lan. Chất điện ảnh Hong Kong thập niên 90.",
+  {exposure:-8,contrast:30,highlights:-15,shadows:-5,fade:10,temp:-5,tint:15,saturation:15,vibrance:10,shHue:165,shAmt:55,hiHue:15,hiAmt:35,grain:45,grainSize:50,halation:55,bloom:30,aberration:15,vignette:35},[0.05,0,0,0,-0.05,0.05,0,0,0]),
+ D("chungking","Chungking","hk","vivid contrast grainy","Vàng lục gắt, nhòe sáng, lệch màu ở rìa. Như máy quay cầm tay giữa phố đêm.",
+  {exposure:5,contrast:40,shadows:-10,fade:5,temp:15,tint:-30,saturation:20,shHue:90,shAmt:40,hiHue:55,hiAmt:30,grain:55,grainSize:55,halation:35,bloom:35,aberration:45,vignette:30}),
+ D("mongkok","Mong Kok 800","hk","cool atmo","Film tungsten chụp đêm: tông xanh lạnh, đèn đường tỏa quầng đỏ mạnh.",
+  {contrast:25,highlights:-20,shadows:5,fade:8,temp:-35,tint:10,saturation:10,vibrance:15,shHue:210,shAmt:35,hiHue:20,hiAmt:10,grain:35,grainSize:40,halation:75,bloom:25,aberration:5,vignette:25}),
+ D("hk97","Hong Kong '97","hk","warm faded","Phim truyền hình Hong Kong cuối thập niên 90: vàng ấm, phớt hồng, mềm và hơi mờ.",
+  {exposure:5,contrast:-5,highlights:-25,shadows:15,fade:30,temp:25,tint:18,saturation:-15,vibrance:5,shHue:290,shAmt:20,hiHue:35,hiAmt:35,grain:30,grainSize:45,halation:20,bloom:30,aberration:10,vignette:20}),
+ D("temple","Temple Street","hk","warm contrast atmo","Chợ đêm đỏ vàng, đèn lồng tỏa quầng mạnh.",
+  {exposure:-5,contrast:35,highlights:-15,shadows:-10,fade:5,temp:25,tint:10,saturation:25,shHue:10,shAmt:25,hiHue:40,hiAmt:25,grain:40,grainSize:45,halation:60,bloom:30,vignette:35}),
+ D("starferry","Star Ferry","hk","cool natural","Bến cảng xanh lơ, bóng đổ ngả xanh lục.",
+  {exposure:5,contrast:10,highlights:-20,shadows:10,fade:12,temp:-25,tint:-10,saturation:-5,vibrance:10,shHue:170,shAmt:40,hiHue:195,hiAmt:15,grain:25,grainSize:35,bloom:10,vignette:20}),
+ D("chachaan","Cha Chaan Teng","hk","warm faded","Quán trà kiểu Hong Kong dưới đèn huỳnh quang vàng xanh.",
+  {exposure:5,contrast:10,highlights:-20,shadows:15,fade:25,temp:15,tint:-25,saturation:-10,shHue:100,shAmt:30,hiHue:60,hiAmt:30,grain:30,grainSize:40,halation:15,bloom:15,vignette:20}),
+ D("rainykowloon","Rainy Kowloon","hk","cool atmo","Mưa đêm xanh dương, đèn đường nhòe sáng.",
+  {exposure:-10,contrast:20,highlights:-15,fade:10,temp:-30,tint:8,saturation:10,vibrance:15,shHue:215,shAmt:40,hiHue:200,hiAmt:15,grain:35,grainSize:45,halation:35,bloom:45,aberration:10,vignette:30}),
+ D("redlantern","Red Lantern","hk","vivid contrast mono","Gần như đơn sắc đỏ, chỉ còn tông đỏ cam như dưới đèn lồng.",
+  {exposure:-5,contrast:40,highlights:-10,shadows:-15,saturation:20,bw:85,shHue:0,shAmt:70,hiHue:15,hiAmt:60,grain:35,grainSize:45,halation:30,bloom:20,vignette:35}),
+ /* Fujifilm */
+ D("f1","F1 Chuẩn","fuji","natural","Cảm hứng từ Provia của Fujifilm: màu trung thực, tương phản vừa, dùng được cho mọi cảnh.",{contrast:10,saturation:8,vibrance:5}),
+ D("f2","F2 Rực","fuji","vivid contrast","Cảm hứng từ Velvia: bão hòa cao, trời xanh và lá cây rất đậm. Hợp phong cảnh.",{contrast:30,shadows:-10,saturation:40,vibrance:20,vignette:5},[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05]),
+ D("f3","F3 Mềm","fuji","pastel natural","Cảm hứng từ Astia: tương phản mềm, da đẹp, màu dịu.",{contrast:-10,highlights:-15,shadows:10,saturation:5,vibrance:10,temp:3,tint:3}),
+ D("f4","F4 Chrome","fuji","faded contrast","Cảm hứng từ Classic Chrome: màu trầm, bóng đổ đậm, xanh ngả cyan. Rất hợp ảnh đường phố.",
+  {contrast:15,highlights:-15,shadows:-15,saturation:-30,vibrance:-5,temp:5,tint:-3,shHue:200,shAmt:20,hiHue:45,hiAmt:10,grain:15,grainSize:30},[-0.02,0.02,0,0,0,0,0,0.04,-0.02]),
+ D("f5","F5 Neg Cổ","fuji","cool contrast faded","Cảm hứng từ Classic Negative: tương phản gắt, bóng ngả xanh lục, đỏ đậm, như film màu bình dân.",
+  {contrast:30,highlights:-10,shadows:-5,fade:8,temp:-3,tint:8,saturation:5,shHue:175,shAmt:35,hiHue:340,hiAmt:15,grain:25,grainSize:35},[0.05,-0.02,0,0,0,0.03,0,0.04,0]),
+ D("f6","F6 Hoài niệm","fuji","warm faded","Cảm hứng từ Nostalgic Neg: vùng sáng hổ phách, bóng đổ mềm, như ảnh in thập niên 70.",
+  {highlights:-20,shadows:10,fade:10,temp:15,tint:5,saturation:5,shHue:20,shAmt:10,hiHue:38,hiAmt:35,grain:15,grainSize:30}),
+ D("f7","F7 Real","fuji","natural","Cảm hứng từ Reala Ace: trung thực, trong, tương phản rõ hơn một chút.",{contrast:12,highlights:-10,saturation:8,vibrance:10,temp:2,grain:5,grainSize:20}),
+ D("f8","F8 Pro Neg","fuji","natural faded","Cảm hứng từ Pro Neg: mềm, ít bão hòa, dành cho chân dung studio.",{contrast:-12,highlights:-15,shadows:10,saturation:-12,temp:4,grain:8,grainSize:20}),
+ D("f9","F9 Cine","fuji","cool faded atmo","Cảm hứng từ Eterna: phẳng, ít màu, bóng ngả xanh mòng két như film điện ảnh.",
+  {contrast:-30,highlights:-25,shadows:20,fade:10,saturation:-30,shHue:185,shAmt:30,hiHue:40,hiAmt:10,grain:15,grainSize:30}),
+ D("f10","F10 Cine Bạc","fuji","faded contrast","Cảm hứng từ Eterna Bleach Bypass: bạc màu, tương phản cao.",{contrast:40,shadows:-15,fade:5,saturation:-60,shHue:190,shAmt:20,grain:20,grainSize:30}),
+ D("f11","F11 Acr","fuji","mono natural","Cảm hứng từ Acros: đen trắng hạt mịn, dải xám giàu, đen sâu.",{bw:100,contrast:25,highlights:-5,shadows:-10,grain:25,grainSize:20}),
+ D("f12","F12 Acr Đỏ","fuji","mono contrast","Đen trắng kèm kính lọc đỏ: trời tối hẳn, da sáng, tương phản mạnh.",{bw:100,contrast:35,shadows:-15,grain:25,grainSize:20},[0,0,0,0.5,-0.4,0,0.6,0,-0.6]),
+ D("f13","F13 Sepia","fuji","mono warm","Đen trắng tông nâu sepia nhẹ.",{bw:100,contrast:5,fade:10,shHue:30,shAmt:40,hiHue:38,hiAmt:45,grain:15,grainSize:30}),
+ /* Nikon */
+ D("n1","N1 Chuẩn","nikon","natural","Cảm hứng từ Picture Control Standard của Nikon: cân bằng, hơi tươi.",{contrast:10,saturation:10,vibrance:5}),
+ D("n2","N2 Rực","nikon","vivid","Cảm hứng từ Picture Control Vivid: màu rực, tương phản rõ.",{contrast:22,saturation:30,vibrance:15}),
+ D("n3","N3 Chân dung","nikon","natural warm","Cảm hứng từ Picture Control Portrait: da mịn, ấm nhẹ, tương phản thấp.",{contrast:-8,highlights:-10,shadows:8,saturation:-5,temp:4,tint:4}),
+ D("n4","N4 Phong cảnh","nikon","vivid natural","Cảm hứng từ Picture Control Landscape: lá xanh và trời xanh đậm hơn.",{contrast:18,saturation:20,vibrance:25},[0,0,0,0,0.04,0,0,0,0.04]),
+ D("n5","N5 Mộng","nikon","pastel atmo","Cảm hứng từ Creative Picture Control Dream: sáng, mềm, phớt hồng, lan sáng.",{exposure:15,contrast:-25,highlights:-20,shadows:20,fade:15,saturation:-5,tint:6,hiHue:330,hiAmt:15,bloom:25}),
+ D("n6","N6 Ban mai","nikon","cool pastel","Cảm hứng từ Morning: lạnh, trong, nhẹ như sáng sớm.",{exposure:12,contrast:-15,fade:12,temp:-18,tint:-4,saturation:-15,shHue:190,shAmt:25}),
+ D("n7","N7 Pop","nikon","vivid","Cảm hứng từ Pop: màu đậm và tươi, nhất là hồng và đỏ.",{contrast:25,saturation:40,vibrance:25,tint:8}),
+ D("n8","N8 Chủ nhật","nikon","warm faded","Cảm hứng từ Sunday: ấm, mềm, thư thả.",{exposure:8,contrast:-10,fade:10,temp:22,tint:6,hiHue:40,hiAmt:25,bloom:10}),
+ D("n9","N9 U trầm","nikon","contrast vivid","Cảm hứng từ Somber: tối hơn, tương phản và bão hòa tăng.",{exposure:-12,contrast:30,shadows:-15,saturation:20,temp:-5,vignette:30}),
+ D("n10","N10 Kịch tính","nikon","contrast","Cảm hứng từ Dramatic: trời tối hẳn, tương phản mạnh, màu giảm.",{contrast:45,highlights:-40,shadows:-20,saturation:-15,grain:15,grainSize:30,vignette:35},[0,0,0,0,0,0,0,0,-0.15]),
+ D("n11","N11 Tĩnh lặng","nikon","faded cool","Cảm hứng từ Silence: trầm, lạnh, ít màu.",{contrast:-20,fade:20,saturation:-35,temp:-10,shHue:210,shAmt:15}),
+ D("n12","N12 Tẩy màu","nikon","faded contrast","Cảm hứng từ Bleached: bạc màu, tương phản cao.",{contrast:35,highlights:5,fade:8,saturation:-50}),
+ D("n13","N13 Sầu","nikon","cool faded","Cảm hứng từ Melancholic: ít màu, ngả xanh, buồn.",{exposure:-5,contrast:10,fade:12,saturation:-40,temp:-15,shHue:220,shAmt:30,vignette:20}),
+ D("n14","N14 Trong","nikon","faded pastel","Cảm hứng từ Pure: phai, nhạt màu, sạch.",{exposure:10,contrast:-15,fade:25,saturation:-30}),
+ D("n15","N15 Denim","nikon","cool mono","Cảm hứng từ Denim: gần đơn sắc, phủ xanh vải jean.",{contrast:10,bw:70,shHue:215,shAmt:55,hiHue:205,hiAmt:25}),
+ D("n16","N16 Đồ chơi","nikon","faded","Cảm hứng từ Toy: màu phai, tối góc nặng như máy ảnh đồ chơi.",{contrast:15,fade:20,temp:8,saturation:-15,grain:20,grainSize:40,vignette:70}),
+ D("n17","N17 Than","nikon","mono grainy","Cảm hứng từ Charcoal: đen trắng mềm, hạt thô như vẽ than.",{bw:100,contrast:-5,fade:15,grain:55,grainSize:55}),
+ D("n18","N18 Chì","nikon","mono contrast","Cảm hứng từ Graphite: đen trắng tương phản mạnh.",{bw:100,contrast:55,shadows:-20,grain:20,grainSize:30}),
+ D("n19","N19 Nhị phân","nikon","mono contrast","Cảm hứng từ Binary: gần như chỉ còn đen và trắng.",{exposure:5,bw:100,contrast:100,highlights:20,shadows:-50}),
+ /* Leica */
+ D("l1","L1 Chuẩn","leica","natural","Cảm hứng từ Leica Standard: đen sâu, màu cân bằng, tương phản vi mô rõ.",{contrast:15,shadows:-8,saturation:8,vignette:8}),
+ D("l2","L2 Tự nhiên","leica","natural","Cảm hứng từ Leica Natural: trung thực, nhẹ nhàng.",{contrast:8,shadows:-5,saturation:-5,vignette:6}),
+ D("l3","L3 Rực","leica","vivid","Cảm hứng từ Leica Vivid: màu đậm, đen sâu.",{contrast:25,shadows:-10,saturation:28,vibrance:10,vignette:10}),
+ D("l4","L4 Chrome","leica","contrast faded","Cảm hứng từ Leica Chrome: tinh tế, màu hơi trầm, khó nhận ra là đã chỉnh.",{contrast:18,shadows:-12,saturation:-18,temp:3,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,0,0]),
+ D("l5","L5 Cổ điển","leica","warm contrast","Cảm hứng từ Leica Classic: như film âm bản màu, đỏ đậm nhưng không gắt.",
+  {contrast:20,highlights:-10,shadows:-10,fade:6,temp:6,saturation:5,shHue:190,shAmt:15,hiHue:40,hiAmt:15,grain:15,grainSize:30,vignette:12},[0.06,-0.03,0,0,0,0,0,0,0]),
+ D("l6","L6 Đương đại","leica","cool natural","Cảm hứng từ Leica Contemporary: sạch, hiện đại, hơi lạnh.",{contrast:12,highlights:-15,temp:-8,saturation:-10,vibrance:10,shHue:205,shAmt:15}),
+ D("l7","L7 Vĩnh cửu","leica","atmo faded","Cảm hứng từ Leica Eternal: điện ảnh, ít màu, bóng ngả xanh, vùng sáng ấm.",
+  {contrast:-10,highlights:-20,shadows:5,fade:10,temp:8,saturation:-25,shHue:185,shAmt:25,hiHue:35,hiAmt:20,grain:12,grainSize:30}),
+ D("l8","L8 Đồng thau","leica","warm","Cảm hứng từ Leica Brass: ấm áp, hợp nhiều chủ đề.",{contrast:12,temp:22,tint:4,saturation:-5,shHue:30,shAmt:15,hiHue:40,hiAmt:30}),
+ D("l9","L9 Mòng két","leica","cool atmo","Cảm hứng từ Leica Teal: bóng xanh mòng két, vùng sáng ấm, hợp cảnh tối và đèn flash.",
+  {contrast:20,shadows:-10,temp:-10,saturation:-5,shHue:182,shAmt:50,hiHue:32,hiAmt:30,vignette:15}),
+ D("l10","L10 Cine","leica","atmo","Cảm hứng từ Leica Cine: tông điện ảnh, vùng sáng mềm, quầng nhẹ.",
+  {contrast:15,highlights:-25,shadows:-5,fade:8,saturation:-15,shHue:195,shAmt:30,hiHue:35,hiAmt:25,grain:18,grainSize:30,halation:10,vignette:15}),
+ D("l11","L11 Bạc","leica","faded cool","Cảm hứng từ Leica Silver: gần như hết màu, ánh bạc lạnh.",{contrast:10,highlights:-10,fade:10,saturation:-45,temp:-6}),
+ D("l12","L12 Mono","leica","mono","Cảm hứng từ Leica Monochrome: đen trắng sạch, đen sâu.",{bw:100,contrast:20,shadows:-10,grain:10,grainSize:20,vignette:10}),
+ D("l13","L13 Mono HC","leica","mono contrast","Cảm hứng từ Leica Monochrome High Contrast: đen trắng gắt, đen đặc.",{bw:100,contrast:60,highlights:10,shadows:-30,grain:12,grainSize:25,vignette:15}),
+ D("l14","L14 Xanh lam","leica","mono cool","Cảm hứng từ Leica Blue: đen trắng phủ xanh lam.",{bw:100,contrast:15,shHue:220,shAmt:45,hiHue:210,hiAmt:20}),
+ /* Film màu cổ điển */
+ D("gold200","Gold 200","color","warm natural","Film thường ngày giá bình dân: vàng óng, ấm, hợp nắng chiều.",
+  {exposure:8,contrast:12,highlights:-15,shadows:10,fade:10,temp:28,tint:4,saturation:15,vibrance:10,shHue:30,shAmt:15,hiHue:45,hiAmt:25,grain:25,grainSize:35,halation:10,bloom:10,vignette:15}),
+ D("chrome64","Chrome 64","color","vivid contrast","Film dương bản thập niên 60: đỏ đậm, xanh sâu, bóng tối dày.",
+  {exposure:-8,contrast:45,highlights:-10,shadows:-25,temp:8,saturation:30,vibrance:5,shHue:220,shAmt:15,hiHue:40,hiAmt:10,grain:20,grainSize:25,halation:5,vignette:25},[0.06,-0.03,0,0,0,0,0,-0.02,0.05]),
+ D("portrait160","Portrait 160","color","warm faded natural","Da mềm, màu tự nhiên, tương phản thấp. Hợp chân dung.",
+  {exposure:8,contrast:-15,highlights:-20,shadows:15,fade:10,temp:8,tint:4,saturation:-12,vibrance:5,shHue:200,shAmt:10,hiHue:35,hiAmt:12,grain:12,grainSize:25}),
+ D("portrait400","Portrait 400","color","warm natural","Sáng hơn, vùng sáng màu kem, hạt mịn.",
+  {exposure:15,contrast:-8,highlights:-25,shadows:15,fade:8,temp:10,tint:3,saturation:-5,vibrance:10,shHue:190,shAmt:12,hiHue:40,hiAmt:18,grain:18,grainSize:30,bloom:8}),
+ D("pastel400h","Pastel 400H","color","pastel cool","Xanh lá ngả cyan, pastel, kiểu ảnh cưới ngoài trời.",
+  {exposure:20,contrast:-15,highlights:-30,shadows:25,fade:18,temp:-5,tint:-10,saturation:-15,vibrance:5,shHue:170,shAmt:30,hiHue:60,hiAmt:10,grain:15,grainSize:30,bloom:12},[0,0,0,0,0,0.03,0,0.06,-0.02]),
+ D("street200","Street 200","color","cool grainy","Xanh lá đặc trưng film bình dân, hơi lạnh, hạt rõ.",
+  {contrast:15,highlights:-15,shadows:5,fade:10,temp:-8,tint:-15,saturation:5,shHue:140,shAmt:25,hiHue:55,hiAmt:10,grain:35,grainSize:40,vignette:15}),
+ D("color400","Color 400","color","vivid warm","Rực, đậm, hợp ảnh du lịch và đường phố ban ngày.",
+  {exposure:5,contrast:20,highlights:-10,shadows:5,fade:5,temp:12,tint:2,saturation:25,vibrance:15,shHue:210,shAmt:10,hiHue:40,hiAmt:15,grain:25,grainSize:35,vignette:10}),
+ D("vivid100","Vivid 100","color","vivid natural","Bão hòa cao, hạt rất mịn, trời xanh đậm.",
+  {contrast:25,highlights:-15,shadows:-5,temp:5,saturation:35,vibrance:25,shHue:220,shAmt:10,hiHue:40,hiAmt:8,grain:8,grainSize:20,vignette:10},[0.03,0,0,0,0,0,0,-0.02,0.04]),
+ D("slide50","Slide 50","color","vivid contrast","Dương bản phong cảnh: xanh lá và đỏ rất đậm.",
+  {exposure:-10,contrast:40,highlights:-10,shadows:-20,tint:-5,saturation:45,vibrance:15,shHue:230,shAmt:15,hiHue:50,hiAmt:5,grain:8,grainSize:20,vignette:20},[0.05,-0.03,0,-0.02,0.05,-0.02,0,-0.02,0.04]),
+ D("slide100","Slide 100","color","natural contrast","Dương bản cân bằng, trong và sạch.",
+  {exposure:-3,contrast:25,highlights:-15,shadows:-10,temp:-3,saturation:15,vibrance:10,shHue:210,shAmt:8,hiHue:50,hiAmt:5,grain:6,grainSize:20,vignette:8}),
+ /* Điện ảnh */
+ D("super8","Super 8","cine","warm grainy faded","Thước phim quay tay 8mm: hạt dày, tối góc mạnh, lóa sáng cam.",
+  {contrast:25,highlights:-10,shadows:-5,fade:15,temp:30,tint:5,saturation:10,shHue:15,shAmt:25,hiHue:45,hiAmt:20,grain:75,grainSize:70,halation:25,bloom:15,aberration:20,vignette:65,leak:45}),
+ D("tungsten500","Tungsten 500","cine","cool atmo","Film máy quay chụp dưới đèn: xanh lạnh, quầng đỏ quanh đèn.",
+  {contrast:15,highlights:-25,shadows:10,fade:8,temp:-40,tint:5,saturation:5,vibrance:10,shHue:210,shAmt:30,hiHue:30,hiAmt:10,grain:30,grainSize:35,halation:50,bloom:20}),
+ D("tealorange","Teal & Orange","cine","contrast warm","Da cam, bóng đổ xanh mòng két kiểu phim bom tấn.",
+  {contrast:30,highlights:-20,shadows:-5,fade:5,temp:10,saturation:15,shHue:185,shAmt:60,hiHue:30,hiAmt:45,grain:15,grainSize:30,vignette:25}),
+ D("bleach","Bleach Bypass","cine","faded contrast","Bạc màu, tương phản gắt, cảm giác kim loại.",
+  {contrast:55,highlights:5,shadows:-20,fade:5,temp:-5,saturation:-55,shHue:200,shAmt:10,grain:30,grainSize:35,vignette:30}),
+ D("nightdrive","Night Drive","cine","warm atmo contrast","Đèn đường natri cam, bóng đêm xanh đen.",
+  {exposure:-10,contrast:30,highlights:-10,shadows:-15,fade:5,temp:30,tint:5,saturation:10,shHue:205,shAmt:50,hiHue:30,hiAmt:40,grain:40,grainSize:45,halation:40,bloom:30,vignette:40}),
+ D("dayfornight","Day for Night","cine","cool atmo","Biến ảnh ban ngày thành đêm xanh, kỹ thuật cũ của điện ảnh.",
+  {exposure:-55,contrast:30,highlights:-30,shadows:-10,temp:-45,tint:5,saturation:-40,shHue:220,shAmt:40,hiHue:210,hiAmt:20,grain:25,grainSize:35,vignette:45}),
+ /* Retro / Y2K */
+ D("disposable98","Disposable '98","retro","vivid contrast grainy","Máy film dùng một lần cuối thập niên 90: màu rực, tối góc, hạt thô, in ngày màu cam.",
+  {exposure:5,contrast:35,highlights:10,shadows:-10,fade:8,temp:12,tint:6,saturation:25,vibrance:10,shHue:220,shAmt:15,hiHue:45,hiAmt:10,grain:45,grainSize:55,halation:12,bloom:10,aberration:25,vignette:45,leak:10,date:1}),
+ D("ccd2003","CCD 2003","retro","vivid cool","Máy ảnh số đời đầu: trời xanh gắt, viền sáng, in ngày ở góc.",
+  {exposure:10,contrast:25,highlights:15,shadows:-5,temp:-12,saturation:20,vibrance:15,shHue:220,shAmt:15,hiHue:200,hiAmt:10,bloom:20,aberration:15,chroma:20,lofi:10,date:1}),
+ D("dvcam","DV Cam","retro","faded grainy","Máy quay MiniDV: mềm, lệch màu nhẹ, in ngày giờ màu trắng.",
+  {exposure:5,contrast:5,highlights:-10,shadows:10,fade:15,temp:-5,tint:5,saturation:-5,shHue:210,shAmt:15,hiHue:50,hiAmt:10,bloom:20,aberration:30,chroma:35,lofi:20,vignette:15,date:2}),
+ D("flashparty","Flash Party","retro","contrast vivid","Đèn flash trực diện: nền tối, da sáng, góc tối.",
+  {exposure:10,contrast:45,highlights:5,shadows:-40,temp:5,saturation:15,vibrance:10,grain:25,grainSize:35,bloom:15,aberration:10,vignette:50,date:1}),
+ D("webcam2008","Webcam 2008","retro","cool grainy","Webcam laptop đời cũ: nhiễu màu, ngả xanh, độ phân giải thấp.",
+  {exposure:5,contrast:15,highlights:10,shadows:-10,fade:10,temp:-20,tint:-10,saturation:-20,shHue:190,shAmt:20,chroma:60,lofi:45,vignette:30}),
+ D("vhs","VHS Home","retro","faded warm","Băng video gia đình: mờ, tràn màu đỏ, in ngày giờ.",
+  {exposure:5,contrast:-10,highlights:-15,shadows:10,fade:25,temp:10,tint:10,saturation:15,shHue:300,shAmt:15,hiHue:20,hiAmt:20,bloom:35,aberration:55,chroma:40,lofi:30,vignette:25,date:2}),
+ /* Vintage */
+ D("faded70","Faded 70s","vintage","faded warm grainy","Ảnh gia đình bạc màu trong album cũ: phai, ngả cam, nhạt màu.",
+  {exposure:5,contrast:-25,highlights:-30,shadows:20,fade:45,temp:30,tint:10,saturation:-35,shHue:30,shAmt:30,hiHue:35,hiAmt:25,grain:35,grainSize:45,halation:10,bloom:15,vignette:30}),
+ D("polar","Instant","vintage","faded pastel cool","Ảnh chụp lấy liền: bóng ngả xanh ngọc, vùng sáng màu kem, mềm.",
+  {exposure:10,contrast:-20,highlights:-35,shadows:25,fade:30,temp:5,tint:-10,saturation:-20,shHue:175,shAmt:40,hiHue:50,hiAmt:25,grain:15,grainSize:30,halation:5,bloom:20,vignette:30}),
+ D("sepia","Sepia Book","vintage","mono faded grainy","Trang sách cũ, báo xưa: tông nâu sepia, tương phản mềm.",
+  {exposure:5,contrast:10,highlights:-15,shadows:15,fade:25,bw:100,shHue:30,shAmt:35,hiHue:40,hiAmt:45,grain:40,grainSize:50,vignette:45}),
+ D("crossprocess","Cross Process","vintage","vivid contrast","Film tráng nhầm thuốc: vàng xanh gắt, da hồng.",
+  {exposure:5,contrast:35,highlights:-10,shadows:-10,temp:10,tint:-20,saturation:25,shHue:180,shAmt:40,hiHue:60,hiAmt:45,grain:25,grainSize:35,vignette:30},[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1]),
+ D("expired","Expired Film","vintage","faded grainy","Film hết hạn: ám tím đỏ, phai, hạt to, lóa sáng.",
+  {exposure:5,contrast:-10,highlights:-25,shadows:15,fade:35,temp:15,tint:30,saturation:-20,shHue:300,shAmt:35,hiHue:20,hiAmt:30,grain:55,grainSize:60,halation:15,leak:25,vignette:35}),
+ D("autochrome","Autochrome","vintage","pastel faded grainy","Ảnh màu thập niên 1910: pastel, chấm hạt màu li ti.",
+  {exposure:5,contrast:-15,highlights:-25,shadows:15,fade:30,temp:15,tint:5,saturation:-25,shHue:120,shAmt:20,hiHue:45,hiAmt:30,grain:70,grainSize:75,chroma:50,vignette:45}),
+ /* Đen trắng */
+ D("shinjuku","Shinjuku Noir","bw","mono contrast grainy","Đen trắng tương phản gắt, hạt thô, kiểu nhiếp ảnh đường phố Shinjuku thập niên 70.",
+  {exposure:-5,contrast:70,highlights:10,shadows:-35,bw:100,grain:65,grainSize:60,bloom:10,vignette:40}),
+ D("silver400","Silver 400","bw","mono natural","Đen trắng cổ điển, dải xám giàu sắc độ.",
+  {contrast:20,highlights:-10,shadows:5,bw:100,grain:30,grainSize:35,vignette:15}),
+ D("softmono","Soft Mono","bw","mono faded","Đen trắng mềm, màu đen được nâng nhẹ.",
+  {exposure:8,contrast:-20,highlights:-25,shadows:20,fade:25,bw:100,grain:20,grainSize:35,bloom:10,vignette:20}),
+ D("push3200","Push 3200","bw","mono contrast grainy","Film đẩy ISO: hạt rất to, đen sâu.",
+  {contrast:60,highlights:5,shadows:-40,bw:100,grain:85,grainSize:80,vignette:35}),
+ D("cyanotype","Cyanotype","bw","mono cool","Ảnh in xanh lam kiểu bản vẽ kỹ thuật cũ.",
+  {exposure:5,contrast:15,highlights:-15,shadows:10,fade:15,bw:100,duo:90,shHue:215,hiHue:195,grain:20,grainSize:35,vignette:25}),
+ D("selenium","Selenium","bw","mono cool contrast","Đen trắng ngả tím lạnh ở vùng tối.",
+  {contrast:30,highlights:-10,shadows:-10,bw:100,shHue:275,shAmt:30,hiHue:40,hiAmt:8,grain:30,grainSize:35,vignette:20}),
+ /* Đặc biệt */
+ D("irpink","Infrared Pink","special","vivid","Hồng ngoại: lá cây chuyển hồng đỏ, trời tím nhạt.",
+  {exposure:5,contrast:15,saturation:20,hiHue:330,hiAmt:15,grain:20,grainSize:35},[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0]),
+ D("irgold","Infrared Gold","special","vivid warm","Hồng ngoại vàng: lá cây chuyển vàng, trời xanh đậm.",
+  {contrast:20,temp:10,saturation:15,shHue:220,shAmt:20,grain:20,grainSize:35},[-0.3,0.7,0,0.3,0.1,-0.1,0,-0.3,0.2]),
+ D("duotone","Duotone","special","contrast vivid","Hai màu tím và cam cho vùng tối và vùng sáng. Đổi cặp màu ở mục Phủ màu.",
+  {contrast:20,duo:100,shHue:260,hiHue:30,grain:10,grainSize:30}),
+ D("lomo","Lomo","special","vivid contrast","Tối góc nặng, bão hòa cao, lệch màu kiểu máy đồ chơi.",
+  {contrast:40,shadows:-15,temp:5,saturation:40,vibrance:20,shHue:200,shAmt:25,hiHue:50,hiAmt:20,grain:25,grainSize:35,aberration:30,vignette:80}),
+];
+
+const GROUPS = [
+ {id:"light",tab:"adjust",title:"Ánh sáng",items:[["exposure","Phơi sáng",-100,100],["contrast","Tương phản",-100,100],["highlights","Vùng sáng",-100,100],["shadows","Vùng tối",-100,100],["fade","Phai màu",0,100]]},
+ {id:"color",tab:"adjust",title:"Màu sắc",items:[["temp","Nhiệt độ màu",-100,100],["tint","Tint",-100,100],["saturation","Độ bão hòa",-100,100],["vibrance","Độ tươi",-100,100],["bw","Đen trắng",0,100]]},
+ {id:"split",tab:"adjust",title:"Phủ màu",items:[["shHue","Màu vùng tối",0,360,"hue"],["shAmt","Độ đậm vùng tối",0,100],["hiHue","Màu vùng sáng",0,360,"hue"],["hiAmt","Độ đậm vùng sáng",0,100],["duo","Duotone",0,100]]},
+ {id:"grain",tab:"fx",title:"Hạt film",items:[["grain","Lượng hạt",0,100],["grainSize","Cỡ hạt",0,100]]},
+ {id:"glow",tab:"fx",title:"Ánh sáng film",items:[["halation","Halation",0,100],["bloom","Bloom",0,100],["leak","Light leak",0,100]]},
+ {id:"lens",tab:"fx",title:"Ống kính",items:[["aberration","Lệch màu viền",0,100],["vignette","Tối góc",0,100]]},
+ {id:"digital",tab:"fx",title:"Máy số đời đầu",items:[["lofi","Độ phân giải thấp",0,100],["chroma","Nhiễu màu",0,100]]},
+];
+
+/* ---------- VSCO-inspired presets (approximations; codes follow VSCO's official preset guide) ---------- */
+(function(){
+const SER={
+ LG:["vsco","Legacy","bộ màu gốc thời VSCO Cam 2012, đơn giản, bền"],
+ AR:["vsco","Archetype","pastel nhẹ, nâng trung tông, hơi dư sáng; hợp chân dung, nội thất, đồ ăn"],
+ AE:["vsco","Aesthetic","màu tự nhiên, lệch màu tinh tế, phai nhẹ"],
+ AN:["vsco","Analog","chất film analog phai và ấm"],
+ BC:["vsco","B&W Classic","đen trắng tinh tế, giữ chi tiết vùng tối"],
+ BM:["vsco","B&W Moody","đen trắng tương phản cao, u buồn; hợp chân dung"],
+ CV:["vsco","Vibrant Classic","tăng màu có kiểm soát, đa dụng"],
+ CC:["vsco","Chromatic","màu film giữa thế kỷ 20: màu cơ bản đậm, màu trung tính trầm"],
+ ES:["vsco","Essence","vùng sáng vàng óng, bóng đổ sâu"],
+ ME:["vsco","Mellow","nhạt màu, nhẹ nhàng, da đẹp; cho khoảnh khắc thường ngày"],
+ PO:["vsco","Portrait","chân dung tươi, da đều màu"],
+ PS:["vsco","Portrait","chân dung cho nhiều bối cảnh, sắc ấm, lạnh hoặc trung tính"],
+ PC:["vsco","Polychrome","đa dụng, phớt hồng, vàng hoặc tím"],
+ MI:["vsco","Minimalist","tĩnh lặng; hợp chân dung, kiến trúc"],
+ KC:["vsco","Analog Classic","tươi, rực, cảm hứng từ film Kodachrome"],
+ MU:["vsco","Mood","hơi thiếu sáng, phai nhẹ, tông nâu và xanh lá cho thiên nhiên"],
+ SF:["vsco","Subtle Fade","nhạt màu, êm, tông vintage thập niên 70"],
+ NM:["vsco","New Modern","đậm, hiện đại; hợp đèn flash hoặc nắng gắt"],
+ IW:["vsco","Instant + Warm","ảnh lấy liền ấm, mịn như kem"],
+ IC:["vsco","Instant + Cool","ảnh lấy liền lạnh, phai xanh"],
+ IK:["vsco","Instant Classic","ảnh lấy liền cổ điển ngả vàng hoặc xanh"],
+ AY:["vsco","Alchemy","kiểu tráng chéo: lệch màu mạnh, tương phản cao"],
+ BR:["vsco","Bright + Clean","sáng, sạch, da đẹp"],
+ BW:["vsco","Bright + Warm","sáng ấm mùa hè, tông cam vàng"],
+ HF:["vsco","Heavy Fade","phai đậm, sắc màu kịch tính cho cảnh tối"],
+ UR:["vsco","Urban","đời sống thành phố, mọi thời tiết"],
+ LC:["vsco","Low-Contrast","tương phản thấp, dải tông rộng, màu trầm"],
+ XF:["vsco","B&W Fade","đen trắng phai đậm, xám, kịch tính"],
+ FX:["vscofilm","Film X","mô phỏng film"],
+ CG:["vscolab","Color Grading","chỉnh màu kiểu điện ảnh"],
+ IR:["vscolab","Infrared","hiệu ứng hồng ngoại"],
+ AL:["vscolab","Artificial Light","xử lý ánh sáng nhân tạo: LED, huỳnh quang, đèn hỗn hợp"],
+ LS:["vscolab","Landscape","phong cảnh thiên nhiên"],
+ CO:["vscolab","Bộ cộng tác","bộ màu từ các chiến dịch cộng tác"],
+ WE:["vscolab","We The Creators","bộ màu cộng tác với nhiếp ảnh gia, chất analog"]
+};
+const MIX={red:[0.06,-0.03,0,0,0,0,0,-0.02,0.05],vivid:[0.04,-0.02,0,-0.02,0.05,-0.02,0,-0.02,0.05],cyan:[0,0,0,0,0,0.03,0,0.06,-0.02],green:[0,0,0,0,0.04,0,0,0,0],
+ cross:[0.05,0,-0.05,0,0.05,-0.05,0,0,-0.1],q2:[-0.05,0.08,0,0,0,0.06,0.06,0,-0.08],q3:[0.08,0,0,-0.04,0.06,0,0,0.06,-0.12],
+ irp:[-0.4,0.9,0,0.5,-0.6,0.1,0,0,0],irp2:[-0.2,0.5,0,0.25,-0.3,0.05,0,0,0],irw:[-0.3,0.9,0,-0.3,0.9,0,-0.3,0.9,0],irb:[0,0.25,0,0,-0.15,0,0,0.8,-0.1],irb2:[0,0.15,0,0,-0.1,0,0,0.5,-0.05],
+ d1:[-0.3,0.3,0,0,-0.3,0.3,0.3,0,-0.3],d2:[-0.2,0,0.2,0.2,-0.2,0,0,0.2,-0.2]};
+const K={e:"exposure",c:"contrast",h:"highlights",s:"shadows",f:"fade",t:"temp",n:"tint",sa:"saturation",v:"vibrance",bw:"bw",du:"duo",ha:"halation",bl:"bloom",lk:"leak",ab:"aberration",vg:"vignette",lo:"lofi",ch:"chroma"};
+const DATA=`01 LG bw100 c8 g10:30
+02 LG bw100 c30 s-10 g15:30
+03 LG bw100 f25 c-5 g20:35
+04 LG t10 f10 sa-5 hi40:15
+05 LG t-12 sh210:20 sa-8
+06 LG n-12 sh170:25 f8
+07 LG n12 hi340:20 f10 e5
+08 LG c30 sa10 vg15
+09 LG t15 f22 sa-15 hi35:20
+10 LG sa25 v15 c12
+A1 AR e15 c-10 s15 f12 t4 sa-5 hi40:10
+A2 AR e14 c-12 s15 f14 n8 sa-8 hi340:15
+A3 AR e12 c-10 s12 f14 t-8 sa-10 sh190:20
+A4 AE f12 t8 sa-10 c5 sh30:12 hi50:10
+A5 AE f12 t-3 n-5 sa-12 sh170:12
+A6 AN f25 t15 n6 sa-15 hi30:20 e5
+A7 AN f20 t-8 sa-20 sh200:20 e6
+A8 AN f15 t8 n10 sa-5 hi10:25 c8
+A9 AN f18 n-12 sa-15 sh160:25
+A10 AN e10 f15 c-8 sa-18
+B1 BC bw100 c10 s5
+B2 BC bw100 c20
+B3 BC bw100 c5 e8 f5
+B4 BM bw100 c40 e-8
+B5 BM bw100 c50 s-20
+B6 BM bw100 c35 vg25 f5
+C1 CV sa25 c15 v10
+C2 CV sa20 t8 c10
+C3 CV sa20 v20 n5
+C4 CC sa15 xred c12 hi45:10
+C5 CC sa10 t-6 c10 xred
+C6 CC n-8 sa12 xgreen c10
+C7 CC t5 sh210:25 hi35:20 sa10 c10
+C8 CC n12 sa15 hi330:15 c10
+C9 CC f15 sa5 xred c5
+E1 ES t12 hi40:30 s-10 c15 g15:30
+E2 ES t20 hi38:35 s-8 c12 g15:30
+E3 ES t10 n-10 hi45:25 s-10 c12 g15:30
+E4 ES t10 n10 hi30:30 s-10 c12 g15:30
+E5 ES t12 hi40:30 s-18 c25 g15:30
+E6 ES t12 hi40:25 f15 c8 g18:30
+E7 ES t12 hi40:30 sa15 c15 g15:30
+E8 ES t8 hi40:25 sh210:25 c15 g15:30
+F1 ME sa-25 f10 c-5
+F2 ME sa-22 f15 e10 c-8
+F3 ME sa-22 f10 t10
+G1 PO t15 n-5 v10 e5
+G2 PO e8 v15 c5
+G3 PO n6 v20 e6 c5
+G4 PS t12 v10 e5 f5
+G5 PS t-10 v10 e5
+G6 PS n-10 t8 v15 sa5 hi60:15
+G7 PS t10 f15 sa-10 e6
+G8 PS t-8 f15 sa-10 e6
+G9 PS e18 c-10 s10 sa-5
+H1 PC hi340:25 f8 e5
+H2 PC hi55:25 f8 e5
+H3 PC sh270:25 f8
+H4 PC hi340:25 c15
+H5 PC hi50:25 f18 sa-10
+H6 PC sh275:30 sa15 c10
+J1 MI c-12 sa-15 f8
+J2 MI c-12 sa-15 t-10 f8
+J3 MI c-12 sa-15 t10 f8
+J4 MI e12 c-15 f15 sa-20
+J5 MI c-10 sa-15 n-10 sh160:15
+J6 MI c-10 sa-15 n10 hi340:15
+K1 KC c25 sa25 xred s-5
+K2 KC c22 sa22 t10 xred
+K3 KC c32 sa25 s-12 xred
+M1 MU e-12 f12 sa-10 t8 sh30:20
+M2 MU e-12 f12 sa-10 n-10 sh150:20
+M3 MU e-10 f12 sa-12 sh180:15
+M4 SF f20 sa-25 t8
+M5 SF e6 t10 n5 sa-20 f15 hi25:15
+M6 SF f20 sa-25 t-6 sh200:15
+N1 NM c25 s-15 sa20
+N2 NM c25 s-12 sa15 t-10
+N3 NM c25 s-12 sa15 t12
+P1 IW e10 f20 t15 c-10 hi40:25
+P2 IW e12 f22 t18 n5 c-12 hi35:25
+P3 IW e8 f18 t12 c-8 hi45:20 sa-10
+P4 IC f22 t-15 sh200:30 c-10 e5
+P5 IC f20 t-12 c-15 sh210:30 sa-10
+P6 IC f25 t-18 sh190:35 e8
+P7 IK f15 t10 hi55:30 c5
+P8 IK f15 t-10 sh210:30 c5
+P9 IK f15 n-8 hi65:25 sh170:15
+Q1 AY c30 sa15 xcross sh180:30
+Q2 AY c30 sa10 xq2 hi60:20
+Q3 AY c28 sa15 xq3 sh220:25
+Q4 AY c32 sa10 n15 sh280:25 hi50:20
+Q5 AY c30 sa20 xcross hi30:25 t10
+Q6 AY c30 sa5 n-20 sh160:30 hi60:25
+Q7 AY c35 sa15 xq2 t-10
+Q8 AY c30 sa15 sh300:30 hi45:30
+Q9 AY c28 sa10 xq3 f8
+Q10 AY c35 sa20 t15 sh200:35 hi20:20
+S1 BR e12 c-5 sa-5 n3
+S2 BR e15 c-8 sa-8 f5
+S3 BR e10 c-3 sa-3 t-5
+S4 BW e10 t20 hi35:25
+S5 BW e12 t25 hi40:30 sa5
+S6 BW e8 t18 hi30:25 f8
+T1 HF f35 c10 e-5 sa-15 t-6
+T2 HF f35 c10 e-5 sa-15 t10
+T3 HF f35 c10 e-5 sa-15 n-10
+U1 UR c15 sa-5
+U2 UR t-20 sh220:25 c10 e-5
+U3 UR t-10 n-10 sh180:30 f8
+U4 UR t25 c15 sh210:30 e-8 ha20
+U5 UR f18 sa-25 c5
+U6 UR n18 sa15 hi320:25 bl15
+V1 LC c-20 t-6 sa-8 e5
+V2 LC c-20 t20 g25:40
+V3 LC c-20 t12 sa-5
+V4 LC c-15 n10 hi5:30 xred
+V5 LC c-20 t12 e10
+V6 LC c-22 sa-25
+V7 LC c-18 n-10 sh150:20
+V8 LC c-25 f15 sa-10
+X1 XF bw100 f30 c15
+X2 XF bw100 f35 c15 e-8
+X3 XF bw100 f25 c10 g30:40
+X4 XF bw100 f15 e8 c-10
+X5 XF bw100 f12 e10 c-5 g15:30
+X6 XF bw100 f18 c-12 e5
+AU1 FX sa30 v15 c15 xvivid t4 #Agfa Ultra 100: màu rất đậm, xanh dương, vàng, xanh lá nổi, da ấm
+AU5 FX sa40 c30 xvivid s-10 #Agfa Ultra 50: màu dày, tương phản sâu
+AV4 FX t12 c8 s8 sa10 hi40:15 g20:35 #Agfa Vista 400: ấm, hoài niệm, trời xanh đậm hơn
+AV8 FX f25 sa-20 bl10 ha10 g25:40 #Agfa Vista 800: phai, nhạt, nhẹ nhàng
+FN16 FX bw100 e-10 c30 g45:45 #Fuji Neopan 1600: đen trắng tối, hạt rõ
+FP1 FX c-15 sa-5 h-10 e5 #Fuji 160S: tương phản thấp, màu tự nhiên
+FP2 FX c-8 sa3 h-10 e5 g8:20 #Fuji 160S: giống FP1, tương phản nhỉnh hơn
+FP4 FX e15 h-25 n-6 c-8 xcyan #Fuji Pro 400H: vùng sáng mềm, thoáng, ngả xanh mát
+FP8 FX e8 c18 sa-10 xred #Fuji Pro 800Z: sáng, tương phản, đỏ nổi
+FR4 FX n8 s15 f8 c10 sa10 g15:30 #Fuji Provia 400X: phớt hồng, bóng đổ nâng
+FS1 FX t-3 n-6 c10 g10:25 #Fuji Superia 100: tự nhiên, hơi xanh lá
+FS4 FX n-12 sh150:20 c10 g20:35 #Fuji Superia 400: xanh lá thập niên 90
+FS16 FX n-10 g50:50 c20 f8 #Fuji Superia 1600: hạt to, tương phản
+FT6 FX t-30 c15 sh210:20 #film cân bằng đèn tungsten: lạnh
+FV5 FX sa45 c30 xvivid #Fuji Velvia 50: rực, đậm
+IH5 FX bw100 c25 s-10 g30:35 #Ilford HP5: tương phản vừa, đen sâu
+KA1 FX c20 sa15 t-5 sh210:20 #Kodak Ektachrome: chất thập niên 80
+KA3 FX c22 sa22 t-8 xcyan #Kodak Ektachrome: rực, ngả cyan
+KC25 FX c30 sa25 t5 xred s-10 #Kodachrome 25: đỏ sâu, tương phản
+KCP2 FX t15 sa10 f5 g25:40 #Kodak ColorPlus 200: ấm, bình dân
+KE1 FX sa35 c20 xred #Kodak Ektar 100: rực, đỏ mạnh
+KG1 FX t15 sa15 g20:35 #Kodak Gold 100: màu đậm, ấm
+KG2 FX t25 sa12 hi40:25 g22:35 #Kodak Gold 200: vàng ấm
+KP1 FX t8 e8 c10 g18:30 #Kodak Portra 160: ấm, sáng, dịu với da
+KP2 FX t8 e8 c8 sa-10 g15:30 #Kodak Portra 160 NC: ít bão hòa
+KP3 FX t8 e8 c12 sa12 g15:30 #Kodak Portra 160 VC: tươi hơn
+KP4 FX t10 h5 s-5 g18:30 #Kodak Portra 400: ấm, đa dụng
+KP5 FX t10 sa-10 g18:30 #Kodak Portra 400 NC: nhạt màu
+KP6 FX t10 sa20 c12 g18:30 #Kodak Portra 400 UC: rất tươi
+KP7 FX t10 sa12 c6 g18:30 #Kodak Portra 400 VC: tươi
+KP8 FX t8 c18 sa10 sh210:15 g25:35 #Kodak Portra 800: ấm, tương phản vừa, ánh xanh nhẹ
+KP9 FX t8 c25 sa10 g25:35 #Kodak Portra 800 HC: tương phản cao
+KT32 FX bw100 e10 s15 c30 g70:60 #Kodak T-Max 3200: sáng, hạt rất dày
+KU1 FX t12 sa15 g20:30 #Kodak UltraMax 100: ấm, tiêu dùng
+KU4 FX t15 sa15 g25:35 #Kodak UltraMax 400: ấm, có hạt
+KU8 FX t15 c10 sa12 g40:45 #Kodak UltraMax 800: hạt to
+KX4 FX bw100 s20 c5 g40:40 #Kodak Tri-X 400: bóng đổ nâng, mềm
+CG1 CG c-15 sh210:45 hi35:35 #duotone mềm, bóng lạnh, vùng sáng ấm
+CG2 CG c15 sa15 sh210:60 hi35:50 #duotone đậm, tương phản hơn
+CG3 CG t-15 c-10 sa-10 sh220:40 hi200:15 #xanh dương tĩnh lặng
+CG4 CG c20 sa10 sh220:55 hi195:20 #xanh dương mạnh mẽ
+CG5 CG t15 sa-20 f10 sh35:20 hi40:40 #vàng trầm, hoài niệm
+CG6 CG t20 sa10 hi40:50 bl20 #vàng rực rỡ
+CG7 CG n-15 sa-10 sh150:35 #xanh lá dịu
+CG8 CG n-30 c20 sh140:55 hi80:25 #xanh lá cường độ cao
+IR1 IR xirp sa20 c15 #phong cảnh: lá cây hồng và đỏ thẫm
+IR2 IR xirp2 sa10 c10 #chân dung: lá hồng, giữ màu da
+IR3 IR xirw bw100 bl30 c15 #đen trắng, lá phát sáng
+IR4 IR xirp sa10 e8 f8 #phong cảnh hồng
+IR5 IR xirp2 e5 f5 #chân dung hồng
+IR6 IR xirb e8 t-10 #phong cảnh xanh lạnh
+IR7 IR xirb2 c10 #chân dung xanh
+AL1 AL t-25 c8 #giảm ám vàng đèn sợi đốt
+AL2 AL t15 n12 #cân lại đèn huỳnh quang
+AL3 AL c20 s-5 sa10 #cảnh đêm, tăng tương phản
+AL4 AL t-12 sh180:30 c12 #đêm ngả mòng két
+AL5 AL n15 sa15 hi320:20 bl10 #làm nổi đèn neon
+AL6 AL t10 f8 c-5 #trong nhà ấm, mềm
+L1 LS sa15 xvivid t-5 #bầu trời
+L2 LS t-10 sa12 sh190:20 #biển
+L3 LS n-12 sa15 xgreen #rừng
+L4 LS c15 t-5 sa8 h-15 #núi
+L5 LS t25 sa15 hi30:25 #sa mạc
+L6 LS e10 t-15 sa-10 #tuyết
+L7 LS t20 n10 hi20:30 sa10 #hoàng hôn
+L8 LS f25 c-15 sa-15 #sương mù
+L9 LS c15 sa-5 sh210:15 #thành phố
+L10 LS n-6 t12 sa15 #đồng cỏ
+L11 LS n-8 t-8 sh180:25 sa10 #hồ nước
+L12 LS t20 sa15 hi25:25 xred #mùa thu
+ACG CO c25 sa-10 t-10 #phố thị, thời tiết khắc nghiệt
+AGA1 CO sa20 v15 f10 sh180:25 hi340:20 #màu ngọc, pastel đậm
+AGA2 CO sa20 v15 f10 sh270:25 #ngọc tím
+AGA3 CO sa20 v15 f10 n-10 sh150:25 #ngọc lục bảo
+BBMA CO t-25 n4 sh215:30 c10 #xanh lạnh cho chân dung
+D1 CO sa20 xd1 #màu khác thường
+D2 CO sa15 xd2 c15 #màu đảo lạ
+DOG1 CO t15 sa-15 f10 hi40:20 #hổ phách trầm
+DOG2 CO t-10 sa-20 f10 sh210:20 #xám xanh
+DOG3 CO n-10 t10 sa-10 hi60:25 #vàng lục
+HB1 CO e-8 t-12 sa-15 vg20 c10 #lạnh, tối nhẹ, góc tối
+HB2 CO e-5 t-20 sa-20 vg15 c12 #rất lạnh, hợp cảnh tuyết
+HB3 CO e-10 sa-15 vg25 c15 #trung tính, tối
+IND1 CO t-30 sh230:40 #xanh chàm
+IND2 CO t-35 sh230:55 c10 #chàm đậm
+INF CO t10 sa20 v15 e6 c10 #món ăn
+JM1 CO c35 sa20 e5 #đậm, tương phản, nắng gắt
+KK1 CO sa20 t15 #rực, ấm
+KK2 CO sa15 t20 f10 #ấm, phai
+LV1 CO sa20 c15 #rực cho đường phố
+LV2 CO bw100 c20 #đen trắng cổ điển
+LV3 CO t10 sa-12 #ấm tự nhiên, nhạt nhẹ
+MTV CO sa35 v20 c15 n10 #vui, rực, retro thập niên 90
+NC CO t12 sa8 hi30:15 #đỏ, cam, vàng ấm nhẹ
+OAK1 CO c25 sa15 t8 xvivid #rõ nét, ấm
+OAK2 CO c25 sa10 t-10 #rõ nét, lạnh
+OAK3 CO c25 sa15 sh200:20 xvivid #rõ nét, cảnh nước
+OC CO sa-35 c15 e-6 vg20 #nhạt màu, u trầm
+SE1 CO e-10 c25 sa-5 f8 #tối, gai góc, retro
+SE2 CO e-10 c25 sa20 #tối, màu đậm nhất bộ
+SE3 CO e-8 c20 sa-8 f10 t6 #tối, retro
+SS1 CO sa-15 v30 #điểm màu trên nền trầm
+SS2 CO sa-20 v35 c10 #điểm màu, tương phản
+SS3 CO sa-10 v25 t8 #điểm màu ấm
+SUM1 CO t18 xred sa10 #đỏ sâu, cam cháy
+SUM2 CO t22 xred sa5 f10 #cam cháy phai
+TECH CO bw100 hi0:80 c40 #đen và đỏ
+TK CO sa-15 c20 sh215:40 hi345:30 #vùng sáng hồng, bóng xanh
+WE1 WE t10 e6 g18:30 f6 #ấm kiểu Portra
+WE2 WE t-10 f8 g18:30 #lạnh, analog
+WE3 WE n-10 sh150:20 g20:35 #xanh lá kiểu Superia
+WE4 WE t15 hi40:30 c10 g18:30 #vàng óng
+WE5 WE f18 n10 hi340:20 e6 g15:30 #hồng phai
+WE6 WE c25 s-10 sa10 g20:35 #tương phản
+WE7 WE sh185:40 hi30:30 c15 #mòng két và cam
+WE8 WE bw100 c20 g30:35 #đen trắng analog`;
+function moods(p){const m=[];if(p.bw>=80)m.push("mono");
+  const warm=p.temp>=8||(p.hiAmt>=20&&(p.hiHue<70||p.hiHue>330)),cool=p.temp<=-8||(p.shAmt>=25&&p.shHue>=170&&p.shHue<=250);
+  if(warm&&p.bw<80)m.push("warm");if(cool&&p.bw<80)m.push("cool");if(p.fade>=15)m.push("faded");if(p.saturation>=20||p.vibrance>=25)m.push("vivid");
+  if(p.contrast>=25)m.push("contrast");if(p.grain>=35)m.push("grainy");if(p.bloom>=20||p.halation>=30)m.push("atmo");
+  if(p.exposure>=8&&p.contrast<=0&&p.saturation<=0&&p.bw<80)m.push("pastel");if(!m.length)m.push("natural");return m;}
+DATA.split("\n").forEach(line=>{
+  const [spec,note]=line.split("#"),tk=spec.trim().split(/\s+/),code=tk[0],ser=SER[tk[1]],p=Object.assign({},NEUTRAL);let mix=Z9;
+  tk.slice(2).forEach(t=>{if(t[0]==="x"&&MIX[t.slice(1)]){mix=MIX[t.slice(1)];return;}const m=t.match(/^([a-z]+?)(-?\d+)(?::(-?\d+))?$/);if(!m)return;const k=m[1],a=+m[2],b=m[3]!=null?+m[3]:null;
+    if(k==="sh"){p.shHue=a;p.shAmt=b;}else if(k==="hi"){p.hiHue=a;p.hiAmt=b;}else if(k==="g"){p.grain=a;if(b!=null)p.grainSize=b;}else if(K[k])p[K[k]]=a;});
+  const desc="Mô phỏng "+code+" của VSCO ("+ser[1]+"): "+(note?note.trim():ser[2])+".";
+  PRESETS.push({id:"v_"+code,name:code,fam:ser[0],moods:moods(p),desc,params:p,mix});
+});
+FAMS.push(["vsco","VSCO Cổ điển"],["vscofilm","VSCO Film X"],["vscolab","VSCO Đặc biệt"]);
+})();
+
+/* ---------- WebGL engine ---------- */
+const glc = document.createElement("canvas");
+const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
+const VS = "attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
+const HEAD = "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\nvarying vec2 v;float luma(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}\n";
+const FS_COLOR = HEAD+`
+uniform sampler2D u_src;uniform float u_exp,u_con,u_hl,u_sh,u_fade,u_temp,u_tint,u_sat,u_vib,u_bw,u_shAmt,u_hiAmt,u_duo;
+uniform vec3 u_shCol,u_hiCol;uniform mat3 u_mix;
+void main(){
+  vec3 c=texture2D(u_src,v).rgb;
+  c=pow(max(c,0.0),vec3(2.2));
+  c*=exp2(u_exp);
+  c*=vec3(1.0+u_temp*0.25+u_tint*0.04,1.0-u_tint*0.14,1.0-u_temp*0.25+u_tint*0.04);
+  c=pow(max(c,0.0),vec3(1.0/2.2));
+  c=max(u_mix*c,0.0);
+  float l=luma(c);
+  c+=u_sh*0.32*(1.0-smoothstep(0.0,0.55,l));
+  c+=u_hl*0.28*smoothstep(0.45,1.0,l);
+  c=clamp(c,0.0,1.0);
+  if(u_con>=0.0){vec3 s=c*c*(3.0-2.0*c);c=mix(c,s,u_con*1.15);}
+  else{c=mix(c,0.5+(c-0.5)*0.45,-u_con);}
+  l=luma(c);
+  float sm=max(max(c.r,c.g),c.b)-min(min(c.r,c.g),c.b);
+  c=mix(vec3(l),c,max(0.0,1.0+u_sat+u_vib*(1.0-sm)*1.2));
+  c=mix(c,vec3(dot(c,vec3(0.30,0.59,0.11))),u_bw);
+  l=luma(c);
+  c+=(u_shCol-luma(u_shCol))*u_shAmt*0.4*(1.0-smoothstep(0.0,0.7,l));
+  c+=(u_hiCol-luma(u_hiCol))*u_hiAmt*0.35*smoothstep(0.3,1.0,l);
+  if(u_duo>0.001){float ld=clamp(luma(c),0.0,1.0);vec3 dk=u_shCol*0.16+0.02;vec3 lt=mix(u_hiCol,vec3(1.0),0.72);c=mix(c,mix(dk,lt,smoothstep(0.02,0.98,ld)),u_duo);}
+  c=u_fade*0.17+c*(1.0-u_fade*0.23);
+  gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
+}`;
+const FS_BRIGHT = HEAD+`
+uniform sampler2D u_src;uniform vec2 u_tx;
+void main(){
+  vec3 c=(texture2D(u_src,v+u_tx*vec2(-1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(-1.0,1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,1.0)).rgb)*0.25;
+  gl_FragColor=vec4(c*smoothstep(0.55,0.95,luma(c)),1.0);
+}`;
+const FS_BLUR = HEAD+`
+uniform sampler2D u_src;uniform vec2 u_dir;
+void main(){
+  vec3 c=texture2D(u_src,v).rgb*0.227027;
+  c+=(texture2D(u_src,v+u_dir).rgb+texture2D(u_src,v-u_dir).rgb)*0.1945946;
+  c+=(texture2D(u_src,v+u_dir*2.0).rgb+texture2D(u_src,v-u_dir*2.0).rgb)*0.1216216;
+  c+=(texture2D(u_src,v+u_dir*3.0).rgb+texture2D(u_src,v-u_dir*3.0).rgb)*0.054054;
+  c+=(texture2D(u_src,v+u_dir*4.0).rgb+texture2D(u_src,v-u_dir*4.0).rgb)*0.016216;
+  gl_FragColor=vec4(c,1.0);
+}`;
+const FS_COMP = HEAD+`
+uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed,u_lofi,u_chroma;uniform vec2 u_res;
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+  float a=hash(i+u_seed),b=hash(i+vec2(1.0,0.0)+u_seed),c=hash(i+vec2(0.0,1.0)+u_seed),d=hash(i+vec2(1.0,1.0)+u_seed);
+  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+void main(){
+  float L=max(u_res.x,u_res.y);float sc=max(L/1500.0,0.08);
+  vec2 uv=v;
+  if(u_lofi>0.001){vec2 cells=u_res/(mix(1.0,9.0,u_lofi)*sc);uv=(floor(v*cells)+0.5)/cells;}
+  vec2 d=uv-0.5;
+  vec2 off=d*u_ab*0.014;
+  vec3 c=vec3(texture2D(u_a,uv+off).r,texture2D(u_a,uv).g,texture2D(u_a,uv-off).b);
+  vec3 b=texture2D(u_b,uv).rgb;
+  c=1.0-(1.0-c)*(1.0-clamp(b*u_bloom*1.5,0.0,1.0));
+  float hb=luma(b);
+  c+=vec3(1.0,0.28,0.10)*hb*u_hal*1.7*(1.0-smoothstep(0.75,1.0,luma(c))*0.6);
+  float lk=smoothstep(0.5,1.08,v.x)*(0.55+0.45*sin(v.y*4.0+1.3));
+  vec3 lc=mix(vec3(1.0,0.22,0.08),vec3(1.0,0.62,0.22),v.y);
+  c=1.0-(1.0-c)*(1.0-clamp(lc*lk*u_leak*1.1,0.0,1.0));
+  float r=length((v-0.5)*vec2(u_aspect,1.0))/(0.5*sqrt(u_aspect*u_aspect+1.0));
+  c*=1.0-u_vig*0.85*pow(r,2.3);
+  float cell=mix(0.8,3.6,u_gsize)*sc;
+  vec2 px=v*u_res/cell;
+  float n=(vn(px)+0.5*vn(px*2.13+17.0))/1.5-0.5;
+  float l=luma(c);
+  c+=n*u_grain*0.3*(0.35+0.65*(1.0-abs(l-0.5)*2.0));
+  if(u_chroma>0.001){vec2 q=v*u_res/(cell*1.6+sc);c+=(vec3(vn(q+31.0),vn(q+57.0),vn(q+91.0))-0.5)*u_chroma*0.32;}
+  gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
+}`;
+
+function compile(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));return s;}
+function program(fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,VS));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,fs));
+  gl.bindAttribLocation(p,0,"p");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}
+  return {p,u};}
+let PR=null, maxTex=4096;
+function initGL(){
+  if(!gl) throw new Error("no webgl");
+  PR={color:program(FS_COLOR),bright:program(FS_BRIGHT),blur:program(FS_BLUR),comp:program(FS_COMP)};
+  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+  maxTex=gl.getParameter(gl.MAX_TEXTURE_SIZE)||4096;
+}
+function makeTex(w,h,src){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  if(src){gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);}
+  else gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+  return t;}
+function makeTarget(w,h){const tex=makeTex(w,h,null);const fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);return {tex,fb,w,h};}
+function freeTarget(t){if(t){gl.deleteTexture(t.tex);gl.deleteFramebuffer(t.fb);}}
+let TA=null,TB1=null,TB2=null;
+function ensureTargets(w,h){
+  if(!TA||TA.w!==w||TA.h!==h){freeTarget(TA);TA=makeTarget(w,h);}
+  const sw=Math.max(1,Math.ceil(w/4)),sh=Math.max(1,Math.ceil(h/4));
+  if(!TB1||TB1.w!==sw||TB1.h!==sh){freeTarget(TB1);freeTarget(TB2);TB1=makeTarget(sw,sh);TB2=makeTarget(sw,sh);}
+}
+function pass(prog,target,w,h,texs){
+  gl.useProgram(prog.p);gl.bindFramebuffer(gl.FRAMEBUFFER,target?target.fb:null);gl.viewport(0,0,w,h);
+  texs.forEach((t,i)=>{gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t[1]);gl.uniform1i(prog.u[t[0]],i);});
+}
+function hue2rgb(h){h=((h%360)+360)%360/60;const x=1-Math.abs(h%2-1);return [[1,x,0],[x,1,0],[0,1,x],[0,x,1],[x,0,1],[1,0,x]][Math.floor(h)%6];}
+let seed=Math.random()*100;
+
+function render(srcTex,W,H,e){
+  if(glc.width!==W)glc.width=W; if(glc.height!==H)glc.height=H;
+  ensureTargets(W,H);
+  const c=PR.color; pass(c,TA,W,H,[["u_src",srcTex]]);
+  gl.uniform1f(c.u.u_exp,e.exposure/100*1.5);gl.uniform1f(c.u.u_con,e.contrast/100);
+  gl.uniform1f(c.u.u_hl,e.highlights/100);gl.uniform1f(c.u.u_sh,e.shadows/100);gl.uniform1f(c.u.u_fade,e.fade/100);
+  gl.uniform1f(c.u.u_temp,e.temp/100);gl.uniform1f(c.u.u_tint,e.tint/100);gl.uniform1f(c.u.u_sat,e.saturation/100);
+  gl.uniform1f(c.u.u_vib,e.vibrance/100);gl.uniform1f(c.u.u_bw,e.bw/100);gl.uniform1f(c.u.u_duo,e.duo/100);
+  gl.uniform1f(c.u.u_shAmt,e.shAmt/100);gl.uniform1f(c.u.u_hiAmt,e.hiAmt/100);
+  gl.uniform3fv(c.u.u_shCol,hue2rgb(e.shHue));gl.uniform3fv(c.u.u_hiCol,hue2rgb(e.hiHue));
+  const m=e.mix;
+  gl.uniformMatrix3fv(c.u.u_mix,false,new Float32Array([1+m[0],m[3],m[6],m[1],1+m[4],m[7],m[2],m[5],1+m[8]]));
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  const needGlow=e.bloom>0.5||e.halation>0.5;
+  if(needGlow){
+    const sw=TB1.w,sh=TB1.h,b=PR.bright;
+    pass(b,TB1,sw,sh,[["u_src",TA.tex]]);gl.uniform2f(b.u.u_tx,1/W,1/H);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    const bl=PR.blur;
+    [[1,0,1,TB1,TB2],[0,1,1,TB2,TB1],[1,0,2.6,TB1,TB2],[0,1,2.6,TB2,TB1]].forEach(s=>{
+      pass(bl,s[4],sw,sh,[["u_src",s[3].tex]]);gl.uniform2f(bl.u.u_dir,s[0]*s[2]/sw,s[1]*s[2]/sh);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);});
+  }
+  const k=PR.comp; pass(k,null,W,H,[["u_a",TA.tex],["u_b",TB1.tex]]);
+  gl.uniform1f(k.u.u_bloom,needGlow?e.bloom/100:0);gl.uniform1f(k.u.u_hal,needGlow?e.halation/100:0);
+  gl.uniform1f(k.u.u_ab,e.aberration/100);gl.uniform1f(k.u.u_vig,e.vignette/100);gl.uniform1f(k.u.u_grain,e.grain/100);
+  gl.uniform1f(k.u.u_gsize,e.grainSize/100);gl.uniform1f(k.u.u_leak,e.leak/100);gl.uniform1f(k.u.u_aspect,W/H);
+  gl.uniform1f(k.u.u_lofi,e.lofi/100);gl.uniform1f(k.u.u_chroma,e.chroma/100);
+  gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+}
+
+/* ================= IOHK Studio Pro — Photoshop-style layered editor ================= */
+const $=id=>document.getElementById(id);
+function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>Math.random().toString(36).slice(2,9);
+let tt=null;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600);}
+const isDesk=()=>window.matchMedia("(min-width: 900px)").matches;
+function newC(w,h){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w));c.height=Math.max(1,Math.round(h));return c;}
+function cloneC(s){const c=newC(s.width,s.height);c.getContext("2d").drawImage(s,0,0);return c;}
+const X=c=>c.getContext("2d",{willReadFrequently:false});
+const hex2rgb=h=>{h=h.replace("#","");if(h.length===3)h=h.split("").map(x=>x+x).join("");const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255];};
+const rgb2hex=(r,g,b)=>"#"+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,"0")).join("");
+const lum=h=>{const [r,g,b]=hex2rgb(h);return (0.2126*r+0.7152*g+0.0722*b)/255;};
+let custom=[];try{custom=(JSON.parse(localStorage.getItem("tiemphim.custom")||"[]")||[]).filter(p=>p&&p.id&&p.params).map(p=>({id:p.id,name:p.name,fam:"mine",params:Object.assign({},NEUTRAL,p.params),mix:Array.isArray(p.mix)&&p.mix.length===9?p.mix:Z9.slice()}));}catch(e){}
+const findP=id=>PRESETS.concat(custom).find(p=>p.id===id)||PRESETS[0];
+
+/* ---------- Document ---------- */
+let DOC=null,act=0,tool="move",fg="#111111",bgc="#ffffff";
+const BLENDS=[["normal","Thường","source-over"],["multiply","Nhân (Multiply)","multiply"],["screen","Sáng (Screen)","screen"],["overlay","Phủ (Overlay)","overlay"],["soft-light","Ánh sáng mềm","soft-light"],["hard-light","Ánh sáng gắt","hard-light"],["darken","Tối hơn","darken"],["lighten","Sáng hơn","lighten"],["color-dodge","Làm sáng màu","color-dodge"],["color-burn","Làm cháy màu","color-burn"],["difference","Khác biệt","difference"],["exclusion","Loại trừ","exclusion"],["hue","Sắc độ","hue"],["saturation","Bão hoà","saturation"],["color","Màu","color"],["luminosity","Độ sáng","luminosity"]];
+const BOP=Object.fromEntries(BLENDS.map(b=>[b[0],b[2]]));
+const PSDB={"normal":"normal","multiply":"multiply","screen":"screen","overlay":"overlay","soft-light":"soft light","hard-light":"hard light","darken":"darken","lighten":"lighten","color-dodge":"color dodge","color-burn":"color burn","difference":"difference","exclusion":"exclusion","hue":"hue","saturation":"saturation","color":"color","luminosity":"luminosity"};
+const PSDB_R=Object.fromEntries(Object.entries(PSDB).map(([a,b])=>[b,a]));
+function mkLayer(o){return Object.assign({id:uid(),name:"Layer",type:"pix",canvas:null,x:0,y:0,visible:true,opacity:100,blend:"normal",mask:null,maskOn:true,editMask:false,text:null,adj:null,tf:null},o);}
+function newDoc(w,h,fill,name){w=Math.round(w);h=Math.round(h);const c=newC(w,h);if(fill){const x=X(c);x.fillStyle=fill;x.fillRect(0,0,w,h);}
+  DOC={w,h,layers:[mkLayer({name:name||"Nền",canvas:c})],sel:null};act=0;hist=[];hIdx=-1;afterDocChange("Tài liệu mới");fitView();}
+const AL=()=>DOC&&DOC.layers[act];
+function capDims(w,h){const lim=Math.min(maxTex||8192,isDesk()?8192:4096),area=isDesk()?40e6:16e6;let s=Math.min(1,lim/Math.max(w,h));if(w*h*s*s>area)s=Math.sqrt(area/(w*h));return [Math.round(w*s),Math.round(h*s),s];}
+function docFromImage(img,name){const [w,h,s]=capDims(img.naturalWidth||img.width,img.naturalHeight||img.height);const c=newC(w,h);const x=X(c);x.imageSmoothingQuality="high";x.drawImage(img,0,0,w,h);
+  DOC={w,h,layers:[mkLayer({name:name||"Nền",canvas:c})],sel:null};act=0;hist=[];hIdx=-1;afterDocChange("Mở ảnh");fitView();if(s<1)toast("Ảnh lớn được thu về "+w+"×"+h+" để chạy mượt trên máy này");}
+
+/* ---------- GL adjustments (shares the film engine's WebGL context) ---------- */
+const FS_ADJ=HEAD+`
+uniform sampler2D u_src,u_lut;uniform int u_mode;uniform vec4 u_a,u_b,u_c;uniform vec3 u_c1,u_c2;
+vec3 rgb2hsl(vec3 c){float mx=max(max(c.r,c.g),c.b),mn=min(min(c.r,c.g),c.b),l=(mx+mn)*0.5,h=0.0,s=0.0;
+  if(mx>mn){float d=mx-mn;s=l>0.5?d/(2.0-mx-mn):d/(mx+mn);if(mx==c.r)h=(c.g-c.b)/d+(c.g<c.b?6.0:0.0);else if(mx==c.g)h=(c.b-c.r)/d+2.0;else h=(c.r-c.g)/d+4.0;h/=6.0;}return vec3(h,s,l);}
+float h2r(float p,float q,float t){if(t<0.0)t+=1.0;if(t>1.0)t-=1.0;if(t<1.0/6.0)return p+(q-p)*6.0*t;if(t<0.5)return q;if(t<2.0/3.0)return p+(q-p)*(2.0/3.0-t)*6.0;return p;}
+vec3 hsl2rgb(vec3 h){if(h.y<=0.0)return vec3(h.z);float q=h.z<0.5?h.z*(1.0+h.y):h.z+h.y-h.z*h.y,p=2.0*h.z-q;return vec3(h2r(p,q,h.x+1.0/3.0),h2r(p,q,h.x),h2r(p,q,h.x-1.0/3.0));}
+void main(){vec4 s=texture2D(u_src,v);vec3 c=s.rgb;float l=luma(c);
+  if(u_mode==0){c=vec3(texture2D(u_lut,vec2(c.r*0.99609+0.00195,0.5)).r,texture2D(u_lut,vec2(c.g*0.99609+0.00195,0.5)).g,texture2D(u_lut,vec2(c.b*0.99609+0.00195,0.5)).b);}
+  else if(u_mode==1){vec3 h=rgb2hsl(c);if(u_a.w>0.5){h.x=u_a.x;h.y=clamp(u_a.y*0.5+0.5,0.0,1.0);}else{h.x=fract(h.x+u_a.x);h.y=clamp(u_a.y>0.0?h.y+(1.0-h.y)*u_a.y*h.y*1.6:h.y*(1.0+u_a.y),0.0,1.0);}
+    c=hsl2rgb(h);c=u_a.z>0.0?mix(c,vec3(1.0),u_a.z):c*(1.0+u_a.z);}
+  else if(u_mode==2){float sm=max(max(c.r,c.g),c.b)-min(min(c.r,c.g),c.b);c=mix(vec3(l),c,max(0.0,1.0+u_a.y+u_a.x*(1.0-sm)*1.4));}
+  else if(u_mode==3){float sh=1.0-smoothstep(0.0,0.5,l),hi=smoothstep(0.5,1.0,l),md=1.0-sh-hi;c+=(sh*u_a.xyz+md*u_b.xyz+hi*u_c.xyz)*0.35;if(u_a.w>0.5)c*=l/max(luma(c),0.001);}
+  else if(u_mode==4){vec3 h=rgb2hsl(c);float x=h.x*6.0;float w;
+    if(x<1.0)w=mix(u_a.x,u_a.y,x);else if(x<2.0)w=mix(u_a.y,u_a.z,x-1.0);else if(x<3.0)w=mix(u_a.z,u_a.w,x-2.0);else if(x<4.0)w=mix(u_a.w,u_b.x,x-3.0);else if(x<5.0)w=mix(u_b.x,u_b.y,x-4.0);else w=mix(u_b.y,u_a.x,x-5.0);
+    float g=clamp(l*(1.0+(w-0.5)*h.y*1.6),0.0,1.0);c=vec3(g);if(u_b.w>0.0)c=mix(c,c*u_c1*1.5,u_b.w);}
+  else if(u_mode==5){vec3 f=c*u_c1/max(luma(u_c1),0.25);c=mix(c,f,u_a.x);if(u_a.y>0.5)c*=l/max(luma(c),0.001);}
+  else if(u_mode==6){c=vec3(step(u_a.x,l));}
+  else if(u_mode==7){c=mix(u_c1,u_c2,smoothstep(0.0,1.0,l));}
+  gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);}`;
+let PADJ=null,lutTex=null;
+function adjProg(){if(!PADJ)PADJ=program(FS_ADJ);return PADJ;}
+function lutFor(a){const L=[new Float32Array(256),new Float32Array(256),new Float32Array(256)];for(let i=0;i<256;i++)L[0][i]=L[1][i]=L[2][i]=i/255;
+  const map=f=>{for(let c=0;c<3;c++)for(let i=0;i<256;i++)L[c][i]=clamp(f(L[c][i],c),0,1);};
+  if(a.kind==="bc"){const k=Math.tan((clamp(a.contrast,-99,99)/100+1)*Math.PI/4);map(v=>(v+a.brightness/300-0.5)*k+0.5);}
+  else if(a.kind==="levels"){const ib=a.inB/255,iw=Math.max(ib+0.004,a.inW/255),ob=a.outB/255,ow=a.outW/255;map(v=>ob+Math.pow(clamp((v-ib)/(iw-ib),0,1),1/a.gamma)*(ow-ob));}
+  else if(a.kind==="curves"){const m=curveFn(a.pts.rgb),f=[curveFn(a.pts.r),curveFn(a.pts.g),curveFn(a.pts.b)];map((v,c)=>f[c](m(v)));}
+  else if(a.kind==="exposure"){map(v=>Math.pow(Math.max(0,Math.pow(v,2.2)*Math.pow(2,a.ev)+a.offset),1/2.2/a.gamma));}
+  else if(a.kind==="invert")map(v=>1-v);
+  else if(a.kind==="posterize"){const n=Math.max(2,a.levels);map(v=>Math.round(v*(n-1))/(n-1));}
+  const u=new Uint8Array(256*4);for(let i=0;i<256;i++){u[i*4]=L[0][i]*255;u[i*4+1]=L[1][i]*255;u[i*4+2]=L[2][i]*255;u[i*4+3]=255;}return u;}
+function curveFn(pts){const P=pts.slice().sort((a,b)=>a[0]-b[0]),n=P.length;if(n<2)return v=>v;const xs=P.map(p=>p[0]/255),ys=P.map(p=>p[1]/255),d=[],m=[];
+  for(let i=0;i<n-1;i++)d.push((ys[i+1]-ys[i])/Math.max(1e-6,xs[i+1]-xs[i]));m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:(d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){if(d[i]===0){m[i]=m[i+1]=0;continue;}const a=m[i]/d[i],b=m[i+1]/d[i],s=a*a+b*b;if(s>9){const t=3/Math.sqrt(s);m[i]=t*a*d[i];m[i+1]=t*b*d[i];}}
+  return v=>{if(v<=xs[0])return ys[0];if(v>=xs[n-1])return ys[n-1];let i=0;while(i<n-2&&v>xs[i+1])i++;const h=xs[i+1]-xs[i],t=(v-xs[i])/h,t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*ys[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*ys[i+1]+(t3-t2)*h*m[i+1];};}
+const LUTK=new Set(["bc","levels","curves","exposure","invert","posterize"]);
+function runAdj(a,src,w,h){/* src: canvas region w×h; returns glc (default framebuffer) holding result */
+  const tex=makeTex(0,0,src);
+  if(a.kind==="film"){const p=findP(a.preset),s=a.strength/100,e={};for(const k in NEUTRAL){const v=p.params[k]==null?NEUTRAL[k]:p.params[k];e[k]=NOSCALE.has(k)?v:NEUTRAL[k]+(v-NEUTRAL[k])*s;}e.mix=(p.mix||Z9).map(x=>x*s);render(tex,w,h,e);gl.deleteTexture(tex);return;}
+  const P=adjProg();if(glc.width!==w)glc.width=w;if(glc.height!==h)glc.height=h;gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,w,h);gl.useProgram(P.p);
+  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.uniform1i(P.u.u_src,0);
+  let mode=0;const A=[0,0,0,0],B=[0,0,0,0],C=[0,0,0,0];let c1=[1,1,1],c2=[1,1,1];
+  if(LUTK.has(a.kind)){if(!lutTex){lutTex=gl.createTexture();}gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,lutTex);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,256,1,0,gl.RGBA,gl.UNSIGNED_BYTE,lutFor(a));gl.uniform1i(P.u.u_lut,1);mode=0;}
+  else if(a.kind==="hsl"){mode=1;A[0]=a.hue/360;A[1]=a.sat/100;A[2]=a.light/100;A[3]=a.colorize?1:0;if(a.colorize)A[0]=((a.hue%360)+360)%360/360;}
+  else if(a.kind==="vibrance"){mode=2;A[0]=a.vib/100;A[1]=a.sat/100;}
+  else if(a.kind==="cbal"){mode=3;["sh","md","hi"].forEach((k,i)=>{const t=[A,B,C][i];t[0]=a[k][0]/100;t[1]=a[k][1]/100;t[2]=a[k][2]/100;});A[3]=a.keep?1:0;}
+  else if(a.kind==="bw"){mode=4;A[0]=a.r/100;A[1]=a.y/100;A[2]=a.g/100;A[3]=a.c/100;B[0]=a.b/100;B[1]=a.m/100;B[3]=a.tint?a.tintAmt/100:0;c1=hex2rgb(a.tintCol).map(v=>v/255);}
+  else if(a.kind==="pfilter"){mode=5;A[0]=a.density/100;A[1]=a.keep?1:0;c1=hex2rgb(a.color).map(v=>v/255);}
+  else if(a.kind==="threshold"){mode=6;A[0]=a.level/255;}
+  else if(a.kind==="gmap"){mode=7;c1=hex2rgb(a.c1).map(v=>v/255);c2=hex2rgb(a.c2).map(v=>v/255);}
+  gl.uniform1i(P.u.u_mode,mode);gl.uniform4fv(P.u.u_a,A);gl.uniform4fv(P.u.u_b,B);gl.uniform4fv(P.u.u_c,C);gl.uniform3fv(P.u.u_c1,c1);gl.uniform3fv(P.u.u_c2,c2);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);gl.deleteTexture(tex);}
+const ADJ_KINDS=[["bc","Độ sáng / Tương phản"],["levels","Levels"],["curves","Curves"],["exposure","Phơi sáng"],["vibrance","Sống động"],["hsl","Sắc độ / Bão hoà"],["cbal","Cân bằng màu"],["bw","Đen trắng"],["pfilter","Kính lọc màu"],["film","Preset film"],["invert","Đảo màu"],["posterize","Posterize"],["threshold","Ngưỡng"],["gmap","Gradient map"]];
+function adjDefaults(k){return Object.assign({kind:k},{bc:{brightness:0,contrast:0},levels:{inB:0,inW:255,gamma:1,outB:0,outW:255},curves:{pts:{rgb:[[0,0],[255,255]],r:[[0,0],[255,255]],g:[[0,0],[255,255]],b:[[0,0],[255,255]]},ch:"rgb"},
+  exposure:{ev:0,offset:0,gamma:1},vibrance:{vib:0,sat:0},hsl:{hue:0,sat:0,light:0,colorize:false},cbal:{sh:[0,0,0],md:[0,0,0],hi:[0,0,0],keep:true,tone:"md"},
+  bw:{r:40,y:60,g:40,c:60,b:20,m:80,tint:false,tintAmt:30,tintCol:"#c9a26b"},pfilter:{color:"#ec8a00",density:25,keep:true},film:{preset:"v_KP4",strength:100},invert:{},posterize:{levels:6},threshold:{level:128},gmap:{c1:"#1b1430",c2:"#ffd59e"}}[k]);}
+
+/* ---------- Compositing ---------- */
+let comp=null,cctx=null,tmpA=null;
+function ensureComp(){if(!comp||comp.width!==DOC.w||comp.height!==DOC.h){comp=newC(DOC.w,DOC.h);cctx=X(comp);tmpA=newC(DOC.w,DOC.h);}}
+function layerSrc(L){return L.canvas;}
+function composite(r){if(!DOC)return;ensureComp();r=r?{x:Math.max(0,Math.floor(r.x)),y:Math.max(0,Math.floor(r.y)),w:0,h:0,x1:Math.min(DOC.w,Math.ceil(r.x+r.w)),y1:Math.min(DOC.h,Math.ceil(r.y+r.h))}:{x:0,y:0,x1:DOC.w,y1:DOC.h};
+  r.w=r.x1-r.x;r.h=r.y1-r.y;if(r.w<=0||r.h<=0)return;const c=cctx;c.save();c.beginPath();c.rect(r.x,r.y,r.w,r.h);c.clip();c.clearRect(r.x,r.y,r.w,r.h);
+  for(const L of DOC.layers){if(!L.visible||L.opacity<=0)continue;
+    if(L.type==="adj"){applyAdj(L,r);continue;}
+    let src=L.canvas;if(!src)continue;
+    if(L.tf){const t=tmpA,tx=X(t);tx.save();tx.setTransform(1,0,0,1,0,0);tx.clearRect(0,0,DOC.w,DOC.h);tx.translate(L.tf.cx+L.tf.tx,L.tf.cy+L.tf.ty);tx.rotate(L.tf.rot);tx.scale(L.tf.sx,L.tf.sy);tx.translate(-L.tf.cx,-L.tf.cy);tx.drawImage(src,0,0);tx.restore();src=t;}
+    if(L.mask&&L.maskOn){const t=tmpA,tx=X(t);if(src!==t){tx.save();tx.clearRect(r.x,r.y,r.w,r.h);tx.globalCompositeOperation="copy";tx.drawImage(src,r.x-L.x,r.y-L.y,r.w,r.h,r.x,r.y,r.w,r.h);tx.restore();}
+      tx.save();tx.globalCompositeOperation="destination-in";tx.drawImage(L.mask,r.x-L.x,r.y-L.y,r.w,r.h,r.x,r.y,r.w,r.h);tx.restore();src=t;
+      c.globalAlpha=L.opacity/100;c.globalCompositeOperation=BOP[L.blend]||"source-over";c.drawImage(src,r.x,r.y,r.w,r.h,r.x,r.y,r.w,r.h);}
+    else{c.globalAlpha=L.opacity/100;c.globalCompositeOperation=BOP[L.blend]||"source-over";const ox=src===tmpA?0:L.x,oy=src===tmpA?0:L.y;c.drawImage(src,r.x-ox,r.y-oy,r.w,r.h,r.x,r.y,r.w,r.h);}
+    c.globalAlpha=1;c.globalCompositeOperation="source-over";}
+  c.restore();}
+const regC=newC(2,2),regO=newC(2,2);
+function applyAdj(L,r){const w=r.w,h=r.h;if(regC.width!==w||regC.height!==h){regC.width=w;regC.height=h;regO.width=w;regO.height=h;}
+  const rx=X(regC),ox=X(regO);rx.clearRect(0,0,w,h);rx.drawImage(comp,r.x,r.y,w,h,0,0,w,h);
+  if(w>maxTex||h>maxTex)return;runAdj(L.adj,regC,w,h);
+  ox.globalCompositeOperation="copy";ox.drawImage(glc,0,0,w,h,0,0,w,h);ox.globalCompositeOperation="destination-in";ox.drawImage(regC,0,0);
+  if(L.mask&&L.maskOn){ox.drawImage(L.mask,r.x,r.y,w,h,0,0,w,h);}ox.globalCompositeOperation="source-over";
+  const c=cctx;c.save();c.globalAlpha=L.opacity/100;if(!(L.mask&&L.maskOn)&&L.opacity>=100){c.globalCompositeOperation="copy";c.beginPath();c.rect(r.x,r.y,w,h);c.clip();}c.drawImage(regO,r.x,r.y);c.restore();}
+let compQ=null;function scheduleComp(r){if(r&&compQ!==true){compQ=compQ?union(compQ,r):r;}else compQ=true;requestFrame();}
+function union(a,b){const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y);return {x,y,w:Math.max(a.x+a.w,b.x+b.w)-x,h:Math.max(a.y+a.h,b.y+b.h)-y};}
+let frameReq=false;function requestFrame(){if(frameReq)return;frameReq=true;requestAnimationFrame(()=>{frameReq=false;if(compQ){composite(compQ===true?null:compQ);compQ=null;}draw();});}
+
+/* ---------- View ---------- */
+const cv=$("cv"),vx=cv.getContext("2d"),stage=$("stage");let Z=1,OX=0,OY=0,dpr=1,curPt=null;
+function fitView(){if(!DOC)return;const r=stage.getBoundingClientRect(),pad=isDesk()?48:16;Z=Math.min((r.width-pad)/DOC.w,(r.height-pad)/DOC.h);OX=(r.width-DOC.w*Z)/2;OY=(r.height-DOC.h*Z)/2;updZoom();antsDirty=true;requestFrame();}
+function setZoom(nz,cx,cy){if(!DOC)return;const r=stage.getBoundingClientRect();if(cx==null){cx=r.width/2;cy=r.height/2;}nz=clamp(nz,0.02,32);const k=nz/Z;OX=cx-(cx-OX)*k;OY=cy-(cy-OY)*k;Z=nz;updZoom();antsDirty=true;requestFrame();}
+function updZoom(){$("stZoom").textContent=Math.round(Z*100)+"%";}
+function d2s(x,y){return [x*Z+OX,y*Z+OY];}function s2d(x,y){return [(x-OX)/Z,(y-OY)/Z];}
+let checker=null;function checkerPat(){if(!checker){const c=newC(16,16),x=X(c);x.fillStyle="#fff";x.fillRect(0,0,16,16);x.fillStyle="#d5d5d5";x.fillRect(0,0,8,8);x.fillRect(8,8,8,8);checker=vx.createPattern(c,"repeat");}return checker;}
+function draw(){const r=stage.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);const W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;antsDirty=true;}
+  vx.setTransform(1,0,0,1,0,0);vx.fillStyle="#1b1c1f";vx.fillRect(0,0,W,H);if(!DOC)return;vx.setTransform(dpr,0,0,dpr,0,0);
+  vx.save();vx.translate(Math.round(OX),Math.round(OY));vx.fillStyle=checkerPat();vx.fillRect(0,0,DOC.w*Z,DOC.h*Z);vx.restore();
+  vx.imageSmoothingEnabled=Z<2;vx.imageSmoothingQuality="high";if(comp)vx.drawImage(comp,OX,OY,DOC.w*Z,DOC.h*Z);
+  vx.imageSmoothingEnabled=true;vx.strokeStyle="rgba(0,0,0,.6)";vx.lineWidth=1;vx.strokeRect(OX-.5,OY-.5,DOC.w*Z+1,DOC.h*Z+1);
+  drawAnts();drawOverlay();}
+/* marching ants */
+let antsDirty=true,antsPts=null,antsPhase=0,antsCv=null;
+function computeAnts(){antsDirty=false;antsPts=null;if(!DOC||!DOC.sel)return;const W=cv.width,H=cv.height;if(!antsCv||antsCv.width!==W||antsCv.height!==H){antsCv=newC(W,H);}
+  const x=antsCv.getContext("2d",{willReadFrequently:true});x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,H);x.imageSmoothingEnabled=Z<1;x.setTransform(dpr*Z,0,0,dpr*Z,dpr*OX,dpr*OY);x.drawImage(DOC.sel,0,0);
+  const d=x.getImageData(0,0,W,H).data,pts=[];const on=i=>d[i*4+3]>127;
+  for(let y=1;y<H-1;y++)for(let xx=1;xx<W-1;xx++){const i=y*W+xx;const a=on(i);if(a&&(!on(i-1)||!on(i+1)||!on(i-W)||!on(i+W)))pts.push(i);}
+  antsPts=new Int32Array(pts);}
+function drawAnts(){if(antsDirty)computeAnts();if(!antsPts||!antsPts.length)return;const W=cv.width,H=cv.height;const x=antsCv.getContext("2d");const im=x.createImageData(W,H),d=im.data;
+  for(let k=0;k<antsPts.length;k++){const i=antsPts[k],px=i%W,py=(i/W)|0,v=((px+py+antsPhase)>>2)&1?255:0;d[i*4]=d[i*4+1]=d[i*4+2]=v;d[i*4+3]=255;}x.setTransform(1,0,0,1,0,0);x.putImageData(im,0,0);
+  vx.save();vx.setTransform(1,0,0,1,0,0);vx.drawImage(antsCv,0,0);vx.restore();}
+setInterval(()=>{if(DOC&&DOC.sel&&antsPts&&antsPts.length&&antsPts.length<400000){antsPhase=(antsPhase+1)%8;requestFrame();}},160);
+function drawOverlay(){const c=vx;c.save();
+  if(drag&&drag.kind==="marq"){const [a,b]=d2s(drag.x0,drag.y0),[e,f]=d2s(drag.x1,drag.y1);c.strokeStyle="#fff";c.setLineDash([4,4]);c.lineWidth=1;c.beginPath();if(O.marquee.shape==="ellipse")c.ellipse((a+e)/2,(b+f)/2,Math.abs(e-a)/2,Math.abs(f-b)/2,0,0,7);else c.rect(Math.min(a,e)+.5,Math.min(b,f)+.5,Math.abs(e-a),Math.abs(f-b));c.stroke();c.strokeStyle="#000";c.lineDashOffset=4;c.stroke();}
+  if(drag&&drag.kind==="lasso"&&drag.pts.length>1){c.strokeStyle="#fff";c.setLineDash([4,4]);c.beginPath();drag.pts.forEach((p,i)=>{const [a,b]=d2s(p[0],p[1]);i?c.lineTo(a,b):c.moveTo(a,b);});c.stroke();c.strokeStyle="#000";c.lineDashOffset=4;c.stroke();}
+  if(drag&&(drag.kind==="grad"||drag.kind==="shape")){const [a,b]=d2s(drag.x0,drag.y0),[e,f]=d2s(drag.x1,drag.y1);c.setLineDash([]);c.strokeStyle="#fff";c.lineWidth=1.5;c.shadowColor="rgba(0,0,0,.8)";c.shadowBlur=3;c.beginPath();
+    if(drag.kind==="grad"){c.moveTo(a,b);c.lineTo(e,f);}else if(O.shape.kind==="ellipse")c.ellipse((a+e)/2,(b+f)/2,Math.abs(e-a)/2,Math.abs(f-b)/2,0,0,7);else if(O.shape.kind==="line"){c.moveTo(a,b);c.lineTo(e,f);}else c.rect(Math.min(a,e),Math.min(b,f),Math.abs(e-a),Math.abs(f-b));c.stroke();}
+  if(tool==="crop"&&cropR){const [a,b]=d2s(cropR.x,cropR.y),w=cropR.w*Z,h=cropR.h*Z;c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.rect(OX,OY,DOC.w*Z,DOC.h*Z);c.rect(a,b,w,h);c.fill("evenodd");c.strokeStyle="#fff";c.lineWidth=1.5;c.strokeRect(a,b,w,h);
+    c.lineWidth=.6;c.strokeStyle="rgba(255,255,255,.5)";for(let i=1;i<3;i++){c.beginPath();c.moveTo(a+w*i/3,b);c.lineTo(a+w*i/3,b+h);c.moveTo(a,b+h*i/3);c.lineTo(a+w,b+h*i/3);c.stroke();}
+    c.fillStyle="#fff";[[a,b],[a+w,b],[a,b+h],[a+w,b+h]].forEach(([p,q])=>c.fillRect(p-5,q-5,10,10));}
+  if(xf){const L=AL(),bx=xf.box,t=L.tf;const pts=[[bx.x,bx.y],[bx.x+bx.w,bx.y],[bx.x+bx.w,bx.y+bx.h],[bx.x,bx.y+bx.h]].map(([x,y])=>tfPt(t,x,y)).map(([x,y])=>d2s(x,y));
+    c.strokeStyle="#fff";c.lineWidth=1.2;c.setLineDash([]);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.stroke();
+    xfHandles().forEach(h=>{const [p,q]=d2s(h.x,h.y);c.fillStyle="#fff";c.strokeStyle="#000";c.lineWidth=1;c.fillRect(p-5,q-5,10,10);c.strokeRect(p-5,q-5,10,10);});}
+  if(tool==="clone"&&O.clone.src){const [a,b]=d2s(O.clone.src[0],O.clone.src[1]);c.strokeStyle="#fff";c.lineWidth=1.5;c.beginPath();c.moveTo(a-8,b);c.lineTo(a+8,b);c.moveTo(a,b-8);c.lineTo(a,b+8);c.stroke();}
+  if(curPt&&BRUSHY.has(tool)&&!spaceDown){const o=O[tool]||O.brush,[a,b]=d2s(curPt[0],curPt[1]),r=Math.max(1,o.size/2*Z);c.setLineDash([]);c.strokeStyle="rgba(0,0,0,.7)";c.lineWidth=2.5;c.beginPath();c.arc(a,b,r,0,7);c.stroke();c.strokeStyle="#fff";c.lineWidth=1;c.stroke();}
+  c.restore();}
+
+/* ---------- Tool options ---------- */
+const O={move:{auto:false},marquee:{shape:"rect",mode:"new",feather:0},lasso:{mode:"new",feather:0},wand:{tol:32,contig:true,all:false,mode:"new"},crop:{ratio:"free"},eyedrop:{all:true},
+  heal:{size:30,hard:50,op:100},clone:{size:40,hard:60,op:100,src:null},brush:{size:24,hard:80,op:100,flow:100},eraser:{size:40,hard:80,op:100,flow:100},
+  gradient:{type:"linear",kind:"fgbg",op:100},bucket:{tol:32,contig:true,op:100},dodge:{size:60,mode:"dodge",exp:25,hard:30},blurb:{size:60,mode:"blur",amt:50,hard:30},
+  text:{font:"Inter",size:72,weight:"700"},shape:{kind:"rect",fill:true,stroke:0},hand:{},zoom:{}};
+const TOOLS=[["move","Di chuyển","V"],["marquee","Vùng chọn khung","M"],["lasso","Vùng chọn tự do","L"],["wand","Đũa thần","W"],["crop","Cắt khung","C"],["eyedrop","Hút màu","I"],
+  ["heal","Xoá khuyết điểm","J"],["clone","Nhân bản vùng","S"],["brush","Cọ vẽ","B"],["eraser","Tẩy","E"],["gradient","Chuyển màu","G"],["bucket","Đổ màu","K"],["dodge","Làm sáng / tối","O"],["blurb","Làm mờ / nét","R"],["text","Chữ","T"],["shape","Hình khối","U"],["hand","Bàn tay","H"],["zoom","Phóng to","Z"]];
+const BRUSHY=new Set(["brush","eraser","clone","heal","dodge","blurb"]);
+function setTool(t){if(xf&&t!=="move")commitXf();tool=t;if(t!=="crop")cropR=null;else if(DOC&&!cropR)cropR={x:0,y:0,w:DOC.w,h:DOC.h};renderTools();renderOpts();stage.style.cursor=t==="hand"?"grab":t==="zoom"?"zoom-in":t==="move"?"move":t==="text"?"text":BRUSHY.has(t)?"none":"crosshair";requestFrame();}
+function renderTools(){const box=$("tools");box.innerHTML="";TOOLS.forEach(([k,l,key])=>{const b=el("button","tl");b.type="button";b.title=l+" ("+key+")";b.setAttribute("aria-label",l);b.setAttribute("aria-pressed",String(k===tool));b.innerHTML='<svg class="i"><use href="#t-'+k+'"/></svg>';b.onclick=()=>setTool(k);box.appendChild(b);});
+  const cl=el("div","colors");cl.innerHTML='<button class="c fg" title="Màu trước (bấm để chọn)" style="background:'+fg+'"></button><button class="c bg" title="Màu nền" style="background:'+bgc+'"></button><input type="color" id="fgIn"><input type="color" id="bgIn">';box.appendChild(cl);
+  const fi=cl.querySelector("#fgIn"),bi=cl.querySelector("#bgIn");fi.value=fg;bi.value=bgc;cl.querySelector(".fg").onclick=()=>fi.click();cl.querySelector(".bg").onclick=()=>bi.click();
+  fi.oninput=()=>{fg=fi.value;cl.querySelector(".fg").style.background=fg;renderMbar();};bi.oninput=()=>{bgc=bi.value;cl.querySelector(".bg").style.background=bgc;};
+  const sw=el("button","swap","⇄ X");sw.type="button";sw.title="Đổi màu trước / nền (X)";sw.onclick=swapColors;box.appendChild(sw);renderMbar();}
+function swapColors(){[fg,bgc]=[bgc,fg];renderTools();renderOpts();}
+function oSlider(label,o,k,min,max,fmt){const l=el("label");l.append(label);const i=document.createElement("input");i.type="range";i.min=min;i.max=max;i.value=o[k];const v=el("span","v",fmt?fmt(o[k]):String(o[k]));
+  i.oninput=()=>{o[k]=+i.value;v.textContent=fmt?fmt(o[k]):String(o[k]);stampKey="";requestFrame();};l.append(i,v);return l;}
+function oSeg(opts,o,k,on){const s=el("div","seg");opts.forEach(([v,l])=>{const b=el("button",null,l);b.type="button";b.setAttribute("aria-pressed",String(o[k]===v));b.onclick=()=>{o[k]=v;s.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));if(on)on(v);};s.appendChild(b);});return s;}
+function oCheck(label,o,k){const l=el("label");const i=document.createElement("input");i.type="checkbox";i.checked=!!o[k];i.onchange=()=>{o[k]=i.checked;};l.append(i,label);return l;}
+function oBtn(label,on,cls){const b=el("button","tbtn"+(cls?" "+cls:""),label);b.type="button";b.onclick=on;return b;}
+const MODES=[["new","Mới"],["add","Thêm"],["sub","Bớt"],["inter","Giao"]];
+function renderOpts(){const box=$("opts");box.innerHTML="";box.appendChild(el("span","ot",(TOOLS.find(t=>t[0]===tool)||["",""])[1]));const o=O[tool];
+  if(tool==="move"){box.append(oCheck("Tự chọn layer khi bấm",o,"auto"),oBtn("Biến đổi tự do (Ctrl+T)",startXf),oBtn("Căn giữa layer",()=>alignLayer("c")));if(xf)box.append(oBtn("Áp dụng ↵",commitXf,"primary"),oBtn("Huỷ",cancelXf));}
+  else if(tool==="marquee"){box.append(oSeg([["rect","Chữ nhật"],["ellipse","Elip"]],o,"shape"),oSeg(MODES,o,"mode"),oSlider("Làm mềm",o,"feather",0,100,v=>v+"px"),oBtn("Chọn tất cả",()=>selAll()),oBtn("Bỏ chọn",()=>deselect()));}
+  else if(tool==="lasso"){box.append(oSeg(MODES,o,"mode"),oSlider("Làm mềm",o,"feather",0,100,v=>v+"px"),oBtn("Bỏ chọn",()=>deselect()));}
+  else if(tool==="wand"){box.append(oSeg(MODES,o,"mode"),oSlider("Dung sai",o,"tol",0,255),oCheck("Liền kề",o,"contig"),oCheck("Mọi layer",o,"all"),oBtn("Chọn người (AI)",selectPerson));}
+  else if(tool==="crop"){box.append(oSeg([["free","Tự do"],["1:1","1:1"],["4:5","4:5"],["3:2","3:2"],["16:9","16:9"],["9:16","9:16"]],o,"ratio",v=>{cropR=fitRatio(v);requestFrame();}),oBtn("Cắt ↵",applyCrop,"primary"),oBtn("Huỷ",()=>{cropR={x:0,y:0,w:DOC.w,h:DOC.h};requestFrame();}));}
+  else if(tool==="eyedrop"){box.append(oCheck("Lấy từ mọi layer",o,"all"),el("span","v","Alt + bấm để đặt màu nền"));}
+  else if(tool==="heal"){box.append(oSlider("Cỡ",o,"size",2,400,v=>v+"px"),el("span","v","Quét lên vết mụn, vật thể nhỏ — tự lấy da / nền xung quanh để vá"));}
+  else if(tool==="clone"){box.append(oSlider("Cỡ",o,"size",2,400,v=>v+"px"),oSlider("Độ cứng",o,"hard",0,100,v=>v+"%"),oSlider("Độ mờ",o,"op",1,100,v=>v+"%"),oBtn(cloneSetMode?"Chạm vào ảnh để đặt nguồn…":"Đặt điểm nguồn",()=>{cloneSetMode=!cloneSetMode;renderOpts();},cloneSetMode?"primary":""),el("span","v","Alt + bấm để đặt nguồn"));}
+  else if(tool==="brush"||tool==="eraser"){box.append(oSlider("Cỡ",o,"size",1,500,v=>v+"px"),oSlider("Độ cứng",o,"hard",0,100,v=>v+"%"),oSlider("Độ mờ",o,"op",1,100,v=>v+"%"),oSlider("Dòng chảy",o,"flow",1,100,v=>v+"%"));}
+  else if(tool==="gradient"){box.append(oSeg([["linear","Thẳng"],["radial","Tròn"]],o,"type"),oSeg([["fgbg","Màu trước → nền"],["fgt","Màu trước → trong suốt"]],o,"kind"),oSlider("Độ mờ",o,"op",1,100,v=>v+"%"));}
+  else if(tool==="bucket"){box.append(oSlider("Dung sai",o,"tol",0,255),oCheck("Liền kề",o,"contig"),oSlider("Độ mờ",o,"op",1,100,v=>v+"%"));}
+  else if(tool==="dodge"){box.append(oSeg([["dodge","Làm sáng"],["burn","Làm tối"]],o,"mode"),oSlider("Cỡ",o,"size",2,500,v=>v+"px"),oSlider("Cường độ",o,"exp",1,100,v=>v+"%"));}
+  else if(tool==="blurb"){box.append(oSeg([["blur","Làm mờ"],["sharpen","Làm nét"]],o,"mode"),oSlider("Cỡ",o,"size",2,500,v=>v+"px"),oSlider("Cường độ",o,"amt",1,100,v=>v+"%"));}
+  else if(tool==="text"){const s=document.createElement("select");s.className="field";FONTS.forEach(f=>{const op=el("option",null,f);op.value=f;op.selected=f===o.font;s.appendChild(op);});s.onchange=()=>o.font=s.value;
+    box.append(s,oSlider("Cỡ",o,"size",8,600,v=>v+"px"),el("span","v","Bấm lên ảnh để thêm chữ"));}
+  else if(tool==="shape"){box.append(oSeg([["rect","Chữ nhật"],["ellipse","Elip"],["line","Đường"]],o,"kind"),oCheck("Tô màu trước",o,"fill"),oSlider("Viền (màu nền)",o,"stroke",0,60,v=>v+"px"));}
+  else if(tool==="hand"||tool==="zoom"){box.append(oBtn("Vừa màn hình",fitView),oBtn("100%",()=>setZoom(1)),oBtn("Phóng to",()=>setZoom(Z*1.25)),oBtn("Thu nhỏ",()=>setZoom(Z/1.25)));}
+}
+const FONTS=["Inter","Playfair Display","Cormorant Garamond","Bebas Neue","Dancing Script","Pacifico","DotGothic16","Georgia","Arial"];
+
+/* ---------- Selection ---------- */
+function newMask(){return newC(DOC.w,DOC.h);}
+function combineSel(m,mode){if(mode==="new"||!DOC.sel){DOC.sel=mode==="sub"||mode==="inter"?(DOC.sel||null):m;if(mode==="new")DOC.sel=m;}
+  else{const s=cloneC(DOC.sel),x=X(s);x.globalCompositeOperation=mode==="add"?"source-over":mode==="sub"?"destination-out":"destination-in";x.drawImage(m,0,0);DOC.sel=s;}
+  if(DOC.sel&&maskEmpty(DOC.sel))DOC.sel=null;antsDirty=true;requestFrame();}
+function maskEmpty(m){const s=newC(64,64),x=s.getContext("2d",{willReadFrequently:true});x.drawImage(m,0,0,64,64);const d=x.getImageData(0,0,64,64).data;for(let i=3;i<d.length;i+=4)if(d[i]>2)return false;
+  const b=maskBBox(m);return !b;}
+function feather(m,px){if(!px)return m;const s=newC(m.width,m.height),x=X(s);x.filter="blur("+px/2+"px)";x.drawImage(m,0,0);x.filter="none";return s;}
+function selAll(){if(!DOC)return;const m=newMask(),x=X(m);x.fillStyle="#fff";x.fillRect(0,0,DOC.w,DOC.h);DOC.sel=m;antsDirty=true;pushHist("Chọn tất cả");requestFrame();}
+function deselect(){if(!DOC||!DOC.sel)return;DOC.sel=null;antsDirty=true;pushHist("Bỏ chọn");requestFrame();}
+function invertSel(){if(!DOC)return;const m=newMask(),x=X(m);x.fillStyle="#fff";x.fillRect(0,0,DOC.w,DOC.h);if(DOC.sel){x.globalCompositeOperation="destination-out";x.drawImage(DOC.sel,0,0);}DOC.sel=maskEmpty(m)?null:m;antsDirty=true;pushHist("Đảo vùng chọn");requestFrame();}
+function growSel(px){if(!DOC.sel)return;const m=newMask(),x=X(m);x.filter="blur("+Math.abs(px)/2+"px)";x.drawImage(DOC.sel,0,0);x.filter="none";const id=x.getImageData(0,0,DOC.w,DOC.h),d=id.data,t=px>0?20:235;
+  for(let i=3;i<d.length;i+=4){d[i]=d[i]>t?255:0;d[i-1]=d[i-2]=d[i-3]=255;}x.putImageData(id,0,0);DOC.sel=m;antsDirty=true;pushHist(px>0?"Mở rộng vùng chọn":"Thu hẹp vùng chọn");requestFrame();}
+function maskBBox(m){const s=Math.min(1,1024/Math.max(m.width,m.height)),w=Math.max(1,Math.round(m.width*s)),h=Math.max(1,Math.round(m.height*s)),c=newC(w,h),x=c.getContext("2d",{willReadFrequently:true});x.drawImage(m,0,0,w,h);
+  const d=x.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;for(let y=0;y<h;y++)for(let xx=0;xx<w;xx++)if(d[(y*w+xx)*4+3]>8){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(y<y0)y0=y;if(y>y1)y1=y;}
+  if(x1<0)return null;const k=1/s;return {x:Math.max(0,Math.floor(x0*k-k)),y:Math.max(0,Math.floor(y0*k-k)),w:0,h:0,get r(){return this;}}&&(()=>{const bx=Math.max(0,Math.floor(x0*k-k)),by=Math.max(0,Math.floor(y0*k-k));return {x:bx,y:by,w:Math.min(m.width,Math.ceil((x1+2)*k))-bx,h:Math.min(m.height,Math.ceil((y1+2)*k))-by};})();}
+function layerAlphaSel(L){const m=newMask(),x=X(m);x.drawImage(L.canvas,L.x,L.y);if(L.mask){x.globalCompositeOperation="destination-in";x.drawImage(L.mask,L.x,L.y);}combineSel(m,"new");pushHist("Chọn theo layer");}
+function wandMask(px,py){const L=AL(),src=O.wand.all||L.type!=="pix"?comp:L.canvas,W=DOC.w,H=DOC.h;const d=src.getContext("2d",{willReadFrequently:true}).getImageData(0,0,W,H).data;
+  return floodMask(d,W,H,px,py,O.wand.tol,O.wand.contig);}
+function floodMask(d,W,H,px,py,tol,contig){px=clamp(Math.floor(px),0,W-1);py=clamp(Math.floor(py),0,H-1);const i0=(py*W+px)*4,r0=d[i0],g0=d[i0+1],b0=d[i0+2],a0=d[i0+3];
+  const ok=i=>{const j=i*4;return Math.max(Math.abs(d[j]-r0),Math.abs(d[j+1]-g0),Math.abs(d[j+2]-b0),Math.abs(d[j+3]-a0))<=tol;};
+  const m=new Uint8Array(W*H);if(contig){const st=new Int32Array(W*H);let sp=0;st[sp++]=py*W+px;m[py*W+px]=1;
+    while(sp){const i=st[--sp],x=i%W;if(x>0&&!m[i-1]&&ok(i-1)){m[i-1]=1;st[sp++]=i-1;}if(x<W-1&&!m[i+1]&&ok(i+1)){m[i+1]=1;st[sp++]=i+1;}if(i>=W&&!m[i-W]&&ok(i-W)){m[i-W]=1;st[sp++]=i-W;}if(i<W*(H-1)&&!m[i+W]&&ok(i+W)){m[i+W]=1;st[sp++]=i+W;}}}
+  else for(let i=0;i<W*H;i++)m[i]=ok(i)?1:0;
+  const c=newMask(),x=X(c),im=x.createImageData(W,H),o=im.data;for(let i=0;i<W*H;i++)if(m[i]){const j=i*4;o[j]=o[j+1]=o[j+2]=255;o[j+3]=255;}x.putImageData(im,0,0);return c;}
+let segP=null;
+async function selectPerson(){if(!DOC)return;toast("Đang tải AI nhận diện người (lần đầu mất vài giây)…");
+  try{if(!segP)segP=(async()=>{const V=await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/vision_bundle.mjs");const fs=await V.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm");
+      return await V.ImageSegmenter.createFromOptions(fs,{baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite"},outputConfidenceMasks:true,runningMode:"IMAGE"});})();
+    const seg=await segP;const s=Math.min(1,1024/Math.max(DOC.w,DOC.h)),c=newC(DOC.w*s,DOC.h*s);X(c).drawImage(comp,0,0,c.width,c.height);const res=seg.segment(c);const bgm=res.confidenceMasks[0].getAsFloat32Array();
+    const w=c.width,h=c.height,m=newC(w,h),x=X(m),im=x.createImageData(w,h);for(let i=0;i<w*h;i++){const a=clamp((1-bgm[i]-0.25)*2,0,1)*255;im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=255;im.data[i*4+3]=a;}x.putImageData(im,0,0);res.close&&res.close();
+    const full=newMask();const fx=X(full);fx.imageSmoothingQuality="high";fx.drawImage(m,0,0,DOC.w,DOC.h);combineSel(full,O.wand.mode);pushHist("Chọn người (AI)");toast("Đã chọn người trong ảnh");}
+  catch(e){console.error(e);segP=null;toast("Không tải được AI chọn người (cần mạng). Hãy dùng Đũa thần hoặc Vùng chọn tự do.");}}
+
+/* ---------- History ---------- */
+let hist=[],hIdx=-1;
+function snapLayer(L){return Object.assign({},L,{text:L.text?Object.assign({},L.text):null,adj:L.adj?JSON.parse(JSON.stringify(L.adj)):null,tf:null});}
+function pushHist(name){if(!DOC)return;hist=hist.slice(0,hIdx+1);hist.push({name,w:DOC.w,h:DOC.h,act,sel:DOC.sel,layers:DOC.layers.map(snapLayer)});if(hist.length>50)hist.shift();hIdx=hist.length-1;renderHist();renderLayers();{const ae=document.activeElement,L=AL();if(!(ae&&$("propsBody").contains(ae)&&(ae.tagName==="TEXTAREA"||ae.type==="range"||ae.type==="color")&&L&&L.id===propsFor))renderProps();}}
+function restore(i){if(i<0||i>=hist.length)return;hIdx=i;const e=hist[i];DOC.w=e.w;DOC.h=e.h;DOC.sel=e.sel;DOC.layers=e.layers.map(snapLayer);act=clamp(e.act,0,DOC.layers.length-1);xf=null;
+  ensureComp();antsDirty=true;scheduleComp();renderHist();renderLayers();renderProps();$("stSize").textContent=DOC.w+"×"+DOC.h+" px";}
+function renderHist(){const box=$("hlist");box.innerHTML="";hist.forEach((h,i)=>{const b=el("button","hrow"+(i===hIdx?" on":i>hIdx?" fut":""),h.name);b.type="button";b.onclick=()=>restore(i);box.appendChild(b);});const on=box.querySelector(".on");if(on)on.scrollIntoView({block:"nearest"});
+  $("bUndo").disabled=hIdx<=0;$("bRedo").disabled=hIdx>=hist.length-1;}
+function afterDocChange(name){ensureComp();composite();pushHist(name);$("welcome").hidden=true;$("stSize").textContent=DOC.w+"×"+DOC.h+" px";cropR=null;antsDirty=true;requestFrame();}
+function own(L,mask){if(mask)L.mask=cloneC(L.mask);else L.canvas=cloneC(L.canvas);}
+
+/* ---------- Painting ---------- */
+let ST=null,stampC=null,stampKey="",cloneSetMode=false;
+function stamp(o,color){const size=Math.max(1,Math.round(o.size)),key=size+"|"+o.hard+"|"+color;if(key===stampKey)return stampC;stampKey=key;stampC=newC(size+2,size+2);const x=X(stampC),r=size/2,c=size/2+1;
+  const g=x.createRadialGradient(c,c,0,c,c,r);const [R,G,B]=hex2rgb(color);const h=clamp((o.hard==null?80:o.hard)/100,0,0.99);g.addColorStop(0,`rgba(${R},${G},${B},1)`);g.addColorStop(h,`rgba(${R},${G},${B},1)`);g.addColorStop(1,`rgba(${R},${G},${B},0)`);
+  x.fillStyle=g;x.beginPath();x.arc(c,c,r,0,7);x.fill();return stampC;}
+function editable(L){if(!L)return false;if(L.type==="adj"&&!L.editMask){toast("Layer điều chỉnh: bấm vào ô mask để vẽ lên mask");return false;}if(L.type==="text"&&!L.editMask){toast("Đây là layer chữ. Chọn Lớp → Chuyển chữ thành ảnh để vẽ lên");return false;}if(!L.visible){toast("Layer đang ẩn");return false;}return true;}
+function strokeStart(p,e){const L=AL();if(!editable(L))return false;const mask=!!(L.editMask&&L.mask);own(L,mask);const tgt=mask?L.mask:L.canvas;
+  const o=O[tool];ST={L,mask,tgt,base:cloneC(tgt),buf:(tool==="brush"||tool==="eraser"||tool==="dodge")?newC(DOC.w,DOC.h):null,last:p,o,dist:0,off:null};
+  if(tool==="clone"){if(!o.src){toast("Đặt điểm nguồn trước: Alt + bấm (máy tính) hoặc nút Đặt điểm nguồn");ST=null;return false;}ST.off=[o.src[0]-p[0],o.src[1]-p[1]];}
+  dab(p);return true;}
+function strokeMove(p){if(!ST)return;const o=ST.o,sp=Math.max(1,o.size*(tool==="heal"?0.35:tool==="blurb"?0.3:0.12)),dx=p[0]-ST.last[0],dy=p[1]-ST.last[1],d=Math.hypot(dx,dy);if(d<sp)return;
+  const n=Math.floor(d/sp);for(let i=1;i<=n;i++)dab([ST.last[0]+dx*i/n,ST.last[1]+dy*i/n]);ST.last=p;}
+function strokeEnd(){if(!ST)return;const L=ST.L;ST=null;stampKey="";L.thumbV=(L.thumbV||0)+1;pushHist(({brush:"Cọ vẽ",eraser:"Tẩy",clone:"Nhân bản",heal:"Xoá khuyết điểm",dodge:"Làm sáng/tối",blurb:"Làm mờ/nét"})[tool]||"Vẽ");}
+function dabRect(p,s){const r=s/2+2;return {x:Math.floor(p[0]-r),y:Math.floor(p[1]-r),w:Math.ceil(r*2),h:Math.ceil(r*2)};}
+const rt=newC(2,2);
+function regionTmp(r){if(rt.width<r.w||rt.height<r.h){rt.width=Math.max(rt.width,r.w);rt.height=Math.max(rt.height,r.h);}const x=X(rt);x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.globalCompositeOperation="source-over";x.clearRect(0,0,r.w,r.h);return x;}
+function dab(p){const o=ST.o,r=dabRect(p,o.size);const t=X(ST.tgt);
+  if(ST.buf){const color=tool==="dodge"?(o.mode==="dodge"?"#ffffff":"#000000"):ST.mask?(lum(fg)>=0.5?"#ffffff":"#000000"):fg;const s=stamp(o,color),bx=X(ST.buf);bx.globalAlpha=tool==="dodge"?o.exp/100*0.35:o.flow/100;bx.drawImage(s,p[0]-s.width/2,p[1]-s.height/2);bx.globalAlpha=1;
+    ST.dirty=ST.dirty?union(ST.dirty,r):r;applyBuf(r);return;}
+  if(tool==="clone"){const s=stamp(o,"#ffffff"),x=regionTmp(r);x.drawImage(ST.base,r.x+ST.off[0],r.y+ST.off[1],r.w,r.h,0,0,r.w,r.h);x.globalCompositeOperation="destination-in";x.drawImage(s,p[0]-s.width/2-r.x,p[1]-s.height/2-r.y);selClip(x,r);
+    t.save();t.globalAlpha=o.op/100;t.drawImage(rt,0,0,r.w,r.h,r.x,r.y,r.w,r.h);t.restore();}
+  else if(tool==="heal")healDab(p,o,r,t);
+  else if(tool==="blurb"){const s=stamp(o,"#ffffff"),x=regionTmp(r),a=o.amt/100;
+    if(o.mode==="blur"){x.filter="blur("+Math.max(0.5,o.size*0.06*a)+"px)";x.drawImage(ST.tgt,r.x,r.y,r.w,r.h,0,0,r.w,r.h);x.filter="none";}
+    else{const id=X(ST.tgt).getImageData(r.x,r.y,r.w,r.h),bl=regionTmp(r);bl.filter="blur(1.2px)";bl.drawImage(ST.tgt,r.x,r.y,r.w,r.h,0,0,r.w,r.h);bl.filter="none";const bd=bl.getImageData(0,0,r.w,r.h).data,d=id.data,k=a*0.8;
+      for(let i=0;i<d.length;i+=4){d[i]=d[i]+(d[i]-bd[i])*k;d[i+1]=d[i+1]+(d[i+1]-bd[i+1])*k;d[i+2]=d[i+2]+(d[i+2]-bd[i+2])*k;}x.clearRect(0,0,r.w,r.h);x.putImageData(id,0,0);}
+    x.globalCompositeOperation="destination-in";x.drawImage(s,p[0]-s.width/2-r.x,p[1]-s.height/2-r.y);selClip(x,r);t.save();t.globalAlpha=0.5;t.drawImage(rt,0,0,r.w,r.h,r.x,r.y,r.w,r.h);t.restore();}
+  bump(r);}
+function selClip(x,r){if(!DOC.sel)return;x.globalCompositeOperation="destination-in";x.drawImage(DOC.sel,r.x,r.y,r.w,r.h,0,0,r.w,r.h);x.globalCompositeOperation="source-over";}
+function applyBuf(r){const t=X(ST.tgt),o=ST.o;t.save();t.beginPath();t.rect(r.x,r.y,r.w,r.h);t.clip();t.globalCompositeOperation="copy";t.drawImage(ST.base,r.x,r.y,r.w,r.h,r.x,r.y,r.w,r.h);t.restore();
+  const x=regionTmp(r);x.drawImage(ST.buf,r.x,r.y,r.w,r.h,0,0,r.w,r.h);selClip(x,r);
+  t.save();t.globalAlpha=tool==="dodge"?1:o.op/100;t.globalCompositeOperation=tool==="eraser"?"destination-out":tool==="dodge"?"soft-light":ST.mask&&lum(fg)<0.5?"destination-out":"source-over";
+  if(tool==="dodge"){t.globalCompositeOperation="source-atop";const y=X(rt);y.globalCompositeOperation="source-over";}
+  if(tool==="dodge"){/* soft-light only where pixels exist */const sl=newC(r.w,r.h),sx=X(sl);sx.drawImage(ST.base,r.x,r.y,r.w,r.h,0,0,r.w,r.h);sx.globalCompositeOperation="soft-light";sx.drawImage(rt,0,0,r.w,r.h,0,0,r.w,r.h);sx.globalCompositeOperation="destination-in";sx.drawImage(ST.base,r.x,r.y,r.w,r.h,0,0,r.w,r.h);
+    t.globalCompositeOperation="copy";t.beginPath();t.rect(r.x,r.y,r.w,r.h);t.clip();t.drawImage(sl,r.x,r.y);}
+  else t.drawImage(rt,0,0,r.w,r.h,r.x,r.y,r.w,r.h);t.restore();bump(r);}
+function bump(r){scheduleComp({x:r.x+ (ST&&ST.L?ST.L.x:0),y:r.y+(ST&&ST.L?ST.L.y:0),w:r.w,h:r.h});}
+function healDab(p,o,r,t){const R=o.size/2,W=DOC.w,H=DOC.h;if(r.w<4)return;const tg=X(ST.tgt);const ring=(cx,cy)=>{const x0=Math.max(0,Math.floor(cx-R*1.5)),y0=Math.max(0,Math.floor(cy-R*1.5)),w=Math.min(W,Math.ceil(cx+R*1.5))-x0,h=Math.min(H,Math.ceil(cy+R*1.5))-y0;
+    if(w<2||h<2)return null;const d=X(ST.base).getImageData(x0,y0,w,h).data;let s=[0,0,0],n=0;const pts=[];for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){const dx=x0+x-cx,dy=y0+y-cy,q=Math.hypot(dx,dy);if(q>R*1.05&&q<R*1.5){const i=(y*w+x)*4;if(d[i+3]<10)continue;s[0]+=d[i];s[1]+=d[i+1];s[2]+=d[i+2];n++;pts.push([dx,dy,d[i],d[i+1],d[i+2]]);}}
+    return n?{m:s.map(v=>v/n),pts}:null;};
+  const dst=ring(p[0],p[1]);if(!dst)return;let best=null;
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2,dd=R*2.3,sx=p[0]+Math.cos(a)*dd,sy=p[1]+Math.sin(a)*dd;if(sx-R<0||sy-R<0||sx+R>W||sy+R>H)continue;const s=ring(sx,sy);if(!s)continue;
+    let e=0;const cd=X(ST.base).getImageData(Math.floor(sx-R),Math.floor(sy-R),Math.ceil(R*2)||1,Math.ceil(R*2)||1).data;let mu=[0,0,0],cn=0,v2=0;for(let i=0;i<cd.length;i+=16){mu[0]+=cd[i];mu[1]+=cd[i+1];mu[2]+=cd[i+2];cn++;}mu=mu.map(v=>v/cn);for(let i=0;i<cd.length;i+=16)v2+=Math.abs(cd[i]-mu[0])+Math.abs(cd[i+1]-mu[1])+Math.abs(cd[i+2]-mu[2]);
+    e=Math.abs(s.m[0]-dst.m[0])+Math.abs(s.m[1]-dst.m[1])+Math.abs(s.m[2]-dst.m[2])+v2/cn*0.6;if(!best||e<best.e)best={e,sx,sy,m:s.m};}
+  if(!best)return;const w=r.w,h=r.h,src=X(ST.base).getImageData(Math.round(best.sx-w/2),Math.round(best.sy-h/2),w,h),sd=src.data,cur=tg.getImageData(r.x,r.y,w,h),cd=cur.data;
+  const dm=dst.m,sm=best.m;
+  /* per-pixel colour correction: interpolate ring difference by angle so the patch blends into surroundings */
+  const bins=16,dif=[];for(let b=0;b<bins;b++)dif.push([0,0,0,0]);
+  dst.pts.forEach(([dx,dy,r0,g0,b0])=>{const b=Math.floor(((Math.atan2(dy,dx)+Math.PI)/(2*Math.PI))*bins)%bins;dif[b][0]+=r0;dif[b][1]+=g0;dif[b][2]+=b0;dif[b][3]++;});
+  for(const d of dif){if(d[3]){d[0]=d[0]/d[3]-sm[0];d[1]=d[1]/d[3]-sm[1];d[2]=d[2]/d[3]-sm[2];}else{d[0]=dm[0]-sm[0];d[1]=dm[1]-sm[1];d[2]=dm[2]-sm[2];}}
+  const hd=clamp(o.hard/100,0,.9);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const dx=r.x+x-p[0],dy=r.y+y-p[1],q=Math.hypot(dx,dy)/R;if(q>1)continue;const i=(y*w+x)*4;if(sd[i+3]<10)continue;
+    const af=(Math.atan2(dy,dx)+Math.PI)/(2*Math.PI)*bins-0.5,b0=((Math.floor(af)%bins)+bins)%bins,b1=(b0+1)%bins,fr=af-Math.floor(af),wr=Math.min(1,q*1.15);
+    const a=q<hd?1:1-(q-hd)/(1-hd),s=a*a*(3-2*a);
+    for(let c=0;c<3;c++){const corr=(dm[c]-sm[c])*(1-wr)+(dif[b0][c]*(1-fr)+dif[b1][c]*fr)*wr;cd[i+c]=cd[i+c]*(1-s)+clamp(sd[i+c]+corr,0,255)*s;}cd[i+3]=Math.max(cd[i+3],sd[i+3]*s);}
+  if(DOC.sel){const sm2=X(DOC.sel).getImageData(r.x,r.y,w,h).data,or=tg.getImageData(r.x,r.y,w,h).data;for(let i=0;i<cd.length;i+=4){const k=sm2[i+3]/255;for(let c=0;c<4;c++)cd[i+c]=or[i+c]+(cd[i+c]-or[i+c])*k;}}
+  tg.putImageData(cur,r.x,r.y);}
+
+/* ---------- Content-aware fill ---------- */
+function contentFill(){const L=AL();if(!DOC.sel)return toast("Tạo vùng chọn quanh vật cần xoá trước (Vùng chọn tự do hoặc khung)");if(!L||L.type!=="pix")return toast("Chọn một layer ảnh để xoá vật thể");
+  toast("Đang tô theo nội dung…");setTimeout(()=>{const t0=performance.now();own(L);const bb=maskBBox(DOC.sel);if(!bb)return;const pad=Math.round(Math.max(bb.w,bb.h)*0.6+16);
+    const x0=Math.max(0,bb.x-pad),y0=Math.max(0,bb.y-pad),x1=Math.min(DOC.w,bb.x+bb.w+pad),y1=Math.min(DOC.h,bb.y+bb.h+pad);let W=x1-x0,H=y1-y0;
+    const sc=Math.min(1,Math.sqrt(900000/(W*H)));const w=Math.max(4,Math.round(W*sc)),h=Math.max(4,Math.round(H*sc));
+    const ic=newC(w,h),ix=ic.getContext("2d",{willReadFrequently:true});ix.drawImage(L.canvas,x0,y0,W,H,0,0,w,h);const img=ix.getImageData(0,0,w,h),d=img.data;
+    const mc=newC(w,h),mx=mc.getContext("2d",{willReadFrequently:true});mx.drawImage(feather(DOC.sel,2),x0,y0,W,H,0,0,w,h);const md=mx.getImageData(0,0,w,h).data;
+    const hole=new Uint8Array(w*h);for(let i=0;i<w*h;i++)hole[i]=md[i*4+3]>40||d[i*4+3]<8?1:0;
+    synth(d,hole,w,h);ix.putImageData(img,0,0);
+    const lx=X(L.canvas);const fm=newC(W,H),fx=X(fm);fx.imageSmoothingQuality="high";fx.drawImage(ic,0,0,W,H);fx.globalCompositeOperation="destination-in";fx.drawImage(feather(DOC.sel,Math.max(1,2/sc)),x0,y0,W,H,0,0,W,H);
+    lx.drawImage(fm,x0,y0);L.thumbV=(L.thumbV||0)+1;scheduleComp();pushHist("Xoá vật thể (tô theo nội dung)");toast("Xong ("+Math.round(performance.now()-t0)+" ms). Có thể bấm lại để tô lần nữa.");},30);}
+function synth(d,hole,w,h){/* onion-peel patch synthesis with coherence + random search (PatchMatch-lite) */
+  const N=w*h,known=new Uint8Array(N);for(let i=0;i<N;i++)known[i]=hole[i]?0:1;const srcIdx=new Int32Array(N).fill(-1);
+  const kn=[];for(let i=0;i<N;i++)if(known[i]&&!hole[i])kn.push(i);if(!kn.length)return;
+  const R=3,rnd=(()=>{let s=12345;return ()=>((s=Math.imul(s^s>>>15,1|s)+0x6D2B79F5|0)>>>0)/4294967296;})();
+  const cost=(p,q,best)=>{const px=p%w,py=(p/w)|0,qx=q%w,qy=(q/w)|0;let e=0,n=0;for(let dy=-R;dy<=R;dy++){const y1=py+dy,y2=qy+dy;if(y1<0||y1>=h||y2<0||y2>=h)continue;
+      for(let dx=-R;dx<=R;dx++){const x1=px+dx,x2=qx+dx;if(x1<0||x1>=w||x2<0||x2>=w)continue;const a=y1*w+x1,b=y2*w+x2;if(!known[a]||hole[b]&&!known[b])continue;const i=a*4,j=b*4;
+        const dr=d[i]-d[j],dg=d[i+1]-d[j+1],db=d[i+2]-d[j+2];e+=dr*dr+dg*dg+db*db;n++;if(n>6&&e/n>best)return 1e12;}}return n?e/n:1e12;};
+  let front=[];const inF=new Uint8Array(N);const addF=i=>{const x=i%w,y=(i/w)|0;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const X2=x+a,Y2=y+b;if(X2<0||Y2<0||X2>=w||Y2>=h)return;const j=Y2*w+X2;if(!known[j]&&!inF[j]){inF[j]=1;front.push(j);}});};
+  for(let i=0;i<N;i++)if(hole[i]&&!known[i]){const x=i%w,y=(i/w)|0;if((x>0&&known[i-1])||(x<w-1&&known[i+1])||(y>0&&known[i-w])||(y<h-1&&known[i+w])){inF[i]=1;front.push(i);}}
+  let guard=0;while(front.length&&guard++<10000){const cur=front;front=[];for(let k=cur.length-1;k>0;k--){const j=Math.floor(rnd()*(k+1));[cur[k],cur[j]]=[cur[j],cur[k]];}
+    for(const p of cur){const px=p%w,py=(p/w)|0;let best=1e12,bq=-1;
+      for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]]){const nx=px+a,ny=py+b;if(nx<0||ny<0||nx>=w||ny>=h)continue;const n=ny*w+nx;let q=srcIdx[n]>=0?srcIdx[n]-a-b*w:(known[n]&&!hole[n]?n-a-b*w:-1);
+        if(q<0||q>=N||hole[q])continue;const c=cost(p,q,best);if(c<best){best=c;bq=q;}}
+      for(let k=0;k<14;k++){const q=kn[Math.floor(rnd()*kn.length)];const c=cost(p,q,best);if(c<best){best=c;bq=q;}}
+      if(bq>=0){let rad=Math.max(w,h)/4;while(rad>2){const qx=clamp((bq%w)+Math.round((rnd()*2-1)*rad),0,w-1),qy=clamp(((bq/w)|0)+Math.round((rnd()*2-1)*rad),0,h-1),q=qy*w+qx;if(!hole[q]){const c=cost(p,q,best);if(c<best){best=c;bq=q;}}rad/=2;}
+        const i=p*4,j=bq*4;d[i]=d[j];d[i+1]=d[j+1];d[i+2]=d[j+2];d[i+3]=255;srcIdx[p]=bq;}
+      known[p]=1;}
+    for(const p of cur)addF(p);}
+  /* light smoothing of seams inside the hole */
+  const out=new Uint8ClampedArray(d);for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;if(!hole[i])continue;for(let c=0;c<3;c++){const j=i*4+c;out[j]=(d[j]*4+d[j-4]+d[j+4]+d[j-w*4]+d[j+w*4])/8;}}d.set(out);}
+
+/* ---------- Fill helpers ---------- */
+function fillLayer(color){const L=AL();if(!L||L.type!=="pix")return toast("Chọn layer ảnh");own(L);const x=X(L.canvas);const t=newC(DOC.w,DOC.h),tx=X(t);tx.fillStyle=color;tx.fillRect(0,0,DOC.w,DOC.h);if(DOC.sel){tx.globalCompositeOperation="destination-in";tx.drawImage(DOC.sel,0,0);}x.drawImage(t,-L.x,-L.y);scheduleComp();pushHist("Tô màu");}
+function clearSel(){const L=AL();if(!L||L.type==="adj")return;if(L.type==="text")return toast("Chuyển chữ thành ảnh trước");own(L);const x=X(L.canvas);x.save();x.globalCompositeOperation="destination-out";if(DOC.sel)x.drawImage(DOC.sel,-L.x,-L.y);else x.fillRect(0,0,DOC.w,DOC.h);x.restore();L.thumbV++;scheduleComp();pushHist("Xoá vùng chọn");}
+function bucketAt(p){const L=AL();if(!editable(L)||L.type!=="pix")return;own(L);const W=DOC.w,H=DOC.h,d=X(L.canvas).getImageData(0,0,W,H).data;const m=floodMask(d,W,H,p[0],p[1],O.bucket.tol,O.bucket.contig);
+  const t=newC(W,H),tx=X(t);tx.fillStyle=fg;tx.fillRect(0,0,W,H);tx.globalCompositeOperation="destination-in";tx.drawImage(m,0,0);if(DOC.sel)tx.drawImage(DOC.sel,0,0);const x=X(L.canvas);x.globalAlpha=O.bucket.op/100;x.drawImage(t,0,0);x.globalAlpha=1;scheduleComp();pushHist("Đổ màu");}
+function gradientDraw(a,b){const L=AL();if(!editable(L)||L.type!=="pix")return;own(L);const o=O.gradient,t=newC(DOC.w,DOC.h),tx=X(t);let g;
+  if(o.type==="radial")g=tx.createRadialGradient(a[0],a[1],0,a[0],a[1],Math.hypot(b[0]-a[0],b[1]-a[1]));else g=tx.createLinearGradient(a[0],a[1],b[0],b[1]);
+  const [R,G,B]=hex2rgb(fg);g.addColorStop(0,fg);g.addColorStop(1,o.kind==="fgt"?`rgba(${R},${G},${B},0)`:bgc);tx.fillStyle=g;tx.fillRect(0,0,DOC.w,DOC.h);if(DOC.sel){tx.globalCompositeOperation="destination-in";tx.drawImage(DOC.sel,0,0);}
+  const x=X(L.canvas);x.globalAlpha=o.op/100;x.drawImage(t,-L.x,-L.y);x.globalAlpha=1;scheduleComp();pushHist("Chuyển màu");}
+function shapeDraw(a,b,shift){const o=O.shape,c=newC(DOC.w,DOC.h),x=X(c);let x0=Math.min(a[0],b[0]),y0=Math.min(a[1],b[1]),w=Math.abs(b[0]-a[0]),h=Math.abs(b[1]-a[1]);if(shift&&o.kind!=="line"){w=h=Math.max(w,h);}
+  if(w<2&&h<2&&o.kind!=="line")return;x.beginPath();if(o.kind==="ellipse")x.ellipse(x0+w/2,y0+h/2,w/2,h/2,0,0,7);else if(o.kind==="line"){x.moveTo(a[0],a[1]);x.lineTo(b[0],b[1]);}else x.rect(x0,y0,w,h);
+  if(o.kind==="line"){x.lineCap="round";x.lineWidth=Math.max(2,o.stroke||6);x.strokeStyle=fg;x.stroke();}else{if(o.fill){x.fillStyle=fg;x.fill();}if(o.stroke){x.lineWidth=o.stroke;x.strokeStyle=bgc;x.stroke();}}
+  const n=DOC.layers.filter(l=>/^Hình/.test(l.name)).length+1;DOC.layers.splice(act+1,0,mkLayer({name:"Hình "+n,canvas:c}));act++;scheduleComp();pushHist("Vẽ hình");}
+
+/* ---------- Text layers ---------- */
+function renderText(L){const t=L.text,c=newC(DOC.w,DOC.h),x=X(c);const fam=FONTS.includes(t.font)?'"'+t.font+'"':t.font;x.font=(t.italic?"italic ":"")+t.weight+" "+t.size+"px "+fam+",sans-serif";x.textAlign=t.align;x.textBaseline="top";
+  try{x.letterSpacing=(t.spacing||0)+"px";}catch(e){}const lines=String(t.str).split("\n"),lh=t.size*(t.lh||1.2);
+  if(t.shadow){x.shadowColor="rgba(0,0,0,.5)";x.shadowBlur=t.size*0.15;x.shadowOffsetY=t.size*0.05;}
+  lines.forEach((l,i)=>{const y=t.y+i*lh;if(t.stroke){x.lineJoin="round";x.lineWidth=t.stroke*2;x.strokeStyle=t.strokeCol;x.strokeText(l,t.x,y);}x.fillStyle=t.color;x.fillText(l,t.x,y);});
+  let mw=0;lines.forEach(l=>mw=Math.max(mw,x.measureText(l).width));t._w=mw;t._h=lh*lines.length;L.canvas=c;L.thumbV=(L.thumbV||0)+1;}
+function textBox(L){const t=L.text;const x0=t.align==="center"?t.x-t._w/2:t.align==="right"?t.x-t._w:t.x;return {x:x0,y:t.y,w:t._w||10,h:t._h||t.size};}
+function addTextAt(p){const n=DOC.layers.filter(l=>l.type==="text").length+1;const L=mkLayer({name:"Chữ "+n,type:"text",text:{str:"Văn bản",font:O.text.font,size:O.text.size,weight:O.text.weight,italic:false,color:fg,align:"left",x:p[0],y:p[1]-O.text.size/2,lh:1.2,spacing:0,stroke:0,strokeCol:"#000000",shadow:false}});
+  renderText(L);DOC.layers.splice(act+1,0,L);act++;scheduleComp();pushHist("Thêm chữ");openProps(true);setTimeout(()=>{const ta=document.querySelector(".ptext");if(ta){ta.focus();ta.select();}},60);}
+
+/* ---------- Free transform ---------- */
+let xf=null;
+function contentBox(L){if(L.type==="text")return textBox(L);return maskBBox(L.canvas)||{x:0,y:0,w:DOC.w,h:DOC.h};}
+function startXf(){const L=AL();if(!L||L.type==="adj")return toast("Chọn layer ảnh hoặc chữ để biến đổi");if(tool!=="move")setTool("move");const b=contentBox(L);if(!b)return;
+  L.tf={cx:b.x+b.w/2,cy:b.y+b.h/2,sx:1,sy:1,rot:0,tx:0,ty:0};xf={box:b};renderOpts();scheduleComp();}
+function tfPt(t,x,y){const dx=(x-t.cx)*t.sx,dy=(y-t.cy)*t.sy,c=Math.cos(t.rot),s=Math.sin(t.rot);return [t.cx+t.tx+dx*c-dy*s,t.cy+t.ty+dx*s+dy*c];}
+function xfHandles(){const L=AL(),t=L.tf,b=xf.box,H=[];[[0,0],[.5,0],[1,0],[1,.5],[1,1],[.5,1],[0,1],[0,.5]].forEach(([u,v],i)=>{const [x,y]=tfPt(t,b.x+b.w*u,b.y+b.h*v);H.push({x,y,u,v,i});});return H;}
+function commitXf(){const L=AL();if(!xf||!L||!L.tf)return;const t=L.tf;xf=null;
+  if(L.type==="text"){const T=L.text;T.size=Math.max(4,Math.round(T.size*Math.abs(t.sy)));const nb=tfPt(t,T.x,T.y);T.x=nb[0];T.y=nb[1];L.tf=null;renderText(L);}
+  else{const c=newC(DOC.w,DOC.h),x=X(c);x.imageSmoothingQuality="high";x.translate(t.cx+t.tx,t.cy+t.ty);x.rotate(t.rot);x.scale(t.sx,t.sy);x.translate(-t.cx,-t.cy);x.drawImage(L.canvas,0,0);L.canvas=c;
+    if(L.mask){const m=newC(DOC.w,DOC.h),mx=X(m);mx.translate(t.cx+t.tx,t.cy+t.ty);mx.rotate(t.rot);mx.scale(t.sx,t.sy);mx.translate(-t.cx,-t.cy);mx.drawImage(L.mask,0,0);L.mask=m;}L.tf=null;}
+  L.thumbV++;scheduleComp();renderOpts();pushHist("Biến đổi tự do");}
+function cancelXf(){const L=AL();if(L)L.tf=null;xf=null;renderOpts();scheduleComp();}
+
+/* ---------- Crop ---------- */
+let cropR=null;
+function fitRatio(v){if(v==="free")return {x:0,y:0,w:DOC.w,h:DOC.h};const [a,b]=v.split(":").map(Number),r=a/b;let w=DOC.w,h=w/r;if(h>DOC.h){h=DOC.h;w=h*r;}return {x:(DOC.w-w)/2,y:(DOC.h-h)/2,w,h};}
+function applyCrop(){if(!cropR)return;const r={x:Math.round(cropR.x),y:Math.round(cropR.y),w:Math.round(cropR.w),h:Math.round(cropR.h)};if(r.w<2||r.h<2)return;resizeCanvas(r.w,r.h,-r.x,-r.y);cropR={x:0,y:0,w:DOC.w,h:DOC.h};fitView();pushHist("Cắt khung");}
+function cropToSel(){if(!DOC.sel)return toast("Chưa có vùng chọn");const b=maskBBox(DOC.sel);if(!b)return;resizeCanvas(b.w,b.h,-b.x,-b.y);DOC.sel=null;fitView();pushHist("Cắt theo vùng chọn");}
+function resizeCanvas(w,h,dx,dy){DOC.layers.forEach(L=>{if(L.type==="text"){L.text.x+=dx;L.text.y+=dy;}const f=c=>{const n=newC(w,h);X(n).drawImage(c,dx,dy);return n;};if(L.canvas)L.canvas=f(L.canvas);if(L.mask){const n=newC(w,h),x=X(n);x.fillStyle="#fff";x.fillRect(0,0,w,h);x.clearRect(dx,dy,DOC.w,DOC.h);x.drawImage(L.mask,dx,dy);L.mask=n;}});
+  if(DOC.sel){const n=newC(w,h);X(n).drawImage(DOC.sel,dx,dy);DOC.sel=n;}DOC.w=w;DOC.h=h;DOC.layers.forEach(L=>{if(L.type==="text")renderText(L);});ensureComp();antsDirty=true;scheduleComp();$("stSize").textContent=DOC.w+"×"+DOC.h+" px";}
+function resample(w,h){w=Math.round(w);h=Math.round(h);const sx=w/DOC.w,sy=h/DOC.h;DOC.layers.forEach(L=>{const f=c=>{const n=newC(w,h),x=X(n);x.imageSmoothingQuality="high";x.drawImage(c,0,0,w,h);return n;};
+  if(L.type==="text"){L.text.x*=sx;L.text.y*=sy;L.text.size*=Math.sqrt(sx*sy);}else if(L.canvas)L.canvas=f(L.canvas);if(L.mask)L.mask=f(L.mask);});if(DOC.sel){const n=newC(w,h);X(n).drawImage(DOC.sel,0,0,w,h);DOC.sel=n;}
+  DOC.w=w;DOC.h=h;DOC.layers.forEach(L=>{if(L.type==="text")renderText(L);});ensureComp();antsDirty=true;scheduleComp();fitView();$("stSize").textContent=DOC.w+"×"+DOC.h+" px";pushHist("Đổi kích thước ảnh");}
+function rotateDoc(deg){const w=deg%180?DOC.h:DOC.w,h=deg%180?DOC.w:DOC.h;const f=c=>{const n=newC(w,h),x=X(n);x.translate(w/2,h/2);x.rotate(deg*Math.PI/180);x.drawImage(c,-c.width/2,-c.height/2);return n;};
+  DOC.layers.forEach(L=>{if(L.type==="text"){L.type="pix";L.name+=" (ảnh)";}if(L.canvas)L.canvas=f(L.canvas);if(L.mask)L.mask=f(L.mask);});if(DOC.sel)DOC.sel=f(DOC.sel);DOC.w=w;DOC.h=h;ensureComp();antsDirty=true;scheduleComp();fitView();pushHist("Xoay "+deg+"°");$("stSize").textContent=DOC.w+"×"+DOC.h+" px";}
+function flipDoc(hz,layerOnly){const f=c=>{const n=newC(c.width,c.height),x=X(n);if(hz){x.translate(c.width,0);x.scale(-1,1);}else{x.translate(0,c.height);x.scale(1,-1);}x.drawImage(c,0,0);return n;};
+  const Ls=layerOnly?[AL()]:DOC.layers;Ls.forEach(L=>{if(L.type==="text"){L.type="pix";L.name+=" (ảnh)";}if(L.canvas)L.canvas=f(L.canvas);if(L.mask)L.mask=f(L.mask);L.thumbV++;});if(!layerOnly&&DOC.sel)DOC.sel=f(DOC.sel);antsDirty=true;scheduleComp();pushHist(hz?"Lật ngang":"Lật dọc");}
+
+/* ---------- Layers ---------- */
+function addLayer(name,canvas,at){const L=mkLayer({name:name||"Layer "+(DOC.layers.length),canvas:canvas||newC(DOC.w,DOC.h)});DOC.layers.splice(at==null?act+1:at,0,L);act=DOC.layers.indexOf(L);scheduleComp();pushHist("Layer mới");return L;}
+function addAdj(kind){const L=mkLayer({name:(ADJ_KINDS.find(k=>k[0]===kind)||["",kind])[1],type:"adj",adj:adjDefaults(kind)});if(DOC.sel){L.mask=cloneC(feather(DOC.sel,0));}DOC.layers.splice(act+1,0,L);act++;scheduleComp();pushHist("Thêm "+L.name);openProps(true);}
+function dupLayer(){const L=AL();if(!L)return;if(DOC.sel&&L.type==="pix"){const c=newC(DOC.w,DOC.h),x=X(c);x.drawImage(L.canvas,L.x,L.y);x.globalCompositeOperation="destination-in";x.drawImage(DOC.sel,0,0);DOC.layers.splice(act+1,0,mkLayer({name:"Layer từ vùng chọn",canvas:c}));act++;scheduleComp();pushHist("Sao chép vùng chọn ra layer");return;}
+  const n=snapLayer(L);n.id=uid();n.name=L.name+" bản sao";DOC.layers.splice(act+1,0,n);act++;scheduleComp();pushHist("Nhân đôi layer");}
+function delLayer(){if(!DOC||DOC.layers.length<=1)return toast("Cần ít nhất một layer");DOC.layers.splice(act,1);act=clamp(act-1,0,DOC.layers.length-1);scheduleComp();pushHist("Xoá layer");}
+function flat(L){/* rasterize a single layer with mask/opacity → canvas (no blend) */const c=newC(DOC.w,DOC.h),x=X(c);x.drawImage(L.canvas,L.x,L.y);if(L.mask&&L.maskOn){x.globalCompositeOperation="destination-in";x.drawImage(L.mask,L.x,L.y);}return c;}
+function mergeDown(){if(act<=0)return toast("Không có layer bên dưới");const A=DOC.layers[act],B=DOC.layers[act-1];if(A.type==="adj"||B.type==="adj")return toast("Gộp xuống chỉ dùng cho layer ảnh / chữ");
+  const c=flat(B),x=X(c);x.globalAlpha=A.opacity/100;x.globalCompositeOperation=BOP[A.blend];x.drawImage(flat(A),0,0);const N=mkLayer({name:B.name,canvas:c,opacity:B.opacity,blend:B.blend,visible:B.visible});
+  if(B.opacity<100){/* keep look: bake B opacity */}DOC.layers.splice(act-1,2,N);act--;scheduleComp();pushHist("Gộp xuống");}
+function flatten(){composite();const c=newC(DOC.w,DOC.h),x=X(c);x.fillStyle="#fff";x.fillRect(0,0,DOC.w,DOC.h);x.drawImage(comp,0,0);DOC.layers=[mkLayer({name:"Nền",canvas:c})];act=0;scheduleComp();pushHist("Làm phẳng ảnh");}
+function mergeVisible(){composite();const c=cloneC(comp);DOC.layers=DOC.layers.filter(l=>!l.visible);DOC.layers.push(mkLayer({name:"Đã gộp",canvas:c}));act=DOC.layers.length-1;scheduleComp();pushHist("Gộp layer hiển thị");}
+function rasterize(){const L=AL();if(!L||L.type!=="text")return;L.type="pix";L.text=null;L.name=L.name+" (ảnh)";pushHist("Chuyển chữ thành ảnh");}
+function addMask(fromSel){const L=AL();if(!L)return;if(L.mask)return toast("Layer đã có mask");const m=newC(DOC.w,DOC.h),x=X(m);x.fillStyle="#fff";if(fromSel&&DOC.sel){x.drawImage(DOC.sel,0,0);}else x.fillRect(0,0,DOC.w,DOC.h);L.mask=m;L.editMask=true;scheduleComp();pushHist("Thêm mask");}
+function applyMask(){const L=AL();if(!L||!L.mask||L.type!=="pix")return;L.canvas=flat(L);L.mask=null;L.editMask=false;scheduleComp();pushHist("Áp dụng mask");}
+function delMask(){const L=AL();if(!L||!L.mask)return;L.mask=null;L.editMask=false;scheduleComp();pushHist("Xoá mask");}
+function invertMask(){const L=AL();if(!L||!L.mask)return;const m=newC(DOC.w,DOC.h),x=X(m);x.fillStyle="#fff";x.fillRect(0,0,DOC.w,DOC.h);x.globalCompositeOperation="destination-out";x.drawImage(L.mask,0,0);L.mask=m;scheduleComp();pushHist("Đảo mask");}
+function moveLayer(d){const j=act+d;if(j<0||j>=DOC.layers.length)return;const [L]=DOC.layers.splice(act,1);DOC.layers.splice(j,0,L);act=j;scheduleComp();pushHist(d>0?"Đưa layer lên":"Đưa layer xuống");}
+function alignLayer(){const L=AL();if(!L||L.type==="adj")return;const b=contentBox(L);if(!b)return;const dx=Math.round(DOC.w/2-(b.x+b.w/2)),dy=Math.round(DOC.h/2-(b.y+b.h/2));if(L.type==="text"){L.text.x+=dx;L.text.y+=dy;renderText(L);}else{shiftLayer(L,dx,dy);}scheduleComp();pushHist("Căn giữa layer");}
+function shiftLayer(L,dx,dy){const c=newC(DOC.w,DOC.h);X(c).drawImage(L.canvas,dx,dy);L.canvas=c;if(L.mask){const m=newC(DOC.w,DOC.h);X(m).drawImage(L.mask,dx,dy);L.mask=m;}L.x=L.y=0;L.thumbV++;}
+const thumbs=new Map();
+function layerThumb(L,mask){const key=L.id+(mask?"m":"")+"|"+(L.thumbV||0)+"|"+DOC.w+"x"+DOC.h+"|"+(mask?L.mask&&L.mask.width:L.canvas&&L.canvas.width)+(mask?(L.mask?"":"0"):"")+(L.text?L.text.str+L.text.color+L.text.size:"");
+  let t=thumbs.get(key);const src=mask?L.mask:L.canvas;if(!src)return null;const c=newC(76,56),x=X(c),s=Math.min(76/DOC.w,56/DOC.h);if(mask){x.fillStyle="#000";x.fillRect(0,0,76,56);}x.drawImage(src,(76-DOC.w*s)/2,(56-DOC.h*s)/2,DOC.w*s,DOC.h*s);return c;}
+let dragRow=null;
+function renderLayers(){const box=$("llist");if(!DOC){box.innerHTML="";return;}box.innerHTML="";for(let i=DOC.layers.length-1;i>=0;i--){const L=DOC.layers[i],r=el("div","lrow"+(i===act?" on":""));r.draggable=true;r.dataset.i=i;
+    const ey=el("button","eye"+(L.visible?"":" off"));ey.type="button";ey.innerHTML='<svg class="i"><use href="#i-eye"/></svg>';ey.title="Ẩn / hiện";ey.onclick=e=>{e.stopPropagation();L.visible=!L.visible;scheduleComp();pushHist(L.visible?"Hiện layer":"Ẩn layer");};r.appendChild(ey);
+    if(L.type==="adj"){const ic=el("span","ico","◐");r.appendChild(ic);}else{const c=layerThumb(L);c.className=L.editMask?"":"sel";c.title="Ctrl + bấm: chọn theo layer";c.onclick=e=>{e.stopPropagation();if(e.ctrlKey||e.metaKey){layerAlphaSel(L);return;}act=i;L.editMask=false;renderLayers();renderProps();};r.appendChild(c);}
+    if(L.mask){const m=layerThumb(L,true);m.className=L.editMask?"sel":"";m.title="Bấm để vẽ lên mask · Shift + bấm: tắt/bật mask";m.onclick=e=>{e.stopPropagation();if(e.shiftKey){L.maskOn=!L.maskOn;scheduleComp();renderLayers();return;}act=i;L.editMask=true;renderLayers();renderProps();toast("Đang vẽ trên mask: màu đen để ẩn, trắng để hiện");};r.appendChild(m);}
+    const nm=el("span","nm",L.name);if(L.type==="text")nm.appendChild(el("small",null,"Chữ"));else if(L.type==="adj")nm.appendChild(el("small",null,"Điều chỉnh"));else if(L.blend!=="normal"||L.opacity<100)nm.appendChild(el("small",null,(BLENDS.find(b=>b[0]===L.blend)||["",""])[1]+" · "+L.opacity+"%"));
+    nm.ondblclick=()=>{const n=prompt("Tên layer",L.name);if(n){L.name=n.slice(0,40);pushHist("Đổi tên layer");}};r.appendChild(nm);
+    r.onclick=()=>{act=i;if(L.type==="adj"&&!L.mask)L.editMask=false;renderLayers();renderProps();openProps(false);};
+    r.ondragstart=e=>{dragRow=i;r.classList.add("drag");e.dataTransfer.effectAllowed="move";};r.ondragend=()=>r.classList.remove("drag");r.ondragover=e=>e.preventDefault();
+    r.ondrop=e=>{e.preventDefault();if(dragRow==null||dragRow===i)return;const [Lr]=DOC.layers.splice(dragRow,1);DOC.layers.splice(i,0,Lr);act=i;dragRow=null;scheduleComp();pushHist("Sắp xếp layer");};box.appendChild(r);}
+  const L=AL();$("lBlend").value=L?L.blend:"normal";$("lOp").value=L?L.opacity:100;$("lBlend").disabled=!L||L.type==="adj";}
+
+/* ---------- Properties panel ---------- */
+function sld(label,min,max,step,val,fmt,onIn,onCh){const row=el("div","row"),lb=el("label",null,label),v=el("span","val"),i=document.createElement("input");i.type="range";i.min=min;i.max=max;i.step=step;i.value=val;
+  const show=()=>v.textContent=fmt?fmt(+i.value):String(Math.round(+i.value*100)/100);show();i.oninput=()=>{onIn(+i.value);show();};i.onchange=()=>{if(onCh)onCh(+i.value);};row.addEventListener("dblclick",e=>{if(e.target!==i){i.value=i.defaultValue;i.oninput();i.onchange();}});i.defaultValue=val;row.append(lb,v,i);return row;}
+function chipRow(opts,cur,on){const r=el("div","chips");opts.forEach(([v,l])=>{const b=el("button","chip",l);b.type="button";b.setAttribute("aria-pressed",String(v===cur));b.onclick=()=>{on(v);r.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});return r;}
+function sec(t){const s=el("div","sec");if(t)s.appendChild(el("h4",null,t));return s;}
+function tbtn(l,on,cls){const b=el("button","tbtn"+(cls?" "+cls:""),l);b.type="button";b.onclick=on;return b;}
+function colorIn(val,on){const i=document.createElement("input");i.type="color";i.value=val;i.oninput=()=>on(i.value,false);i.onchange=()=>on(i.value,true);return i;}
+let adjT=null;function adjLive(){scheduleComp();clearTimeout(adjT);}
+function adjCommit(){clearTimeout(adjT);const n="Chỉnh "+(AL()?AL().name:"");adjT=setTimeout(()=>pushHist(n),250);}
+let propsFor=null;
+function renderProps(){const box=$("propsBody");box.innerHTML="";const L=AL();propsFor=L?L.id:null;if(!DOC||!L){$("propsTitle").textContent="Thuộc tính";box.appendChild(el("p","note","Mở ảnh hoặc tạo tài liệu mới để bắt đầu."));return;}
+  $("propsTitle").textContent=L.type==="adj"?L.name:L.type==="text"?"Chữ":"Thuộc tính layer";box.appendChild(buildProps(L));}
+function buildProps(L){const box=el("div","sec");box.style.gap="12px";
+  if(L.type==="text"){const t=L.text,re=(h)=>{renderText(L);scheduleComp();if(h)adjCommit();};const ta=document.createElement("textarea");ta.className="field ptext";ta.value=t.str;ta.rows=3;ta.oninput=()=>{t.str=ta.value;re(false);};ta.onchange=()=>adjCommit();box.appendChild(ta);
+    const s=document.createElement("select");s.className="field";FONTS.forEach(f=>{const o=el("option",null,f);o.value=f;o.selected=f===t.font;s.appendChild(o);});s.onchange=()=>{t.font=s.value;re(true);};box.appendChild(s);
+    box.append(sld("Cỡ chữ",6,800,1,t.size,v=>v+"px",v=>{t.size=v;re(false);},()=>adjCommit()),chipRow([["400","Thường"],["600","Đậm vừa"],["800","Đậm"]],t.weight,v=>{t.weight=v;re(true);}),
+      chipRow([["left","Trái"],["center","Giữa"],["right","Phải"]],t.align,v=>{const b=textBox(L);t.align=v;t.x=v==="left"?b.x:v==="center"?b.x+b.w/2:b.x+b.w;re(true);}));
+    const cr=el("div","inline");cr.append(el("span","note","Màu"),colorIn(t.color,(v,h)=>{t.color=v;re(h);}),el("span","note","Viền"),colorIn(t.strokeCol,(v,h)=>{t.strokeCol=v;re(h);}));box.appendChild(cr);
+    box.append(sld("Độ dày viền",0,40,1,t.stroke,v=>v+"px",v=>{t.stroke=v;re(false);},()=>adjCommit()),sld("Giãn dòng",0.7,2.5,0.05,t.lh,v=>v.toFixed(2),v=>{t.lh=v;re(false);},()=>adjCommit()),sld("Giãn chữ",-10,60,1,t.spacing,v=>v+"px",v=>{t.spacing=v;re(false);},()=>adjCommit()));
+    const r=el("div","btnrow chips");r.append(tbtn(t.shadow?"Bỏ đổ bóng":"Đổ bóng",()=>{t.shadow=!t.shadow;re(true);renderProps();}),tbtn(t.italic?"Bỏ nghiêng":"Nghiêng",()=>{t.italic=!t.italic;re(true);renderProps();}),tbtn("Chuyển thành ảnh",rasterize));box.appendChild(r);return box;}
+  if(L.type==="adj"){const a=L.adj,k=a.kind,S=(lab,key,mn,mx,st,f)=>sld(lab,mn,mx,st||1,a[key],f,v=>{a[key]=v;adjLive();},()=>adjCommit());
+    if(k==="bc")box.append(S("Độ sáng","brightness",-150,150),S("Tương phản","contrast",-50,100));
+    else if(k==="levels"){box.append(histCanvas(),S("Điểm đen vào","inB",0,253),S("Điểm trắng vào","inW",2,255),S("Trung tính (gamma)","gamma",0.1,3,0.01,v=>v.toFixed(2)),S("Điểm đen ra","outB",0,255),S("Điểm trắng ra","outW",0,255));
+      box.appendChild(tbtn("Tự động",()=>{const s=autoLevels();a.inB=s[0];a.inW=s[1];a.gamma=1;adjLive();adjCommit();renderProps();}));}
+    else if(k==="curves")box.append(curveEditor(a));
+    else if(k==="exposure")box.append(S("Phơi sáng","ev",-5,5,0.01,v=>(v>0?"+":"")+v.toFixed(2)),S("Bù sáng","offset",-0.5,0.5,0.005,v=>v.toFixed(3)),S("Gamma","gamma",0.1,3,0.01,v=>v.toFixed(2)));
+    else if(k==="vibrance")box.append(S("Sống động","vib",-100,100),S("Bão hoà","sat",-100,100));
+    else if(k==="hsl"){box.append(S("Sắc độ","hue",-180,180,1,v=>v+"°"),S("Bão hoà","sat",-100,100),S("Độ sáng","light",-100,100));const c=el("label","note");const ch=document.createElement("input");ch.type="checkbox";ch.checked=a.colorize;ch.onchange=()=>{a.colorize=ch.checked;if(a.colorize&&a.sat===0)a.sat=25;adjLive();adjCommit();renderProps();};c.append(ch," Nhuộm màu (Colorize)");box.appendChild(c);}
+    else if(k==="cbal"){box.appendChild(chipRow([["sh","Vùng tối"],["md","Trung tính"],["hi","Vùng sáng"]],a.tone,v=>{a.tone=v;renderProps();}));const arr=a[a.tone];
+      [["Lục lam ↔ Đỏ",0],["Hồng ↔ Xanh lá",1],["Vàng ↔ Xanh dương",2]].forEach(([l,i])=>box.appendChild(sld(l,-100,100,1,arr[i],null,v=>{arr[i]=v;adjLive();},()=>adjCommit())));
+      const c=el("label","note");const ch=document.createElement("input");ch.type="checkbox";ch.checked=a.keep;ch.onchange=()=>{a.keep=ch.checked;adjLive();adjCommit();};c.append(ch," Giữ độ sáng");box.appendChild(c);}
+    else if(k==="bw"){[["Đỏ","r"],["Vàng","y"],["Xanh lá","g"],["Lục lam","c"],["Xanh dương","b"],["Hồng tím","m"]].forEach(([l,key])=>box.appendChild(S(l,key,-200,300,1,v=>v+"%")));
+      const c=el("label","note");const ch=document.createElement("input");ch.type="checkbox";ch.checked=a.tint;ch.onchange=()=>{a.tint=ch.checked;adjLive();adjCommit();renderProps();};c.append(ch," Nhuộm tông ",colorIn(a.tintCol,(v,h)=>{a.tintCol=v;adjLive();if(h)adjCommit();}));box.appendChild(c);if(a.tint)box.appendChild(S("Mức nhuộm","tintAmt",0,100));}
+    else if(k==="pfilter"){const c=el("div","inline");c.append(el("span","note","Màu kính"),colorIn(a.color,(v,h)=>{a.color=v;adjLive();if(h)adjCommit();}));box.append(c,chipRow([["#ec8a00","Ấm 85"],["#00b5ff","Lạnh 80"],["#ff5a2a","Đỏ"],["#2ad16c","Xanh lá"],["#b07a47","Sepia"]],a.color,v=>{a.color=v;adjLive();adjCommit();renderProps();}),S("Mật độ","density",0,100,1,v=>v+"%"));}
+    else if(k==="film"){const g=el("div","pgrid");box.appendChild(chipRow([["jp","Nhật"],["hk","HK"],["fuji","Fuji"],["leica","Leica"],["vscofilm","VSCO Film"],["vsco","VSCO"],["bw","B&W"],["cine","Điện ảnh"]],filmFam,v=>{filmFam=v;renderProps();}));
+      PRESETS.filter(p=>p.fam===filmFam).forEach(p=>{const b=el("button","chip",p.name);b.type="button";b.setAttribute("aria-pressed",String(p.id===a.preset));b.onclick=()=>{a.preset=p.id;L.name="Film: "+p.name;adjLive();adjCommit();renderProps();renderLayers();};g.appendChild(b);});g.className="chips";box.appendChild(g);box.appendChild(S("Độ mạnh","strength",0,100,1,v=>v+"%"));}
+    else if(k==="posterize")box.append(S("Số mức","levels",2,32));
+    else if(k==="threshold")box.append(S("Ngưỡng","level",1,255));
+    else if(k==="gmap"){const c=el("div","inline");c.append(el("span","note","Tối"),colorIn(a.c1,(v,h)=>{a.c1=v;adjLive();if(h)adjCommit();}),el("span","note","Sáng"),colorIn(a.c2,(v,h)=>{a.c2=v;adjLive();if(h)adjCommit();}));box.appendChild(c);}
+    else if(k==="invert")box.appendChild(el("p","note","Đảo ngược toàn bộ màu của các layer bên dưới."));
+    box.appendChild(el("p","note","Layer điều chỉnh tác động lên mọi layer bên dưới và không làm hỏng ảnh gốc. "+(L.mask?"Bấm ô mask trong bảng Layer để tô vùng áp dụng.":"Tạo vùng chọn trước khi thêm để chỉ áp dụng vào vùng đó.")));
+    const r=el("div","btnrow chips");r.append(tbtn("Đặt lại",()=>{L.adj=adjDefaults(k);adjLive();pushHist("Đặt lại "+L.name);}));if(!L.mask)r.append(tbtn("Thêm mask",()=>addMask(true)));box.appendChild(r);return box;}
+  box.appendChild(el("p","note",L.name+" · "+DOC.w+"×"+DOC.h+(L.mask?" · có mask":"")+(L.editMask?" — đang vẽ trên mask":"")));
+  const s1=sec("Sửa nhanh");const r1=el("div","btnrow chips");r1.append(tbtn("Tự động tông màu",autoTone),tbtn("Xoá vật thể trong vùng chọn",contentFill),tbtn("Film preset…",()=>addAdj("film")));s1.appendChild(r1);box.appendChild(s1);
+  const s2=sec("Layer điều chỉnh");const r2=el("div","btnrow chips");ADJ_KINDS.forEach(([k,l])=>r2.appendChild(tbtn(l,()=>addAdj(k))));s2.appendChild(r2);box.appendChild(s2);
+  if(L.mask){const s3=sec("Mask");const r3=el("div","btnrow chips");r3.append(tbtn(L.editMask?"Vẽ trên ảnh":"Vẽ trên mask",()=>{L.editMask=!L.editMask;renderLayers();renderProps();}),tbtn("Đảo mask",invertMask),tbtn("Áp dụng mask",applyMask),tbtn("Xoá mask",delMask,"warn"));s3.appendChild(r3);box.appendChild(s3);}
+  return box;}
+let filmFam="vscofilm";
+function histCanvas(){const c=newC(256,70);c.style.cssText="width:100%;height:60px;border-radius:6px;background:rgba(0,0,0,.35)";const s=Math.min(1,400/Math.max(DOC.w,DOC.h)),t=newC(DOC.w*s,DOC.h*s),tx=t.getContext("2d",{willReadFrequently:true});tx.drawImage(comp,0,0,t.width,t.height);
+  const d=tx.getImageData(0,0,t.width,t.height).data,hh=new Float32Array(256);for(let i=0;i<d.length;i+=4)if(d[i+3]>10)hh[Math.round(0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2])]++;const mx=Math.max(...hh)||1,x=X(c);x.fillStyle="rgba(244,241,234,.6)";for(let i=0;i<256;i++){const h=Math.sqrt(hh[i]/mx)*66;x.fillRect(i,70-h,1,h);}return c;}
+function autoLevels(){const s=Math.min(1,600/Math.max(DOC.w,DOC.h)),t=newC(DOC.w*s,DOC.h*s),tx=t.getContext("2d",{willReadFrequently:true});tx.drawImage(comp,0,0,t.width,t.height);const d=tx.getImageData(0,0,t.width,t.height).data,v=[];
+  for(let i=0;i<d.length;i+=4)if(d[i+3]>10)v.push(0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2]);v.sort((a,b)=>a-b);const q=f=>v[Math.floor(clamp(f,0,1)*(v.length-1))]||0;return [Math.round(clamp(q(0.005),0,250)),Math.round(clamp(q(0.995),5,255))];}
+function autoTone(){const L=AL();if(!L||L.type!=="pix")return toast("Chọn layer ảnh");own(L);const c=L.canvas,x=c.getContext("2d",{willReadFrequently:true}),im=x.getImageData(0,0,c.width,c.height),d=im.data;
+  const lo=[],hi=[];for(let ch=0;ch<3;ch++){const h=new Uint32Array(256);let n=0;for(let i=ch;i<d.length;i+=16){if(d[i+3-ch]<10)continue;h[d[i]]++;n++;}let a=0,k=0;while(k<255&&a+h[k]<n*0.004){a+=h[k];k++;}lo[ch]=k;a=0;k=255;while(k>0&&a+h[k]<n*0.004){a+=h[k];k--;}hi[ch]=Math.max(lo[ch]+8,k);}
+  const LUT=[0,1,2].map(ch=>{const t=new Uint8Array(256);for(let i=0;i<256;i++)t[i]=clamp(Math.round((i-lo[ch])/(hi[ch]-lo[ch])*255),0,255);return t;});
+  for(let i=0;i<d.length;i+=4){d[i]=LUT[0][d[i]];d[i+1]=LUT[1][d[i+1]];d[i+2]=LUT[2][d[i+2]];}
+  if(DOC.sel){const o=X(c).getImageData(0,0,c.width,c.height);const t=newC(c.width,c.height);X(t).putImageData(im,0,0);const tx=X(t);tx.globalCompositeOperation="destination-in";tx.drawImage(DOC.sel,0,0);x.drawImage(t,0,0);}else x.putImageData(im,0,0);
+  L.thumbV++;scheduleComp();pushHist("Tự động tông màu");}
+function curveEditor(a){const wrap=el("div","sec");wrap.appendChild(chipRow([["rgb","RGB"],["r","Đỏ"],["g","Xanh lá"],["b","Xanh dương"]],a.ch,v=>{a.ch=v;paint();}));const c=newC(512,512);c.className="curve";wrap.appendChild(c);
+  wrap.appendChild(el("p","note","Kéo để thêm / di chuyển điểm. Kéo điểm ra ngoài khung để xoá."));const x=X(c);
+  function paint(){x.clearRect(0,0,512,512);x.strokeStyle="rgba(255,255,255,.08)";for(let i=1;i<4;i++){x.beginPath();x.moveTo(i*128,0);x.lineTo(i*128,512);x.moveTo(0,i*128);x.lineTo(512,i*128);x.stroke();}
+    x.strokeStyle="rgba(255,255,255,.2)";x.beginPath();x.moveTo(0,512);x.lineTo(512,0);x.stroke();const col={rgb:"#f4f1ea",r:"#ff6b6b",g:"#6be38a",b:"#6bb8ff"}[a.ch];
+    const f=curveFn(a.pts[a.ch]);x.strokeStyle=col;x.lineWidth=2.5;x.beginPath();for(let i=0;i<=256;i++){const y=f(i/256)*512;i?x.lineTo(i*2,512-y):x.moveTo(0,512-y);}x.stroke();
+    a.pts[a.ch].forEach(p=>{x.fillStyle=col;x.beginPath();x.arc(p[0]*2,512-p[1]*2,8,0,7);x.fill();});}
+  let dg=null;const pos=e=>{const r=c.getBoundingClientRect();return [clamp((e.clientX-r.left)/r.width*255,0,255),clamp(255-(e.clientY-r.top)/r.height*255,0,255),(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height];};
+  c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);const [px,py]=pos(e),P=a.pts[a.ch];let i=P.findIndex(p=>Math.abs(p[0]-px)<12&&Math.abs(p[1]-py)<16);if(i<0){P.push([px,py]);P.sort((p,q)=>p[0]-q[0]);i=P.findIndex(p=>p[0]===px);}dg=P[i];paint();adjLive();};
+  c.onpointermove=e=>{if(!dg)return;const [px,py,u,v]=pos(e),P=a.pts[a.ch];if((u<-0.08||u>1.08||v<-0.08||v>1.08)&&P.length>2&&dg!==P[0]&&dg!==P[P.length-1]){P.splice(P.indexOf(dg),1);dg=null;paint();adjLive();return;}
+    const i=P.indexOf(dg),lo=i>0?P[i-1][0]+1:0,hi=i<P.length-1?P[i+1][0]-1:255;dg[0]=i===0?Math.min(px,hi):i===P.length-1?Math.max(px,lo):clamp(px,lo,hi);dg[1]=py;paint();adjLive();};
+  c.onpointerup=()=>{if(dg!==undefined){dg=null;adjCommit();}};paint();return wrap;}
+
+/* ---------- Filters (destructive, on the active layer, respecting selection) ---------- */
+const FILTERS=[["gblur","Làm mờ Gaussian"],["mblur","Làm mờ chuyển động"],["unsharp","Làm nét (Unsharp Mask)"],["noise","Thêm nhiễu / hạt"],["mosaic","Mosaic"],["film","Preset film (áp thẳng)"],["vignette","Tối góc"],["highpass","High Pass"]];
+function openFilter(k){const L=AL();if(!L||L.type!=="pix")return toast("Chọn một layer ảnh");const base=cloneC(L.canvas);own(L);const prm={gblur:{r:8},mblur:{d:30,a:0},unsharp:{amt:80,r:2,th:2},noise:{amt:12,mono:true},mosaic:{s:16},film:{preset:"v_KP4",st:100},vignette:{amt:50,size:60},highpass:{r:6}}[k];
+  const d=$("dlg");d.innerHTML="";d.appendChild(el("h3",null,(FILTERS.find(f=>f[0]===k)||["",""])[1]));let T=null;const run=()=>{clearTimeout(T);T=setTimeout(()=>{applyFilter(L,base,k,prm);scheduleComp();},60);};
+  const S=(l,key,a,b,st,f)=>d.appendChild(sld(l,a,b,st||1,prm[key],f,v=>{prm[key]=v;run();}));
+  if(k==="gblur")S("Bán kính","r",0.5,100,0.5,v=>v+"px");else if(k==="mblur"){S("Khoảng cách","d",1,200,1,v=>v+"px");S("Góc","a",-90,90,1,v=>v+"°");}
+  else if(k==="unsharp"){S("Lượng","amt",1,300,1,v=>v+"%");S("Bán kính","r",0.3,20,0.1,v=>v+"px");S("Ngưỡng","th",0,60);}
+  else if(k==="noise"){S("Lượng","amt",1,60,1,v=>v+"%");const c=el("label","note");const ch=document.createElement("input");ch.type="checkbox";ch.checked=prm.mono;ch.onchange=()=>{prm.mono=ch.checked;run();};c.append(ch," Đơn sắc (như hạt film)");d.appendChild(c);}
+  else if(k==="mosaic")S("Cỡ ô","s",2,200,1,v=>v+"px");else if(k==="vignette"){S("Lượng","amt",-100,100);S("Độ rộng","size",10,100);}else if(k==="highpass")S("Bán kính","r",0.5,60,0.5,v=>v+"px");
+  else if(k==="film"){const sel=document.createElement("select");sel.className="field";FAMS.forEach(([f,fl])=>{const g=document.createElement("optgroup");g.label=fl;PRESETS.filter(p=>p.fam===f).forEach(p=>{const o=el("option",null,p.name);o.value=p.id;o.selected=p.id===prm.preset;g.appendChild(o);});sel.appendChild(g);});sel.onchange=()=>{prm.preset=sel.value;run();};d.appendChild(sel);S("Độ mạnh","st",0,100,1,v=>v+"%");}
+  d.appendChild(el("p","note",DOC.sel?"Chỉ áp dụng trong vùng chọn.":"Áp dụng cho cả layer “"+L.name+"”."));
+  const r=el("div","btnrow chips");r.append(tbtn("Huỷ",()=>{L.canvas=base;scheduleComp();$("dlgBox").hidden=true;}),tbtn("Áp dụng",()=>{clearTimeout(T);applyFilter(L,base,k,prm);L.thumbV++;scheduleComp();$("dlgBox").hidden=true;pushHist((FILTERS.find(f=>f[0]===k)||["",""])[1]);},"primary"));d.appendChild(r);
+  $("dlgBox").hidden=false;run();}
+function applyFilter(L,base,k,p){const W=DOC.w,H=DOC.h,out=newC(W,H),o=out.getContext("2d",{willReadFrequently:true});
+  if(k==="gblur"){o.filter="blur("+p.r+"px)";o.drawImage(base,0,0);o.filter="none";}
+  else if(k==="mblur"){const n=Math.min(40,Math.max(4,Math.round(p.d/3))),a=p.a*Math.PI/180;for(let i=0;i<n;i++){const t=(i/(n-1)-0.5)*p.d;o.globalAlpha=1/(i+1);o.drawImage(base,Math.cos(a)*t,Math.sin(a)*t);}o.globalAlpha=1;}
+  else if(k==="unsharp"||k==="highpass"){const b=newC(W,H),bx=b.getContext("2d",{willReadFrequently:true});bx.filter="blur("+p.r+"px)";bx.drawImage(base,0,0);const bd=bx.getImageData(0,0,W,H).data,im=base.getContext("2d",{willReadFrequently:true}).getImageData(0,0,W,H),d=im.data;
+    if(k==="unsharp"){const a=p.amt/100;for(let i=0;i<d.length;i+=4)for(let c=0;c<3;c++){const df=d[i+c]-bd[i+c];if(Math.abs(df)>=p.th)d[i+c]=clamp(d[i+c]+df*a,0,255);}}else for(let i=0;i<d.length;i+=4)for(let c=0;c<3;c++)d[i+c]=clamp(128+d[i+c]-bd[i+c],0,255);o.putImageData(im,0,0);}
+  else if(k==="noise"){o.drawImage(base,0,0);const im=o.getImageData(0,0,W,H),d=im.data,a=p.amt*2.55;for(let i=0;i<d.length;i+=4){if(p.mono){const n=(Math.random()+Math.random()-1)*a;d[i]+=n;d[i+1]+=n;d[i+2]+=n;}else{d[i]+=(Math.random()+Math.random()-1)*a;d[i+1]+=(Math.random()+Math.random()-1)*a;d[i+2]+=(Math.random()+Math.random()-1)*a;}}o.putImageData(im,0,0);}
+  else if(k==="mosaic"){const s=newC(Math.ceil(W/p.s),Math.ceil(H/p.s));X(s).drawImage(base,0,0,s.width,s.height);o.imageSmoothingEnabled=false;o.drawImage(s,0,0,s.width*p.s,s.height*p.s);}
+  else if(k==="vignette"){o.drawImage(base,0,0);const g=o.createRadialGradient(W/2,H/2,Math.min(W,H)*p.size/200,W/2,H/2,Math.hypot(W,H)/2);const c=p.amt>0?"0,0,0":"255,255,255";g.addColorStop(0,`rgba(${c},0)`);g.addColorStop(1,`rgba(${c},${Math.abs(p.amt)/100})`);o.globalCompositeOperation="source-atop";o.fillStyle=g;o.fillRect(0,0,W,H);}
+  else if(k==="film"){const tex=makeTex(0,0,base);const pr=findP(p.preset),s=p.st/100,e={};for(const kk in NEUTRAL){const v=pr.params[kk]==null?NEUTRAL[kk]:pr.params[kk];e[kk]=NOSCALE.has(kk)?v:NEUTRAL[kk]+(v-NEUTRAL[kk])*s;}e.mix=(pr.mix||Z9).map(x=>x*s);
+    if(W>maxTex||H>maxTex){gl.deleteTexture(tex);toast("Ảnh vượt giới hạn GPU");o.drawImage(base,0,0);}else{render(tex,W,H,e);gl.deleteTexture(tex);o.drawImage(glc,0,0);o.globalCompositeOperation="destination-in";o.drawImage(base,0,0);}}
+  const x=X(L.canvas);x.save();x.globalCompositeOperation="copy";x.drawImage(base,0,0);x.restore();
+  if(k!=="vignette"&&k!=="highpass"&&k!=="mosaic"&&k!=="mblur"&&k!=="gblur"){}/* keep alpha */
+  if(DOC.sel){o.globalCompositeOperation="destination-in";o.drawImage(DOC.sel,0,0);x.save();x.globalCompositeOperation="destination-out";x.drawImage(DOC.sel,0,0);x.restore();x.drawImage(out,0,0);}
+  else{x.save();x.globalCompositeOperation="copy";x.drawImage(out,0,0);x.restore();}}
+
+/* ---------- Dialogs ---------- */
+function dialog(title,build,okLabel,ok){const d=$("dlg");d.innerHTML="";d.appendChild(el("h3",null,title));const get=build(d);const r=el("div","btnrow chips");r.append(tbtn("Huỷ",()=>{$("dlgBox").hidden=true;}),tbtn(okLabel,()=>{if(ok(get())!==false)$("dlgBox").hidden=true;},"primary"));d.appendChild(r);$("dlgBox").hidden=false;}
+function numIn(label,val){const l=el("label","row");l.style.gridTemplateColumns="1fr 110px";const s=el("span","note",label),i=document.createElement("input");i.type="number";i.className="field";i.value=val;i.min=1;i.max=20000;l.append(s,i);return [l,i];}
+function dlgNew(){dialog("Tài liệu mới",d=>{const [a,w]=numIn("Rộng (px)",1080),[b,h]=numIn("Cao (px)",1350);d.append(a,b);let fill="#ffffff";d.appendChild(chipRow([["#ffffff","Nền trắng"],["#000000","Nền đen"],["","Trong suốt"]],fill,v=>fill=v));return ()=>({w:+w.value,h:+h.value,fill});},"Tạo",v=>{const [w,h]=capDims(clamp(v.w,1,20000),clamp(v.h,1,20000));newDoc(w,h,v.fill);});}
+function dlgImageSize(){if(!DOC)return;dialog("Kích thước ảnh",d=>{const [a,w]=numIn("Rộng (px)",DOC.w),[b,h]=numIn("Cao (px)",DOC.h);let lock=true;const r=DOC.w/DOC.h;w.oninput=()=>{if(lock)h.value=Math.round(+w.value/r);};h.oninput=()=>{if(lock)w.value=Math.round(+h.value*r);};
+  const c=el("label","note");const ch=document.createElement("input");ch.type="checkbox";ch.checked=true;ch.onchange=()=>lock=ch.checked;c.append(ch," Giữ tỉ lệ");d.append(a,b,c);return ()=>[+w.value,+h.value];},"Đổi",([w,h])=>{const [W,H]=capDims(w,h);resample(W,H);});}
+function dlgCanvasSize(){if(!DOC)return;dialog("Kích thước canvas",d=>{const [a,w]=numIn("Rộng (px)",DOC.w),[b,h]=numIn("Cao (px)",DOC.h);d.append(a,b,el("p","note","Ảnh được giữ ở giữa; phần thêm vào trong suốt."));return ()=>[+w.value,+h.value];},"Đổi",([w,h])=>{const [W,H]=capDims(w,h);resizeCanvas(W,H,Math.round((W-DOC.w)/2),Math.round((H-DOC.h)/2));fitView();pushHist("Kích thước canvas");});}
+function dlgFeather(){if(!DOC||!DOC.sel)return toast("Chưa có vùng chọn");dialog("Làm mềm biên vùng chọn",d=>{const [a,r]=numIn("Bán kính (px)",10);d.append(a);return ()=>+r.value;},"OK",v=>{DOC.sel=feather(DOC.sel,v);antsDirty=true;pushHist("Làm mềm vùng chọn");requestFrame();});}
+function dlgGrow(sign){if(!DOC||!DOC.sel)return toast("Chưa có vùng chọn");dialog(sign>0?"Mở rộng vùng chọn":"Thu hẹp vùng chọn",d=>{const [a,r]=numIn("Số pixel",8);d.append(a);return ()=>+r.value;},"OK",v=>growSel(sign*v));}
+function dlgExport(){if(!DOC)return toast("Chưa có ảnh");let fmt="png",q=92;dialog("Xuất ảnh",d=>{d.appendChild(chipRow([["png","PNG (giữ trong suốt)"],["jpg","JPG"],["webp","WEBP"],["psd","PSD (giữ layer)"]],fmt,v=>fmt=v));d.appendChild(sld("Chất lượng JPG/WEBP",50,100,1,q,v=>v+"%",v=>q=v));d.appendChild(el("p","note",DOC.w+"×"+DOC.h+" px · "+DOC.layers.length+" layer"));return ()=>({fmt,q});},"Xuất",v=>{exportAs(v.fmt,v.q/100);});}
+
+/* ---------- File IO ---------- */
+let dlP=null;function getDownloads(){if(!dlP){try{dlP=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads").catch(()=>null):Promise.resolve(null);}catch(e){dlP=Promise.resolve(null);}}return dlP;}
+async function saveBlob(blob,name){const dl=await getDownloads();if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu "+name);return;}catch(err){if(err&&err.code==="declined"){toast("Đã huỷ lưu");return;}}}
+  const file=new File([blob],name,{type:blob.type});if(/iPhone|iPad|Android/.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return;}catch(e){}}
+  const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);toast("Đã tải "+name);}
+const stamp_=()=>new Date().toISOString().slice(0,19).replace(/[:T]/g,"");
+async function exportAs(fmt,q){composite();const base="IOHK-Studio-"+stamp_();
+  if(fmt==="psd"){try{const blob=await toPSD();await saveBlob(blob,base+".psd");}catch(e){console.error(e);toast("Không tạo được PSD: "+(e.message||e));}return;}
+  let c=comp;if(fmt==="jpg"){c=newC(DOC.w,DOC.h);const x=X(c);x.fillStyle="#fff";x.fillRect(0,0,DOC.w,DOC.h);x.drawImage(comp,0,0);}
+  const mime=fmt==="jpg"?"image/jpeg":fmt==="webp"?"image/webp":"image/png";const blob=await new Promise(r=>c.toBlob(r,mime,q));if(!blob)return toast("Không xuất được");await saveBlob(blob,base+"."+(fmt==="jpg"?"jpg":fmt));}
+const PSD_URL="https://cdn.jsdelivr.net/npm/ag-psd@31.0.1/dist/bundle.js";
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("Không tải được thư viện PSD (cần mạng)"));document.head.appendChild(s);});}
+async function psdLib(){if(!window.agPsd){toast("Đang tải thư viện PSD…");await loadScript(PSD_URL);}return window.agPsd;}
+async function toPSD(){const lib=await psdLib();composite();const children=[];let skipped=0;
+  for(const L of DOC.layers){const o={name:L.name,opacity:L.opacity/100,blendMode:PSDB[L.blend]||"normal",hidden:!L.visible};
+    if(L.type==="adj"){const a=L.adj;let adj=null;if(a.kind==="bc")adj={type:"brightness/contrast",brightness:Math.round(a.brightness),contrast:Math.round(a.contrast)};
+      else if(a.kind==="hsl")adj={type:"hue/saturation",master:{a:0,b:0,c:0,d:0,hue:Math.round(a.hue),saturation:Math.round(a.sat),lightness:Math.round(a.light)}};
+      else if(a.kind==="levels")adj={type:"levels",rgb:{shadowInput:a.inB,highlightInput:a.inW,shadowOutput:a.outB,highlightOutput:a.outW,midtoneInput:a.gamma}};
+      else if(a.kind==="invert")adj={type:"invert"};else if(a.kind==="posterize")adj={type:"posterize",levels:a.levels};else if(a.kind==="threshold")adj={type:"threshold",level:a.level};
+      else if(a.kind==="exposure")adj={type:"exposure",exposure:a.ev,offset:a.offset,gamma:a.gamma};else if(a.kind==="vibrance")adj={type:"vibrance",vibrance:Math.round(a.vib),saturation:Math.round(a.sat)};
+      if(!adj){skipped++;continue;}o.adjustment=adj;}
+    else{o.canvas=L.type==="text"||L.x||L.y?flatNoMask(L):L.canvas;o.left=0;o.top=0;}
+    if(L.mask){o.mask={canvas:maskToGray(L.mask),left:0,top:0,defaultColor:0,disabled:!L.maskOn};}
+    children.push(o);}
+  const psd={width:DOC.w,height:DOC.h,children,canvas:comp};const buf=lib.writePsd(psd,{generateThumbnail:true});if(skipped)toast(skipped+" layer điều chỉnh (curves, film…) không có trong chuẩn PSD nên được bỏ qua");return new Blob([buf],{type:"image/vnd.adobe.photoshop"});}
+function flatNoMask(L){const c=newC(DOC.w,DOC.h);X(c).drawImage(L.canvas,L.x,L.y);return c;}
+function maskToGray(m){const c=newC(DOC.w,DOC.h),x=X(c);x.fillStyle="#000";x.fillRect(0,0,DOC.w,DOC.h);x.drawImage(m,0,0);return c;}
+function grayToMask(g){const c=newC(g.width,g.height),x=c.getContext("2d",{willReadFrequently:true});x.drawImage(g,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;for(let i=0;i<d.length;i+=4){d[i+3]=d[i];d[i]=d[i+1]=d[i+2]=255;}x.putImageData(im,0,0);return c;}
+async function openPSD(file){try{const lib=await psdLib();const buf=await file.arrayBuffer();const psd=lib.readPsd(buf,{skipThumbnail:true});const W=psd.width,H=psd.height;const layers=[];
+  const walk=(arr)=>{(arr||[]).forEach(ch=>{if(ch.children){walk(ch.children);return;}const L=mkLayer({name:ch.name||"Layer",visible:!ch.hidden,opacity:Math.round((ch.opacity==null?1:ch.opacity)*100),blend:PSDB_R[ch.blendMode]||"normal"});
+    if(ch.canvas){const c=newC(W,H);X(c).drawImage(ch.canvas,ch.left||0,ch.top||0);L.canvas=c;}else if(ch.adjustment){const a=ch.adjustment;let k=null;
+      if(a.type==="brightness/contrast")k=Object.assign(adjDefaults("bc"),{brightness:a.brightness||0,contrast:a.contrast||0});else if(a.type==="hue/saturation"&&a.master)k=Object.assign(adjDefaults("hsl"),{hue:a.master.hue||0,sat:a.master.saturation||0,light:a.master.lightness||0});
+      else if(a.type==="levels"&&a.rgb)k=Object.assign(adjDefaults("levels"),{inB:a.rgb.shadowInput,inW:a.rgb.highlightInput,outB:a.rgb.shadowOutput,outW:a.rgb.highlightOutput,gamma:a.rgb.midtoneInput||1});else if(a.type==="invert")k=adjDefaults("invert");
+      if(!k)return;L.type="adj";L.adj=k;}else return;
+    if(ch.mask&&ch.mask.canvas){const g=newC(W,H),gx=X(g);gx.fillStyle=ch.mask.defaultColor?"#fff":"#000";gx.fillRect(0,0,W,H);gx.drawImage(ch.mask.canvas,ch.mask.left||0,ch.mask.top||0);L.mask=grayToMask(g);L.maskOn=!ch.mask.disabled;}
+    layers.push(L);});};walk(psd.children);
+  if(!layers.length&&psd.canvas){const c=newC(W,H);X(c).drawImage(psd.canvas,0,0);layers.push(mkLayer({name:"Nền",canvas:c}));}
+  DOC={w:W,h:H,layers,sel:null};act=layers.length-1;hist=[];hIdx=-1;afterDocChange("Mở PSD");fitView();toast("Đã mở PSD: "+layers.length+" layer");}
+  catch(e){console.error(e);toast("Không mở được PSD: "+(e.message||e));}}
+function openFile(f){if(!f)return;if(/\.psd$/i.test(f.name)){openPSD(f);return;}if(!/^image\//.test(f.type))return toast("Hãy chọn ảnh hoặc file PSD");const u=URL.createObjectURL(f),img=new Image();
+  img.onload=()=>{docFromImage(img,f.name.replace(/\.[^.]+$/,""));URL.revokeObjectURL(u);};img.onerror=()=>{URL.revokeObjectURL(u);toast("Không đọc được ảnh này");};img.src=u;}
+function placeFiles(files){if(!DOC){openFile(files[0]);return;}[...files].forEach(f=>{if(!/^image\//.test(f.type))return;const u=URL.createObjectURL(f),img=new Image();img.onload=()=>{const s=Math.min(1,DOC.w*0.8/img.naturalWidth,DOC.h*0.8/img.naturalHeight),w=img.naturalWidth*s,h=img.naturalHeight*s;
+    const c=newC(DOC.w,DOC.h),x=X(c);x.imageSmoothingQuality="high";x.drawImage(img,(DOC.w-w)/2,(DOC.h-h)/2,w,h);addLayer(f.name.replace(/\.[^.]+$/,""),c);URL.revokeObjectURL(u);toast("Đã thêm layer “"+f.name+"”. Ctrl+T để biến đổi.");};img.src=u;});}
+let clip=null;
+function copySel(cut){const L=AL();if(!L||L.type==="adj")return;const c=flat(L),x=X(c);if(DOC.sel){x.globalCompositeOperation="destination-in";x.drawImage(DOC.sel,0,0);}clip=c;if(cut){clearSel();}toast(cut?"Đã cắt":"Đã sao chép");}
+function paste(){if(!clip||!DOC)return;const c=newC(DOC.w,DOC.h);X(c).drawImage(clip,0,0);addLayer("Đã dán",c);}
+
+/* ---------- Menus ---------- */
+const MENUS=[["Tệp",[["Mới…","Ctrl+N",dlgNew],["Mở ảnh / PSD…","Ctrl+O",()=>$("fOpen").click()],["Thêm ảnh thành layer…","",()=>$("fPlace").click()],null,["Xuất ảnh…","Ctrl+E",dlgExport],["Lưu PSD (giữ layer)","Ctrl+S",()=>exportAs("psd")],["Xuất PNG nhanh","",()=>exportAs("png",1)],["Xuất JPG nhanh","",()=>exportAs("jpg",.95)]]],
+  ["Sửa",[["Hoàn tác","Ctrl+Z",()=>restore(hIdx-1)],["Làm lại","Ctrl+Shift+Z",()=>restore(hIdx+1)],null,["Cắt","Ctrl+X",()=>copySel(true)],["Sao chép","Ctrl+C",()=>copySel(false)],["Dán thành layer","Ctrl+V",paste],["Xoá vùng chọn","Delete",clearSel],null,["Tô màu trước","Alt+Delete",()=>fillLayer(fg)],["Tô màu nền","Ctrl+Delete",()=>fillLayer(bgc)],["Xoá vật thể (tô theo nội dung)","Shift+Delete",contentFill],null,["Biến đổi tự do","Ctrl+T",startXf],["Lật layer ngang","",()=>flipDoc(true,true)],["Lật layer dọc","",()=>flipDoc(false,true)]]],
+  ["Ảnh",[["Tự động tông màu","Ctrl+Shift+L",autoTone],null,["Kích thước ảnh…","Ctrl+Alt+I",dlgImageSize],["Kích thước canvas…","Ctrl+Alt+C",dlgCanvasSize],["Cắt theo vùng chọn","",cropToSel],null,["Xoay 90° phải","",()=>rotateDoc(90)],["Xoay 90° trái","",()=>rotateDoc(270)],["Xoay 180°","",()=>rotateDoc(180)],["Lật ảnh ngang","",()=>flipDoc(true)],["Lật ảnh dọc","",()=>flipDoc(false)]]],
+  ["Lớp",[["Layer mới","Ctrl+Shift+N",()=>addLayer()],["Nhân đôi / tách vùng chọn","Ctrl+J",dupLayer],["Xoá layer","",delLayer],{sub:"Layer điều chỉnh"},...ADJ_KINDS.map(([k,l])=>[l,"",()=>addAdj(k)]),null,["Thêm mask (hiện tất cả)","",()=>addMask(false)],["Mask từ vùng chọn","",()=>addMask(true)],["Áp dụng mask","",applyMask],["Xoá mask","",delMask],null,["Đưa lên","Ctrl+]",()=>moveLayer(1)],["Đưa xuống","Ctrl+[",()=>moveLayer(-1)],["Gộp xuống","Ctrl+E",mergeDown],["Gộp layer hiển thị","Ctrl+Shift+E",mergeVisible],["Làm phẳng ảnh","",flatten],["Chuyển chữ thành ảnh","",rasterize]]],
+  ["Chọn",[["Chọn tất cả","Ctrl+A",selAll],["Bỏ chọn","Ctrl+D",deselect],["Đảo vùng chọn","Ctrl+Shift+I",invertSel],null,["Chọn người (AI)","",selectPerson],["Chọn theo layer hiện tại","",()=>layerAlphaSel(AL())],null,["Làm mềm biên…","Shift+F6",dlgFeather],["Mở rộng…","",()=>dlgGrow(1)],["Thu hẹp…","",()=>dlgGrow(-1)]]],
+  ["Bộ lọc",FILTERS.map(([k,l])=>[l+"…","",()=>openFilter(k)])],
+  ["Xem",[["Phóng to","Ctrl++",()=>setZoom(Z*1.25)],["Thu nhỏ","Ctrl+-",()=>setZoom(Z/1.25)],["Vừa màn hình","Ctrl+0",fitView],["Kích thước thật 100%","Ctrl+1",()=>setZoom(1)]]]];
+function buildMenus(){const nav=$("menus");nav.innerHTML="";MENUS.forEach(([title,items])=>{const m=el("div","menu"),b=el("button",null,title);b.type="button";b.setAttribute("aria-expanded","false");const dd=menuDrop(items);dd.hidden=true;
+    b.onclick=e=>{e.stopPropagation();const open=dd.hidden;closeMenus();dd.hidden=!open;b.setAttribute("aria-expanded",String(open));};b.onmouseenter=()=>{if(document.querySelector(".menu .drop:not([hidden])")&&dd.hidden){closeMenus();dd.hidden=false;b.setAttribute("aria-expanded","true");}};m.append(b,dd);nav.appendChild(m);});}
+function menuDrop(items){const dd=el("div","drop scroll");dd.style.maxHeight="70vh";items.forEach(it=>{if(!it){dd.appendChild(el("hr"));return;}if(it.sub){dd.appendChild(el("div","sub",it.sub));return;}const [l,k,fn]=it;const b=el("button");b.type="button";b.append(el("span",null,l));if(k)b.appendChild(el("kbd",null,k));
+  b.onclick=e=>{e.stopPropagation();closeMenus();closeSheet();if(!DOC&&!/Mới|Mở/.test(l))return toast("Mở ảnh hoặc tạo tài liệu trước");fn();};dd.appendChild(b);});return dd;}
+function closeMenus(){document.querySelectorAll(".menu .drop").forEach(d=>d.hidden=true);document.querySelectorAll(".menu>button").forEach(b=>b.setAttribute("aria-expanded","false"));}
+
+/* ---------- Mobile bar & sheet ---------- */
+function renderMbar(){const box=$("mbar");if(!box)return;box.innerHTML="";const B=(ic,l,on,pressed,sym)=>{const b=el("button","mbtn");b.type="button";b.innerHTML='<svg class="i"><use href="#'+(sym||"t-")+ic+'"/></svg>'+l;b.setAttribute("aria-pressed",String(!!pressed));b.onclick=on;box.appendChild(b);};
+  B("layers","Layer",()=>openSheet("layers"),false,"i-");B("sliders","Thuộc tính",()=>openSheet("props"),false,"i-");
+  const fgB=el("button","mbtn");fgB.type="button";fgB.innerHTML='<span style="display:block;width:22px;height:22px;border-radius:6px;border:1.5px solid #fff;box-sizing:border-box;background:'+fg+'"></span>Màu';const ci=document.createElement("input");ci.type="color";ci.value=fg;ci.style.cssText="position:absolute;opacity:0;width:1px;height:1px";ci.oninput=()=>{fg=ci.value;renderTools();};fgB.onclick=()=>ci.click();fgB.appendChild(ci);box.appendChild(fgB);
+  TOOLS.filter(t=>t[0]!=="hand").forEach(([k,l])=>B(k,l.split(" ")[0]==="Vùng"?l.replace("Vùng chọn ","Chọn "):l,()=>setTool(k),k===tool));B("menu","Menu",()=>openSheet("menu"),false,"i-");}
+let sheetMode=null;
+function openSheet(m){sheetMode=m;const s=$("sheet"),b=$("sbody");b.innerHTML="";$("sTitle").textContent={layers:"Layer",props:"Thuộc tính",menu:"Menu"}[m];
+  if(m==="layers"){const side=$("layersPn");b.appendChild(side);side.style.display="flex";}
+  else if(m==="props"){const p=$("props");b.appendChild(p);p.style.display="flex";p.style.maxHeight="none";}
+  else{MENUS.forEach(([t,items])=>{const d=el("details");d.style.borderBottom="1px solid var(--line)";const sm=el("summary",null,t);sm.style.cssText="padding:12px 16px;font-weight:600;cursor:pointer";d.appendChild(sm);const dd=menuDrop(items);dd.classList.remove("drop");dd.style.cssText="display:flex;flex-direction:column;padding:0 10px 10px";d.appendChild(dd);b.appendChild(d);});}
+  s.classList.add("open");s.setAttribute("aria-hidden","false");}
+function closeSheet(){const s=$("sheet");if(!s.classList.contains("open"))return;s.classList.remove("open");s.setAttribute("aria-hidden","true");const side=$("side");
+  ["props","layersPn","histPn"].forEach(id=>{const n=$(id);n.style.display="";n.style.maxHeight="";side.appendChild(n);});}
+function openProps(force){if(!isDesk()&&force)openSheet("props");}
+
+/* ---------- Pointer handling ---------- */
+let drag=null,spaceDown=false;const ptrs=new Map();let pinch=null;
+function evDoc(e){const r=stage.getBoundingClientRect();return s2d(e.clientX-r.left,e.clientY-r.top);}
+stage.addEventListener("pointerdown",e=>{if(!DOC)return;closeMenus();stage.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+  if(ptrs.size===2){if(ST){strokeEnd();restore(hIdx-1);hist.length=hIdx+1;}drag=null;const [a,b]=[...ptrs.values()],r=stage.getBoundingClientRect();pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:Z,cx:(a[0]+b[0])/2-r.left,cy:(a[1]+b[1])/2-r.top,ox:OX,oy:OY};return;}
+  const p=evDoc(e),r=stage.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;
+  if(spaceDown||tool==="hand"||e.button===1){drag={kind:"pan",sx,sy,ox:OX,oy:OY};stage.style.cursor="grabbing";return;}
+  if(tool==="zoom"){setZoom(e.altKey?Z/1.6:Z*1.6,sx,sy);return;}
+  if(tool==="eyedrop"){pickColor(p,e.altKey);drag={kind:"pick"};return;}
+  if(xf){const h=xfHandles().find(h=>{const [a,b]=d2s(h.x,h.y);return Math.abs(a-sx)<12&&Math.abs(b-sy)<12;});const L=AL(),t=L.tf;
+    if(h){drag={kind:"xfscale",h,t0:Object.assign({},t),p0:p};return;}const inside=pointInXf(p);drag=inside?{kind:"xfmove",t0:Object.assign({},t),p0:p}:{kind:"xfrot",t0:Object.assign({},t),a0:Math.atan2(p[1]-t.cy-t.ty,p[0]-t.cx-t.tx)};return;}
+  if(tool==="move"){let L=AL();if(O.move.auto||e.ctrlKey||e.metaKey){const hit=pickLayer(p);if(hit>=0){act=hit;L=AL();renderLayers();renderProps();}}if(!L||L.type==="adj")return;
+    drag={kind:"move",p0:p,L,tx0:L.text?L.text.x:0,ty0:L.text?L.text.y:0};return;}
+  if(tool==="marquee"){drag={kind:"marq",x0:p[0],y0:p[1],x1:p[0],y1:p[1],mode:e.shiftKey?"add":e.altKey?"sub":O.marquee.mode};return;}
+  if(tool==="lasso"){drag={kind:"lasso",pts:[p],mode:e.shiftKey?"add":e.altKey?"sub":O.lasso.mode};return;}
+  if(tool==="wand"){const m=wandMask(p[0],p[1]);combineSel(m,e.shiftKey?"add":e.altKey?"sub":O.wand.mode);pushHist("Đũa thần");return;}
+  if(tool==="crop"){const h=cropHandle(sx,sy);drag={kind:"crop",h,p0:p,r0:Object.assign({},cropR||{x:0,y:0,w:DOC.w,h:DOC.h})};return;}
+  if(tool==="bucket"){bucketAt(p);return;}
+  if(tool==="gradient"){drag={kind:"grad",x0:p[0],y0:p[1],x1:p[0],y1:p[1]};return;}
+  if(tool==="shape"){drag={kind:"shape",x0:p[0],y0:p[1],x1:p[0],y1:p[1]};return;}
+  if(tool==="text"){const hit=DOC.layers.map((L,i)=>[L,i]).reverse().find(([L])=>L.type==="text"&&L.visible&&(b=>p[0]>=b.x-8&&p[0]<=b.x+b.w+8&&p[1]>=b.y-8&&p[1]<=b.y+b.h+8)(textBox(L)));
+    if(hit){act=hit[1];renderLayers();renderProps();openProps(true);const ta=document.querySelector(".ptext");if(ta&&isDesk())ta.focus();}else addTextAt(p);return;}
+  if(tool==="clone"&&(e.altKey||cloneSetMode)){O.clone.src=p;cloneSetMode=false;renderOpts();toast("Đã đặt điểm nguồn");requestFrame();return;}
+  if(BRUSHY.has(tool)){if(strokeStart(p,e))drag={kind:"stroke"};}});
+stage.addEventListener("pointermove",e=>{if(!DOC)return;const p=evDoc(e);curPt=p;$("stPos").textContent=Math.round(p[0])+", "+Math.round(p[1]);
+  if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pinch&&ptrs.size===2){const [a,b]=[...ptrs.values()],r=stage.getBoundingClientRect(),d=Math.hypot(a[0]-b[0],a[1]-b[1]),cx=(a[0]+b[0])/2-r.left,cy=(a[1]+b[1])/2-r.top,nz=clamp(pinch.z*d/pinch.d,0.02,32),k=nz/pinch.z;
+    Z=nz;OX=cx-(pinch.cx-pinch.ox)*k;OY=cy-(pinch.cy-pinch.oy)*k;updZoom();antsDirty=true;requestFrame();return;}
+  if(!drag){if(BRUSHY.has(tool))requestFrame();return;}const r=stage.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;
+  if(drag.kind==="pan"){OX=drag.ox+sx-drag.sx;OY=drag.oy+sy-drag.sy;antsDirty=true;requestFrame();}
+  else if(drag.kind==="pick")pickColor(p,e.altKey);
+  else if(drag.kind==="stroke"){strokeMove(p);}
+  else if(drag.kind==="move"){const L=drag.L,dx=Math.round(p[0]-drag.p0[0]),dy=Math.round(p[1]-drag.p0[1]);if(L.type==="text"){L.text.x=drag.tx0+dx;L.text.y=drag.ty0+dy;renderText(L);}else{L.x=dx;L.y=dy;}scheduleComp();}
+  else if(drag.kind==="marq"||drag.kind==="grad"||drag.kind==="shape"){drag.x1=p[0];drag.y1=p[1];if(drag.kind==="marq"&&e.shiftKey&&drag.mode!=="add"){const s=Math.max(Math.abs(p[0]-drag.x0),Math.abs(p[1]-drag.y0));drag.x1=drag.x0+Math.sign(p[0]-drag.x0)*s;drag.y1=drag.y0+Math.sign(p[1]-drag.y0)*s;}requestFrame();}
+  else if(drag.kind==="lasso"){const l=drag.pts[drag.pts.length-1];if(Math.hypot(p[0]-l[0],p[1]-l[1])*Z>2)drag.pts.push(p);requestFrame();}
+  else if(drag.kind==="crop"){cropDrag(p);requestFrame();}
+  else if(drag.kind==="xfmove"){const t=AL().tf;t.tx=drag.t0.tx+p[0]-drag.p0[0];t.ty=drag.t0.ty+p[1]-drag.p0[1];scheduleComp();}
+  else if(drag.kind==="xfrot"){const t=AL().tf,a=Math.atan2(p[1]-t.cy-t.ty,p[0]-t.cx-t.tx);let r2=drag.t0.rot+a-drag.a0;if(e.shiftKey)r2=Math.round(r2/(Math.PI/12))*(Math.PI/12);t.rot=r2;scheduleComp();}
+  else if(drag.kind==="xfscale"){const t=AL().tf,t0=drag.t0,b=xf.box,h=drag.h;const c=Math.cos(-t0.rot),s=Math.sin(-t0.rot);const lx=(p[0]-t0.cx-t0.tx)*c-(p[1]-t0.cy-t0.ty)*s,ly=(p[0]-t0.cx-t0.tx)*s+(p[1]-t0.cy-t0.ty)*c;
+    const hx=(b.x+b.w*h.u-t0.cx),hy=(b.y+b.h*h.v-t0.cy);let sx2=h.u===0.5?t0.sx:(Math.abs(hx)>1e-3?lx/hx:t0.sx),sy2=h.v===0.5?t0.sy:(Math.abs(hy)>1e-3?ly/hy:t0.sy);
+    if(h.u!==0.5&&h.v!==0.5&&!e.shiftKey){const k=Math.max(Math.abs(sx2/t0.sx),Math.abs(sy2/t0.sy));sx2=t0.sx*k*Math.sign(sx2||1);sy2=t0.sy*k*Math.sign(sy2||1);}t.sx=sx2;t.sy=sy2;scheduleComp();}
+  requestFrame();});
+function endPtr(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!drag)return;const d=drag;drag=null;const p=evDoc(e);
+  if(d.kind==="pan"){setTool(tool);}
+  else if(d.kind==="stroke")strokeEnd();
+  else if(d.kind==="pick"){renderTools();renderOpts();}
+  else if(d.kind==="move"){const L=d.L;if(L.type==="text"){if(L.text.x!==d.tx0||L.text.y!==d.ty0)pushHist("Di chuyển chữ");}else if(L.x||L.y){shiftLayer(L,L.x,L.y);scheduleComp();pushHist("Di chuyển layer");}}
+  else if(d.kind==="marq"){const x0=Math.min(d.x0,d.x1),y0=Math.min(d.y0,d.y1),w=Math.abs(d.x1-d.x0),h=Math.abs(d.y1-d.y0);if(w<2||h<2){if(d.mode==="new"&&DOC.sel)deselect();requestFrame();return;}
+    const m=newMask(),x=X(m);x.fillStyle="#fff";x.beginPath();if(O.marquee.shape==="ellipse")x.ellipse(x0+w/2,y0+h/2,w/2,h/2,0,0,7);else x.rect(Math.round(x0),Math.round(y0),Math.round(w),Math.round(h));x.fill();combineSel(feather(m,O.marquee.feather),d.mode);pushHist("Vùng chọn khung");}
+  else if(d.kind==="lasso"){if(d.pts.length<3){requestFrame();return;}const m=newMask(),x=X(m);x.fillStyle="#fff";x.beginPath();d.pts.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath();x.fill();combineSel(feather(m,O.lasso.feather),d.mode);pushHist("Vùng chọn tự do");}
+  else if(d.kind==="grad"){if(Math.hypot(d.x1-d.x0,d.y1-d.y0)>2)gradientDraw([d.x0,d.y0],[d.x1,d.y1]);}
+  else if(d.kind==="shape")shapeDraw([d.x0,d.y0],[d.x1,d.y1],e.shiftKey);
+  else if(d.kind.startsWith("xf"))scheduleComp();
+  requestFrame();}
+stage.addEventListener("pointerup",endPtr);stage.addEventListener("pointercancel",endPtr);stage.addEventListener("pointerleave",()=>{curPt=null;requestFrame();});
+stage.addEventListener("wheel",e=>{if(!DOC)return;e.preventDefault();const r=stage.getBoundingClientRect();if(e.ctrlKey||e.metaKey||e.altKey)setZoom(Z*Math.exp(-e.deltaY*0.0022),e.clientX-r.left,e.clientY-r.top);else{OX-=e.deltaX;OY-=e.deltaY;antsDirty=true;requestFrame();}},{passive:false});
+stage.addEventListener("dblclick",e=>{if(tool==="crop")applyCrop();else if(xf)commitXf();});
+function pointInXf(p){const t=AL().tf,b=xf.box,c=Math.cos(-t.rot),s=Math.sin(-t.rot),lx=((p[0]-t.cx-t.tx)*c-(p[1]-t.cy-t.ty)*s)/t.sx+t.cx,ly=((p[0]-t.cx-t.tx)*s+(p[1]-t.cy-t.ty)*c)/t.sy+t.cy;return lx>=b.x&&lx<=b.x+b.w&&ly>=b.y&&ly<=b.y+b.h;}
+function pickLayer(p){for(let i=DOC.layers.length-1;i>=0;i--){const L=DOC.layers[i];if(!L.visible||L.type==="adj"||!L.canvas)continue;const x=L.canvas.getContext("2d",{willReadFrequently:true});const d=x.getImageData(clamp(Math.floor(p[0]-L.x),0,DOC.w-1),clamp(Math.floor(p[1]-L.y),0,DOC.h-1),1,1).data;if(d[3]>20)return i;}return -1;}
+function pickColor(p,toBg){const src=O.eyedrop.all||AL().type!=="pix"?comp:AL().canvas;const x=src.getContext("2d",{willReadFrequently:true}),cx=clamp(Math.floor(p[0])-2,0,DOC.w-5),cy=clamp(Math.floor(p[1])-2,0,DOC.h-5),d=x.getImageData(cx,cy,5,5).data;
+  let r=0,g=0,b=0,n=0;for(let i=0;i<d.length;i+=4){if(d[i+3]<10)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++;}if(!n)return;const h=rgb2hex(r/n,g/n,b/n);if(toBg)bgc=h;else fg=h;const sw=document.querySelector(toBg?".colors .bg":".colors .fg");if(sw)sw.style.background=h;}
+function cropHandle(sx,sy){if(!cropR)return "move";const [a,b]=d2s(cropR.x,cropR.y),w=cropR.w*Z,h=cropR.h*Z;const near=(x,y)=>Math.abs(sx-x)<14&&Math.abs(sy-y)<14;
+  if(near(a,b))return "nw";if(near(a+w,b))return "ne";if(near(a,b+h))return "sw";if(near(a+w,b+h))return "se";if(sx>a&&sx<a+w&&sy>b&&sy<b+h)return "move";return "new";}
+function cropDrag(p){const d=drag,r0=d.r0,dx=p[0]-d.p0[0],dy=p[1]-d.p0[1];let x0=r0.x,y0=r0.y,x1=r0.x+r0.w,y1=r0.y+r0.h;
+  if(d.h==="move"){const w=r0.w,h=r0.h;x0=clamp(r0.x+dx,0,DOC.w-w);y0=clamp(r0.y+dy,0,DOC.h-h);x1=x0+w;y1=y0+h;}
+  else if(d.h==="new"){x0=Math.min(d.p0[0],p[0]);y0=Math.min(d.p0[1],p[1]);x1=Math.max(d.p0[0],p[0]);y1=Math.max(d.p0[1],p[1]);}
+  else{if(d.h.includes("w"))x0+=dx;if(d.h.includes("e"))x1+=dx;if(d.h.includes("n"))y0+=dy;if(d.h.includes("s"))y1+=dy;}
+  x0=clamp(x0,0,DOC.w);x1=clamp(x1,0,DOC.w);y0=clamp(y0,0,DOC.h);y1=clamp(y1,0,DOC.h);if(x1-x0<4||y1-y0<4)return;
+  const rt2=O.crop.ratio;if(rt2!=="free"&&d.h!=="move"){const [a,b]=rt2.split(":").map(Number),k=a/b;let w=x1-x0,h=w/k;if(d.h.includes("n"))y0=y1-h;else y1=y0+h;if(y1>DOC.h||y0<0){h=Math.min(DOC.h,y1)-Math.max(0,y0);w=h*k;if(d.h.includes("w"))x0=x1-w;else x1=x0+w;}}
+  cropR={x:x0,y:y0,w:x1-x0,h:y1-y0};}
+
+/* ---------- Keyboard ---------- */
+document.addEventListener("keydown",e=>{const tg=e.target;if(tg&&(tg.tagName==="TEXTAREA"||tg.tagName==="INPUT"&&!["range","checkbox","color"].includes(tg.type)||tg.tagName==="SELECT"))return;
+  const k=e.key.toLowerCase(),C=e.ctrlKey||e.metaKey;
+  if(e.key===" "&&!spaceDown){spaceDown=true;stage.style.cursor="grab";e.preventDefault();return;}
+  if(C){const map={z:()=>e.shiftKey?restore(hIdx+1):restore(hIdx-1),y:()=>restore(hIdx+1),a:selAll,d:deselect,j:dupLayer,t:startXf,c:()=>copySel(false),x:()=>copySel(true),v:paste,o:()=>$("fOpen").click(),n:()=>e.shiftKey?addLayer():dlgNew(),s:()=>exportAs("psd"),e:()=>e.shiftKey?mergeVisible():(DOC&&act>0?mergeDown():dlgExport()),i:()=>e.shiftKey?invertSel():null,l:()=>e.shiftKey?autoTone():null,"0":fitView,"1":()=>setZoom(1),"=":()=>setZoom(Z*1.25),"+":()=>setZoom(Z*1.25),"-":()=>setZoom(Z/1.25),"]":()=>moveLayer(1),"[":()=>moveLayer(-1)};
+    if(map[k]){e.preventDefault();if(!DOC&&!"on".includes(k))return;map[k]();}
+    else if(e.key==="Backspace"||e.key==="Delete"){e.preventDefault();fillLayer(bgc);}return;}
+  if(!DOC)return;
+  if(e.key==="Enter"){if(xf)commitXf();else if(tool==="crop")applyCrop();return;}
+  if(e.key==="Escape"){if(xf)cancelXf();else if(!$("dlgBox").hidden)$("dlgBox").hidden=true;else closeMenus();closeSheet();return;}
+  if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();if(e.shiftKey)contentFill();else if(e.altKey)fillLayer(fg);else clearSel();return;}
+  if(e.key==="["||e.key==="]"){const o=O[tool];if(o&&o.size){o.size=clamp(Math.round(o.size*(e.key==="]"?1.2:1/1.2)),1,500);stampKey="";renderOpts();requestFrame();}return;}
+  if(e.key.startsWith("Arrow")&&tool==="move"){e.preventDefault();const L=AL();if(!L||L.type==="adj")return;const s=e.shiftKey?10:1,dx=e.key==="ArrowLeft"?-s:e.key==="ArrowRight"?s:0,dy=e.key==="ArrowUp"?-s:e.key==="ArrowDown"?s:0;
+    if(L.type==="text"){L.text.x+=dx;L.text.y+=dy;renderText(L);}else shiftLayer(L,dx,dy);scheduleComp();clearTimeout(nudgeT);nudgeT=setTimeout(()=>pushHist("Dịch layer"),400);return;}
+  if(k==="x"){swapColors();return;}if(k==="d"){fg="#000000";bgc="#ffffff";renderTools();return;}
+  const t=TOOLS.find(t=>t[2].toLowerCase()===k);if(t){if(k==="m"&&tool==="marquee"){O.marquee.shape=O.marquee.shape==="rect"?"ellipse":"rect";renderOpts();}setTool(t[0]);}});
+let nudgeT=null;
+document.addEventListener("keyup",e=>{if(e.key===" "){spaceDown=false;setTool(tool);}});
+
+/* ---------- Wiring ---------- */
+function wire(){buildMenus();renderTools();renderOpts();
+  $("lBlend").innerHTML=BLENDS.map(b=>'<option value="'+b[0]+'">'+b[1]+'</option>').join("");
+  $("lBlend").onchange=e=>{const L=AL();if(!L)return;L.blend=e.target.value;scheduleComp();pushHist("Chế độ hoà trộn");};
+  $("lOp").oninput=e=>{const L=AL();if(!L)return;L.opacity=+e.target.value;scheduleComp();};$("lOp").onchange=()=>pushHist("Độ mờ layer");
+  $("lNew").onclick=()=>DOC&&addLayer();$("lDup").onclick=()=>DOC&&dupLayer();$("lDel").onclick=()=>DOC&&delLayer();$("lMask").onclick=()=>DOC&&addMask(!!DOC.sel);
+  $("lAdj").onclick=e=>{if(!DOC)return;e.stopPropagation();const dd=menuDrop(ADJ_KINDS.map(([k,l])=>[l,"",()=>addAdj(k)]));dd.style.cssText="position:fixed;max-height:60vh;bottom:60px;right:20px;top:auto;left:auto";document.body.appendChild(dd);const off=()=>{dd.remove();document.removeEventListener("click",off);};setTimeout(()=>document.addEventListener("click",off),0);};
+  $("bUndo").onclick=()=>restore(hIdx-1);$("bRedo").onclick=()=>restore(hIdx+1);$("bExport").onclick=()=>DOC?dlgExport():toast("Mở ảnh hoặc tạo tài liệu trước");
+  $("mMenuBtn").onclick=()=>openSheet("menu");$("sClose").onclick=closeSheet;
+  $("fOpen").onchange=e=>{openFile(e.target.files[0]);e.target.value="";};$("fPlace").onchange=e=>{placeFiles(e.target.files);e.target.value="";};
+  $("wOpen").onclick=()=>$("fOpen").click();$("wPsd").onclick=()=>$("fOpen").click();
+  document.querySelectorAll("[data-new]").forEach(b=>b.onclick=()=>{const [w,h]=b.dataset.new.split("x").map(Number);newDoc(w,h,"#ffffff");});
+  $("wSample").onclick=()=>{const img=new Image();img.onload=()=>{docFromImage(img,"Ảnh mẫu");};img.onerror=()=>toast("Không tải được ảnh mẫu");img.src="demo/lake.jpg";};
+  $("mMode").onclick=e=>{e.stopPropagation();$("modeMenu").hidden=!$("modeMenu").hidden;};
+  document.addEventListener("click",e=>{if(!e.target.closest("#modeMenu,#mMode"))$("modeMenu").hidden=true;if(!e.target.closest(".menu"))closeMenus();});
+  document.body.addEventListener("dragover",e=>e.preventDefault());document.body.addEventListener("drop",e=>{e.preventDefault();const f=e.dataTransfer.files;if(!f.length)return;if(!DOC)openFile(f[0]);else placeFiles(f);});
+  document.addEventListener("paste",e=>{const f=e.clipboardData&&e.clipboardData.files;if(f&&f.length){if(!DOC)openFile(f[0]);else placeFiles(f);}});
+  new ResizeObserver(()=>{antsDirty=true;requestFrame();}).observe(stage);
+  renderHist();renderLayers();renderProps();}
+try{initGL();wire();requestFrame();
+  window.__SDEBUG={DOC:()=>DOC,act:()=>act,setAct:i=>{act=i;renderLayers();renderProps();},hist:()=>hist.map(h=>h.name),comp:()=>comp,tool:t=>setTool(t),O,fg:v=>{fg=v;},sel:()=>DOC.sel,contentFill,addAdj,newDoc,openFilter,applyCrop,setCrop:r=>{cropR=r;},exportPSD:()=>toPSD(),openPSD,docToView:(x,y)=>{const r=stage.getBoundingClientRect();const [a,b]=d2s(x,y);return [a+r.left,b+r.top];},startXf,commitXf,composite:()=>composite()};
+}catch(err){document.body.innerHTML='<div style="padding:40px;color:#ddd;font:15px system-ui">Trình duyệt này chưa bật WebGL nên Studio Pro không chạy được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';console.error(err);}
+
+})();
+</script>
+<script>if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+</body>
+</html>
