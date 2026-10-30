@@ -1247,24 +1247,27 @@ function cellPath(x,cell,W,H){const gap=(cell.gap||0)/100*Math.min(W,H),r=(cell.
   else if(r>0.5&&x.roundRect)x.roundRect(X,Y,w,h,r);else x.rect(X,Y,w,h);return {X,Y,w,h};}
 
 /* --- media elements & audio graph --- */
-const els=new Map(),aus=new Map(),gains=new Map();let AC=null,master=null,recDest=null;
-function elFor(c){let v=els.get(c.id);if(v&&v._mid!==c.mid){v.pause();v.removeAttribute("src");els.delete(c.id);v=null;}
+const els=new Map(),aus=new Map(),gains=new Map();
+const vbox=document.createElement("div");vbox.setAttribute("aria-hidden","true");vbox.style.cssText="position:fixed;left:0;top:0;width:4px;height:4px;overflow:hidden;opacity:0.01;pointer-events:none;z-index:-1";document.body.appendChild(vbox);let AC=null,master=null,recDest=null;
+function elFor(c){let v=els.get(c.id);if(v&&v._mid!==c.mid){v.pause();v.removeAttribute("src");v.remove();els.delete(c.id);v=null;}
   if(!v){const m=media.get(c.mid);if(!m||c.kind!=="video")return null;v=document.createElement("video");v.preload="auto";v.playsInline=true;v.src=m.url;v._mid=c.mid;v.crossOrigin="anonymous";
-    v.addEventListener("seeked",()=>{if(v._pend!=null){const p=v._pend;v._pend=null;v.currentTime=p;return;}if(!playing)requestDraw();});v.addEventListener("loadeddata",()=>requestDraw());els.set(c.id,v);hook(v,c.id);}return v;}
+    v.style.cssText="width:4px;height:4px";v.setAttribute("playsinline","");v.disablePictureInPicture=true;vbox.appendChild(v);v.addEventListener("seeked",()=>{if(v._pend!=null){const p=v._pend;v._pend=null;v.currentTime=p;return;}if(!playing)requestDraw();});v.addEventListener("loadeddata",()=>requestDraw());els.set(c.id,v);hook(v,c.id);}return v;}
 function seekEl(v,t){if(v.seeking){v._pend=t;return;}if(Math.abs(v.currentTime-t)>.001)v.currentTime=t;}
-function auFor(a){let e=aus.get(a.id);if(e&&e._mid!==a.mid){e.pause();aus.delete(a.id);e=null;}if(!e){const m=media.get(a.mid);if(!m)return null;e=document.createElement("audio");e.preload="auto";e.src=m.url;e._mid=a.mid;aus.set(a.id,e);hook(e,a.id);}return e;}
+function auFor(a){let e=aus.get(a.id);if(e&&e._mid!==a.mid){e.pause();aus.delete(a.id);e=null;}if(!e){const m=media.get(a.mid);if(!m)return null;e=document.createElement("audio");e.preload="auto";e.src=m.url;e._mid=a.mid;vbox.appendChild(e);aus.set(a.id,e);hook(e,a.id);}return e;}
 function hook(e,id){if(!AC||gains.has(id))return;try{const s=AC.createMediaElementSource(e),g=AC.createGain();s.connect(g);g.connect(master);gains.set(id,g);}catch(err){}}
 function ensureAudio(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.connect(AC.destination);recDest=AC.createMediaStreamDestination();master.connect(recDest);els.forEach((v,id)=>hook(v,id));aus.forEach((v,id)=>hook(v,id));}catch(e){AC=null;}}
 function setVol(id,e,v){const g=gains.get(id);v=clamp(v,0,4);if(g){if(Math.abs(g.gain.value-v)>.001)g.gain.value=v;if(e.muted)e.muted=false;}else{e.volume=clamp(v,0,1);}}
 function envelope(t,start,dur,fi,fo){let k=1;if(fi>0&&t-start<fi)k*=clamp((t-start)/fi,0,1);const r=start+dur-t;if(fo>0&&r<fo)k*=clamp(r/fo,0,1);return k;}
 function allVisualClips(){const L=P.main.slice();P.tracks.forEach(t=>{if(t.type==="overlay")t.items.forEach(i=>{if(i.kind==="video")L.push(i);});});return L;}
 function trackMuted(it){const tr=trackOf(it.id);return tr&&tr.mute;}
-let mainMuted=false;
+let mainMuted=false,masterC=null;
+function outTime(c,src){if(!(c.curve&&c.curve!=="none"))return (src-c.in)/c.speed;let lo=0,hi=c._dur;for(let i=0;i<30;i++){const m=(lo+hi)/2;if(srcTime(c,m)<src)lo=m;else hi=m;}return (lo+hi)/2;}
+function pickMaster(t){masterC=null;const act=mainAt(t);for(let i=act.length-1;i>=0;i--){const c=act[i];if(c.kind==="video"&&!(c.cell&&false)){masterC=c;return c;}}return null;}
 function syncMedia(t,run){const live=new Set();
   const doClip=(c,nextTd)=>{if(c.kind!=="video")return;const v=elFor(c);if(!v)return;const active=t>=c._start-1e-3&&t<c._start+c._dur,soon=!active&&c._start>t&&c._start-t<1.2;
     const lt=clamp(t-c._start,0,c._dur),st=srcTime(c,lt);if(active||soon)live.add(c.id);
     if(active){const muted=isMain(c)?mainMuted:trackMuted(c);setVol(c.id,v,muted?0:c.vol/100*envelope(t,c._start,c._dur,Math.max(c.fadeIn,c._td||0),Math.max(c.fadeOut,nextTd||0)));
-      if(run){const sp=instSpeed(c,lt);if(v.paused){if(Math.abs(v.currentTime-st)>.06)seekEl(v,st);v.playbackRate=clamp(sp,.0625,16);v.play().catch(()=>{});}
+      if(run){const sp=instSpeed(c,lt);if(c===masterC&&!v.paused){const r=clamp(sp,.0625,16);if(Math.abs(v.playbackRate-r)>.01)v.playbackRate=r;if(Math.abs(v.currentTime-st)>.8)seekEl(v,st);}else if(v.paused){if(Math.abs(v.currentTime-st)>.06)seekEl(v,st);v.playbackRate=clamp(sp,.0625,16);v.play().catch(()=>{});}
         else{const drift=v.currentTime-st;if(Math.abs(drift)>.5){seekEl(v,st);}else{const r=clamp(sp*(1-clamp(drift*1.6,-.3,.3)),.0625,16);if(Math.abs(v.playbackRate-r)>.01)v.playbackRate=r;}}}
       else{if(!v.paused)v.pause();if(Math.abs(v.currentTime-st)>.5/FPS)seekEl(v,st);}}
     else{if(!v.paused)v.pause();if(soon&&!v.seeking&&Math.abs(v.currentTime-c.in)>.05)seekEl(v,c.in);}};
@@ -1401,10 +1404,18 @@ function fitPreview(){const wrap=$("prevWrap"),r=wrap.getBoundingClientRect();if
   pv.style.width=cw+"px";pv.style.height=ch+"px";if(pv.width!==W||pv.height!==H){pv.width=W;pv.height=H;}requestDraw();}
 let exporting=false;function requestDraw(){if(drawReq||playing||exporting)return;drawReq=true;requestAnimationFrame(()=>{drawReq=false;syncMedia(T,false);drawFrame(pctx,pv.width,pv.height,T,true);updTime();});}
 let lastTC=0;function updTime(force){const now=performance.now();if(!force&&playing&&now-lastTC<90)return;lastTC=now;$("tCur").textContent=fmtTC(T);$("tDur").textContent=fmtTC(total);}
-function play(){if(!P.main.length&&!P.tracks.length)return;ensureAudio();if(AC&&AC.state==="suspended")AC.resume();if(T>=total-.05)T=0;playing=true;T0=T;clk0=performance.now();fpsN=0;fpsT=clk0;slowN=0;setPlayIcon();raf=requestAnimationFrame(tick);}
+let unlocked=false;
+function unlockMedia(){if(unlocked)return;unlocked=true;/* iOS/Safari need one gesture-initiated play() per element */allVisualClips().forEach(c=>{const v=elFor(c);if(!v)return;const wasMuted=v.muted;v.muted=true;const p=v.play();if(p&&p.then)p.then(()=>{if(!(playing&&mainAt(T).includes(c)))v.pause();v.muted=wasMuted;}).catch(()=>{v.muted=wasMuted;});});}
+function play(){if(!P.main.length&&!P.tracks.length)return;ensureAudio();if(AC&&AC.state==="suspended")AC.resume();if(T>=total-.05)T=0;playing=true;T0=T;clk0=performance.now();fpsN=0;fpsT=clk0;slowN=0;stallT=0;setPlayIcon();
+  pickMaster(T);syncMedia(T,true);unlockMedia();raf=requestAnimationFrame(tick);}
+let stallT=0;
 function pause(){if(!playing)return;playing=false;cancelAnimationFrame(raf);els.forEach(v=>v.pause());aus.forEach(a=>a.pause());setPlayIcon();$("fps").textContent="";requestDraw();updTime(true);scrollToT();}
 function setPlayIcon(){$("play").innerHTML='<svg><use href="#i-'+(playing?"pause":"play")+'"/></svg>';}
-function tick(now){if(!playing)return;T=T0+(now-clk0)/1000;if(T>=total){T=total;playing=false;els.forEach(v=>v.pause());aus.forEach(a=>a.pause());setPlayIcon();requestDraw();updTime(true);scrollToT();return;}
+function tick(now){if(!playing)return;let clockT=T0+(now-clk0)/1000;const m=pickMaster(T);
+  if(m){const v=els.get(m.id);if(v&&v.readyState>=2&&!v.seeking&&!v.paused){const tm=m._start+outTime(m,v.currentTime);
+      if(tm>=m._start-.05&&tm<m._start+m._dur-.6/FPS&&Math.abs(tm-T)<1){clockT=Math.max(T,tm);T0=clockT;clk0=now;stallT=0;}}
+    else if(v&&(v.seeking||v.readyState<3)&&!v.paused){/* buffering: hold the frame instead of racing ahead, but never more than 1.5s */if(!stallT)stallT=now;if(now-stallT<1500){clockT=T;T0=T;clk0=now;}}}
+  T=clockT;if(T>=total){T=total;playing=false;els.forEach(v=>v.pause());aus.forEach(a=>a.pause());setPlayIcon();requestDraw();updTime(true);scrollToT();return;}
   const f0=performance.now();syncMedia(T,true);drawFrame(pctx,pv.width,pv.height,T,true);const ft=performance.now()-f0;
   if($("selQ").value==="auto"){if(ft>26)slowN++;else slowN=Math.max(0,slowN-1);if(slowN>20&&!liteMode){liteMode=true;fitPreviewKeep();}}
   fpsN++;if(now-fpsT>1000){$("fps").textContent=Math.round(fpsN*1000/(now-fpsT))+" fps";fpsN=0;fpsT=now;}
@@ -1801,7 +1812,7 @@ async function openProject(id){const rec=await DB.get("projects",id);if(!rec)ret
   for(const mid of mids){const m=await DB.get("media",mid);if(!m){miss++;continue;}await addMedia(new File([m.blob],m.name+extFor(m),{type:m.type||m.blob.type}),{id:mid,restore:true});}
   if(miss)toast(miss+" file gốc không còn trong bộ nhớ trình duyệt");commit(true);fitPreview();renderLib();syncProjSel();}
 function extFor(m){return m.kind==="video"?".mp4":m.kind==="audio"?".m4a":".jpg";}
-function resetMediaEls(){els.forEach(v=>{v.pause();v.removeAttribute("src");v.load();});els.clear();aus.forEach(a=>{a.pause();a.removeAttribute("src");});aus.clear();gains.clear();imgTex.forEach(t=>gl.deleteTexture(t));imgTex.clear();}
+function resetMediaEls(){els.forEach(v=>{v.pause();v.removeAttribute("src");v.load();v.remove();});els.clear();aus.forEach(a=>{a.pause();a.removeAttribute("src");a.remove();});aus.clear();unlocked=false;gains.clear();imgTex.forEach(t=>gl.deleteTexture(t));imgTex.clear();}
 function newProject(ratio){pause();resetMediaEls();media.clear();P=emptyProject(ratio);FPS=30;sel=null;T=0;hist=[];hIdx=-1;$("projName").value=P.name;$("welcome").hidden=true;commit(true);fitPreview();renderLib();syncProjSel();}
 async function showWelcome(){const w=$("wcard");w.innerHTML="";const h=el("h1",null,"IOHK Video");const p=el("p",null,"Dựng video nhiều lớp: bố cục ghép nhiều video, keyframe, mask, tách nền, chuyển cảnh, chữ động, phụ đề và xuất MP4 tới 4K — mọi thứ chạy ngay trên máy bạn.");w.append(h,p);
   const g=el("div","wnew");[["9:16","TikTok · Reels",18,32],["16:9","YouTube",32,18],["1:1","Vuông",26,26],["4:5","Instagram",22,27],["orig","Theo video",28,22]].forEach(([r,l,a,b])=>{const bt=el("button");bt.type="button";bt.innerHTML='<i style="width:'+a+'px;height:'+b+'px"></i>'+(r==="orig"?"Gốc":r)+"<small>"+l+"</small>";bt.onclick=()=>{newProject(r);$("file").click();};g.appendChild(bt);});w.appendChild(g);
