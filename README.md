@@ -28,3 +28,9 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 
 - **Công cụ Flash** (mục Công cụ → Flash): 10 kiểu đèn (Flash thẳng, Sứ, Flash đêm, Tiệc, Paparazzi, Hồng sương, Selfie gương, Flash film, Giờ xanh, Studio đen). Đèn tự rọi vào khuôn mặt AI tìm thấy, ánh sáng giảm dần ra rìa, vùng sáng được nén mềm nên không cháy trắng; thanh **Quầng mềm** tạo hào quang mềm; **Làm tối nền** dùng AI tách người để đẩy nền về đen; có tuỳ chọn in ngày.
 - **4 nhóm preset mới** (công thức riêng, lấy cảm hứng từ xu hướng ảnh trên điện thoại): Flash, Digi & CCD, Chân dung Á Đông, Hằng ngày. Hai thông số mới `flash` và `glow` có cả trong Chỉnh màu và Video Pro.
+
+### Cập nhật Flash AI
+
+- **Flash AI** làm theo cách đèn flash của Meitu: rọi sáng người (mạnh nhất ở da), khử ám màu trên mặt, đưa da về tông trắng hồng, giữ đen sâu ở tóc và quần áo, nền gần như giữ nguyên. Bốn màu đèn: Hồng, Trắng (khử ám cả khung hình), Ấm, Đỏ. Mở công cụ Flash là tự bật ở mức 80.
+- Các kiểu cũ chuyển thành **Flash Pro · phong cách**.
+- Giao diện dùng font **Be Vietnam Pro**, nhãn tối thiểu 11px, tương phản đạt chuẩn; kiểm tra bằng [Impeccable](https://github.com/pbakaus/impeccable) không còn cảnh báo. Xem `PRODUCT.md`.

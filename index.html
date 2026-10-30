@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#0a0a0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Dancing+Script:wght@700&family=Pacifico&family=DotGothic16&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Dancing+Script:wght@700&family=Pacifico&family=DotGothic16&display=swap">
 <style>
 :root{padding-top:0}
 body{margin:0}
@@ -25,8 +25,8 @@ img{max-width:100%}
 :root{
   --bg:#0a0a0b;
   --fg:#f4f1ea;
-  --muted:rgba(244,241,234,.64);
-  --faint:rgba(244,241,234,.40);
+  --muted:rgba(244,241,234,.70);
+  --faint:rgba(244,241,234,.62);
   --line:rgba(255,255,255,.09);
   --glass:rgba(22,23,26,.62);
   --glass-solid:#17181b;
@@ -38,7 +38,7 @@ img{max-width:100%}
   --r-panel:20px;--r-inner:10px;--pad:12px;
   --topbar:58px;--inspw:368px;
   --ctx:122px;--tabh:56px;
-  --font-ui:"Inter",system-ui,-apple-system,"SF Pro Text","Segoe UI",sans-serif;
+  --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"SF Pro Text","Segoe UI",sans-serif;
   --font-display:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
   --font-brand:var(--font-display);
   --font-mark:"DotGothic16","Courier New",ui-monospace,monospace;
@@ -169,14 +169,14 @@ body.no-insp .insp{transform:translateX(calc(100% + 28px));opacity:0;pointer-eve
 .tile canvas{width:100%;aspect-ratio:1;display:block;border-radius:8px;background:var(--well);outline:1.5px solid transparent;outline-offset:2px;transition:outline-color .15s,transform .2s}
 .tile:hover canvas{outline-color:rgba(255,255,255,.3)}
 .tile[aria-pressed="true"] canvas{outline-color:var(--fg)}
-.tname{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:1px;color:var(--muted)}
+.tname{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:1px;color:var(--muted)}
 .tile[aria-pressed="true"] .tname{color:var(--fg)}
 .empty{color:var(--muted);font-size:13px;padding:16px 4px}
 
 .card{margin:4px 12px 0;padding:14px 14px 12px;border-radius:14px;background:var(--well);display:flex;flex-direction:column;gap:8px}
 .card h3{margin:0;font:500 24px/1.1 var(--font-display);letter-spacing:.01em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .card p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5}
-.edited{font:600 9.5px var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(233,180,92,.5);border-radius:999px;padding:2px 8px}
+.edited{font:600 11px var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(233,180,92,.5);border-radius:999px;padding:2px 8px}
 .linkbtn{font-size:12px;color:var(--faint);text-decoration:underline;text-underline-offset:3px;align-self:flex-start}
 .linkbtn:hover{color:var(--fg)}
 #hist{width:100%;height:52px;display:block;border-radius:8px;background:rgba(0,0,0,.25)}
@@ -187,7 +187,7 @@ body.no-insp .insp{transform:translateX(calc(100% + 28px));opacity:0;pointer-eve
 .group{padding:12px 2px 8px;display:flex;flex-direction:column;gap:4px}
 .group+.group{border-top:1px solid var(--line)}
 .ghead{display:flex;align-items:center;justify-content:space-between}
-.ghead h4{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ghead h4{margin:0;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .eye{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--faint)}
 .eye:hover{background:var(--well-hi);color:var(--fg)}
 .eye[aria-pressed="false"]{color:var(--accent)}
@@ -217,7 +217,7 @@ input.hue::-webkit-slider-runnable-track{height:4px}
 .inline .field{flex:1}
 
 .recipe{display:flex;flex-direction:column;gap:12px;padding:6px 2px}
-.recipe h4{margin:6px 0 0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.recipe h3,.recipe h4{margin:6px 0 0;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .recipe p{margin:0;color:var(--muted);font-size:12.5px}
 .minelist{display:flex;flex-direction:column;gap:6px}
 .mine{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:var(--well)}
@@ -230,7 +230,7 @@ input.hue::-webkit-slider-runnable-track{height:4px}
 
 /* Tool rail (desktop): icon grid */
 .toolrail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px 12px 10px;border-bottom:1px solid var(--line)}
-.rtool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:58px;border-radius:10px;color:var(--muted);font-size:10.5px;font-weight:500;text-align:center;line-height:1.15;padding:0 2px}
+.rtool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:58px;border-radius:10px;color:var(--muted);font-size:11px;font-weight:500;text-align:center;line-height:1.15;padding:0 2px}
 .rtool svg.i{width:20px;height:20px}
 .rtool:hover{background:var(--well);color:var(--fg)}
 .rtool[aria-pressed="true"]{background:rgba(255,255,255,.12);color:var(--fg)}
@@ -267,7 +267,7 @@ body.mob .upt small.d-only{display:none!important}
 .strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 12px;scroll-snap-type:x proximity;flex:none}
 .strip .tile{width:62px;flex:none;scroll-snap-align:start;gap:5px}
 .strip .tile canvas{border-radius:6px}
-.strip .tname{font-size:9.5px;text-align:center;padding:0}
+.strip .tname{font-size:11px;text-align:center;padding:0}
 .mstrength{position:absolute;left:10px;right:10px;bottom:calc(100% + 8px);display:flex;flex-direction:column;gap:2px;padding:8px 14px;border-radius:16px}
 .bigrow{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px}
 .bigrow b{font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -283,11 +283,11 @@ body.mob .upt small.d-only{display:none!important}
 .tool.set::after{content:"";position:absolute;top:4px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
 /* edit tab: CapCut-style icon row */
 #mToolChips{gap:2px;padding:0 6px}
-#mToolChips .tool{height:64px;min-width:66px;padding:0 4px;border:0;border-radius:12px;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:10.5px}
+#mToolChips .tool{height:64px;min-width:66px;padding:0 4px;border:0;border-radius:12px;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:11px}
 #mToolChips .tool svg.i{width:22px;height:22px}
 #mToolChips .tool[aria-pressed="true"]{background:rgba(255,255,255,.1);color:var(--fg)}
 .tabbar{height:var(--tabh);display:flex;justify-content:space-around;align-items:stretch;border-top:1px solid var(--line);flex:none;padding:0 max(4px,env(safe-area-inset-left,0px))}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:500;color:var(--faint);letter-spacing:.02em}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:500;color:var(--faint);letter-spacing:.02em}
 .tab svg.i{width:21px;height:21px}
 .tab[aria-selected="true"]{color:var(--fg)}
 /* floating drawer for tool options */
@@ -335,7 +335,7 @@ body.mob .toast{bottom:calc(var(--ctx) + var(--tabh) + 20px + env(safe-area-inse
 .tp-title{margin:6px 2px 0;font:500 22px var(--font-display)}
 .tpane-in{display:flex;flex-direction:column;gap:14px}
 .tp-sec{display:flex;flex-direction:column;gap:8px}
-.tp-sec h4{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tp-sec h4{margin:0;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .btnrow{display:flex;flex-wrap:wrap;gap:8px}
 .tbtn.primary{background:var(--fg);color:#121212;border-color:var(--fg);font-weight:600}
 .tbtn[aria-pressed="true"]{background:var(--fg);color:#121212}
@@ -536,7 +536,7 @@ details.fold>.tpane-in{margin-top:10px}
   <p>Lưu bộ chỉnh hiện tại thành công thức để dùng lại cho ảnh khác.</p>
   <div class="inline"><input class="field" id="saveName" placeholder="Đặt tên, ví dụ: Sài Gòn mưa" maxlength="28" aria-label="Tên công thức"><button class="tbtn" id="savePreset" type="button">Lưu</button></div>
   <div class="minelist" id="mineList"></div>
-  <h4>Mã chia sẻ</h4>
+  <h3>Mã chia sẻ</h3>
   <p>Gửi mã này cho bạn bè để họ dán vào và dùng đúng công thức của bạn.</p>
   <div class="codebox" id="codeBox"></div>
   <div class="inline"><button class="tbtn" id="copyCode" type="button">Sao chép mã</button></div>
@@ -1841,7 +1841,7 @@ function wire(){
 
 /* ---------- Editing tools: pipeline ---------- */
 const GEO0={rot:0,flipH:false,flipV:false,angle:0,crop:null,aspect:"free"};
-const AI0={dark:0,bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
+const AI0={flash:0,flashStyle:"pink",dark:0,bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
 const OPS=[];
 Object.assign(state,{geo:Object.assign({},GEO0),opsLen:0,overlays:[],frame:"none",ai:Object.assign({},AI0)});
 let tool=null,origPrev=null,retPrev=null,geoPrev=null,geoOrig=null,geoInfo=null,imgRect={x:0,y:0,w:1,h:1},selId=null,cropDraft=null,handMode=false;
@@ -1881,7 +1881,7 @@ function setSource(src,sample){
 }
 
 function beautyKey(){const A=state.ai;return [A.acne,A.skin,A.bright,A.eyes,A.slim,A.lips,A.lipColor,aiStamp,srcStamp].join("|");}
-function bgKey(){const A=state.ai;return [A.bg,A.bgColor,A.bgBlur,A.dark,aiStamp].join("|");}
+function bgKey(){const A=state.ai;return [A.bg,A.bgColor,A.bgBlur,A.dark,A.flash,A.flashStyle,aiStamp].join("|");}
 const FL_DARK={fl_direct:25,fl_porcelain:70,fl_night:55,fl_studio:80,fl_paparazzi:40,fl_mirror:20,fl_blue:30};
 let flKey="";
 function updFlashC(){const g=state.geo,k=aiStamp+"|"+JSON.stringify(g);if(k===flKey)return;flKey=k;let x=0.5,y=0.44;
@@ -1976,7 +1976,7 @@ function frameGeom(W,H){const m=Math.min(W,H),f=tool==="crop"?"none":state.frame
   if(f==="cream"){const p=Math.round(m*0.08);return {f,OW:W+2*p,OH:H+2*p,x:p,y:p};}
   return {f:"none",OW:W,OH:H,x:0,y:0};}
 function rrPath(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
-const FONTS={modern:['700','"Inter",system-ui,sans-serif',"Hiện đại"],serif:['600','"Cormorant Garamond",Georgia,serif',"Serif"],pixel:['400','"DotGothic16",monospace',"Pixel"],hand:['700','"Dancing Script",cursive',"Viết tay"],round:['400','"Pacifico",cursive',"Tròn"]};
+const FONTS={modern:['700','"Be Vietnam Pro",system-ui,sans-serif',"Hiện đại"],serif:['600','"Cormorant Garamond",Georgia,serif',"Serif"],pixel:['400','"DotGothic16",monospace',"Pixel"],hand:['700','"Dancing Script",cursive',"Viết tay"],round:['400','"Pacifico",cursive',"Tròn"]};
 function drawOverlay(x,it,ox,oy,W,H,preview){
   const u=Math.min(W,H);
   if(it.kind==="stroke"){if(it.pts.length<2)return;x.save();x.lineCap="round";x.lineJoin="round";
@@ -2152,6 +2152,20 @@ void main(){vec4 I4=texture2D(u_I,v);vec3 I=I4.rgb;float m=texture2D(u_M,v).r;ve
   vec3 sm=b+(I-bf)*0.75;float g=1.0-smoothstep(0.08,0.2,abs(lumi(I)-lumi(b)));gl_FragColor=vec4(clamp(mix(I,sm,clamp(m*u_s*g,0.0,1.0)),0.0,1.0),I4.a);}`,
  bblur:`uniform sampler2D u_I,u_M,u_B;uniform vec2 u_szB;uniform float u_s;
 void main(){vec4 I4=texture2D(u_I,v);float m=texture2D(u_M,v).r;gl_FragColor=vec4(mix(I4.rgb,bicubic(u_B,v,u_szB).rgb,clamp(m*u_s,0.0,1.0)),I4.a);}`,
+ rel:`uniform sampler2D u_I,u_F;uniform float u_k,u_hasF,u_gw,u_tintA,u_bgd,u_skA;uniform vec2 u_fc,u_fr;uniform vec3 u_sg,u_gg,u_tg,u_tint;
+float skinW(vec3 c){float y=dot(c,vec3(0.299,0.587,0.114));float cb=-0.168736*c.r-0.331264*c.g+0.5*c.b;float cr=0.5*c.r-0.418688*c.g-0.081312*c.b;
+  return smoothstep(0.06,0.18,y)*(1.0-smoothstep(0.0,0.06,abs(cb+0.1)-0.1))*(1.0-smoothstep(0.0,0.06,abs(cr-0.1)-0.08));}
+void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;vec2 d=(v-u_fc)/u_fr;float fall=1.0/(1.0+dot(d,d)*0.35);
+  float m=u_hasF>0.5?texture2D(u_F,v).r:clamp(1.25-length(d*vec2(1.0,0.55))*0.45,0.0,1.0);float k=u_k;
+  c=mix(c,c*u_gg,u_gw*k);
+  float sw=skinW(c)*m;c=mix(c,c*u_sg,k*(0.2+0.3*m+0.5*sw));
+  float sk=skinW(c)*(u_hasF>0.5?m:0.5+0.5*m);float g=k*(0.12+0.88*max(sk,0.28*m))*(0.8+0.2*fall);float l0=max(dot(c,vec3(0.2126,0.7152,0.0722)),0.002);
+  float l1=min(1.0,l0+g*(1.3*l0*l0*(1.0-l0)+0.35*l0*(1.0-l0)));vec3 lit=c*(l1/l0);
+  float sw2=skinW(lit)*m;vec3 T=u_tg/dot(u_tg,vec3(0.2126,0.7152,0.0722));lit=mix(lit,l1*T,k*sw2*u_skA);
+  lit=mix(lit,lit*u_tint,u_tintA*k*m*(0.4+0.6*fall));
+  float l=dot(lit,vec3(0.2126,0.7152,0.0722));lit+=smoothstep(0.7,0.95,l)*0.03*k*m*fall;lit*=1.0-k*u_bgd*(1.0-m);
+  vec3 ov=max(lit-0.92,0.0);lit=min(lit,vec3(0.92))+0.08*(1.0-exp(-ov/0.08));
+  gl_FragColor=vec4(clamp(lit,0.0,1.0),I4.a);}`,
  jbu:`uniform sampler2D u_I,u_M,u_G;uniform vec2 u_szM;uniform float u_sr;
 void main(){vec3 c=texture2D(u_I,v).rgb;vec2 p=v*u_szM-0.5;vec2 b=floor(p);float acc=0.0,ws=0.0;
   for(int j=-2;j<=3;j++)for(int i=-2;i<=3;i++){vec2 q=b+vec2(float(i),float(j));vec2 uv=(q+0.5)/u_szM;vec2 d=p-q;float wsp=exp(-dot(d,d)/2.2);
@@ -2371,10 +2385,30 @@ let bgTexC=null,bgKeyC="";
 function bgTextures(){const key=srcStamp+"|"+aiStamp;if(bgTexC&&bgKeyC===key)return bgTexC;if(bgTexC){gDel(bgTexC.M);gDel(bgTexC.G);}
   const w=aiData.w,h=aiData.h,m=mk(w,h),id=m.x.createImageData(w,h),p=id.data;for(let i=0;i<w*h;i++){p[i*4]=Math.round(aiData.bg[i]*255);p[i*4+3]=255;}m.x.putImageData(id,0,0);
   const g=mk(w,h);g.x.imageSmoothingQuality="high";g.x.drawImage(aiSrc,0,0,w,h);bgTexC={M:gUp(m.c),G:gUp(g.c)};bgKeyC=key;return bgTexC;}
+function flashGeom(){let fc=[0.5,0.56],fr=[0.34,0.3];const fs=aiData&&aiData.faces;
+  if(fs&&fs.length){let best=null,ba=0;fs.forEach(f=>{let a=1,b=1,c=0,d=0;f.forEach(p=>{a=Math.min(a,p.x);b=Math.min(b,p.y);c=Math.max(c,p.x);d=Math.max(d,p.y);});const ar=(c-a)*(d-b);if(ar>ba){ba=ar;best=[a,b,c,d];}});
+    if(best){fc=[(best[0]+best[2])/2,1-((best[1]+best[3])/2+(best[3]-best[1])*0.15)];fr=[Math.max(0.08,(best[2]-best[0])*1.5),Math.max(0.08,(best[3]-best[1])*1.5)];}}
+  return {fc,fr};}
+const FL_STYLES={pink:{tg:[1,.87,.86],skA:.55,gw:0,tint:[1,1,1],tintA:0,bgd:.04},white:{tg:[1,.9,.89],skA:.45,gw:.6,tint:[1,1,1],tintA:0,bgd:0},
+  red:{tg:[1,.84,.8],skA:.2,gw:0,tint:[1.0,.5,.45],tintA:.6,bgd:.42},warm:{tg:[1,.84,.75],skA:.3,gw:0,tint:[1.05,.97,.88],tintA:.45,bgd:.06}};
+function flashStats(cv,fg){const N=160,r=N/Math.max(cv.width,cv.height),w=Math.max(1,Math.round(cv.width*r)),h=Math.max(1,Math.round(cv.height*r)),m=mk(w,h);m.x.drawImage(cv,0,0,w,h);
+  const p=m.x.getImageData(0,0,w,h).data;let M=[0,0,0],mn=0,S=[0,0,0],sn=0;
+  const fx=g=>[g.fc[0]-g.fr[0]/3,1-g.fc[1]-g.fr[1]/3,g.fc[0]+g.fr[0]/3,1-g.fc[1]+g.fr[1]/3],box=aiData&&aiData.faces&&aiData.faces.length?fx(fg):null;
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){const o=(j*w+i)*4,R=p[o],G=p[o+1],B=p[o+2];M[0]+=R;M[1]+=G;M[2]+=B;mn++;
+    const u=i/w,vv=j/h;let isS;if(box)isS=u>box[0]&&u<box[2]&&vv>box[1]&&vv<box[3]&&R+G+B>90;
+    else{const y=0.299*R+0.587*G+0.114*B,cb=128-0.168736*R-0.331264*G+0.5*B,cr=128+0.5*R-0.418688*G-0.081312*B;isS=y>40&&cb>77&&cb<127&&cr>133&&cr<175;}
+    if(isS){S[0]+=R;S[1]+=G;S[2]+=B;sn++;}}
+  const L=a=>0.2126*a[0]+0.7152*a[1]+0.0722*a[2],cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+  M=M.map(x=>x/mn);const gg=M.map((x,i)=>cl(L(M)/Math.max(1,x),0.8,1.25)*[1.02,1,0.97][i]);
+  let sg=[1,1,1];if(sn>w*h*0.004){S=S.map(x=>x/sn);const st=FL_STYLES[state.ai.flashStyle]||FL_STYLES.pink,T=st.tg,lt=L(T),ls=L(S);sg=[0,1,2].map(i=>cl((T[i]/lt)/(Math.max(1,S[i])/ls),0.78,1.3));}
+  return {gg,sg};}
 function bgStage(cv){
-  const A=state.ai;if(!aiData||!aiData.bg||(A.bg==="keep"&&!(A.dark>0)))return cv;
-  const W=cv.width,H=cv.height,T=bgTextures(),I=gUp(cv),F=gT(W,H);
-  gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});
+  const A=state.ai,fl=(A.flash||0)>0,hasBg=!!(aiData&&aiData.bg),doBg=hasBg&&(A.bg!=="keep"||A.dark>0);
+  if(!fl&&!doBg)return cv;
+  const W=cv.width,H=cv.height;let I=gUp(cv),F=null;
+  if(hasBg){const T=bgTextures();F=gT(W,H);gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});}
+  if(fl){const R=gT(W,H),g=flashGeom(),st=FL_STYLES[A.flashStyle]||FL_STYLES.pink,fs=flashStats(cv,g);gRun(GQ.rel,R,[["u_I",I],["u_F",F||I]],{u_k:Math.min(1,A.flash/100),u_hasF:F?1:0,u_fc:g.fc,u_fr:g.fr,u_sg:fs.sg,u_gg:fs.gg,u_gw:st.gw,u_tg:st.tg,u_skA:st.skA,u_tint:st.tint,u_tintA:st.tintA,u_bgd:st.bgd});gDel(I);I=R;}
+  if(!doBg){const c=gRead(I);gDel(I);if(F)gDel(F);return c;}
   let B=null;if(A.bg==="blur"){const P=gT(Math.ceil(W/2),Math.ceil(H/2));gRun(GQ.pbg,P,[["u_I",I],["u_F",F]],{});B=gBlur(P,Math.max(1.5,Math.max(W,H)*0.012*A.bgBlur/100));gDel(P);}
   const O=gT(W,H),col=A.bgColor.match(/\w\w/g).map(h=>parseInt(h,16)/255);
   gRun(GQ.bgc,O,[["u_I",I],["u_F",F],["u_B",B||F]],{u_szB:B?sz(B):sz(F),u_col:col,u_mode:A.bg==="blur"?0:A.bg==="color"?1:A.bg==="remove"?2:3,u_dark:(A.dark||0)/100});
@@ -2417,7 +2451,13 @@ function panelFor(t){
   }
   else if(t==="flash"){
     const A=state.ai,P=state.params,list=PRESETS.filter(p=>p.fam==="flash");
-    const s=sec("Kiểu đèn"),g=el("div","flgrid");
+    const s0=sec("Flash AI"),relit=()=>{clearTimeout(bT);bT=setTimeout(()=>{retDirty=true;schedule();},70);};
+    s0.appendChild(chipRow([["pink","Hồng"],["white","Trắng"],["warm","Ấm"],["red","Đỏ"]],A.flashStyle||"pink",v=>{A.flashStyle=v;if(!A.flash)A.flash=80;retDirty=true;schedule();pushHistory();renderToolUI();}));
+    s0.appendChild(chipRow([[0,"Tắt"],[45,"Nhẹ"],[80,"Vừa"],[100,"Mạnh"]],[0,45,80,100].includes(A.flash)?A.flash:-1,v=>{A.flash=v;retDirty=true;schedule();pushHistory();renderToolUI();}));
+    s0.appendChild(sld("Flash",0,100,A.flash||0,v=>{A.flash=v;relit();},()=>{pushHistory();renderToolUI();}));
+    s0.appendChild(hint(aiBusy?"Đang tìm người trong ảnh…":"Rọi đèn vào người trong ảnh: da sáng và trong hơn, khử ám vàng, ám đỏ trên mặt, nền giữ nguyên. Hồng cho da trắng hồng, Trắng khử ám cả khung hình, Ấm cho nắng chiều, Đỏ cho hiệu ứng đèn đỏ."));
+    box.appendChild(s0);
+    const s=sec("Flash Pro · phong cách"),g=el("div","flgrid");
     [["none","Tắt"]].concat(list.map(p=>[p.id,p.name])).forEach(([id,name])=>{const b=el("button","flcard");b.type="button";b.setAttribute("aria-pressed",String(state.presetId===id));
       const c=document.createElement("canvas");c.width=c.height=TH;c.dataset.thumb=id;b.appendChild(c);if(thumbCache.has(id))requestAnimationFrame(()=>paintThumb(id));
       b.appendChild(el("span",null,name));b.onclick=()=>{selectPreset(id);if(id!=="none"){const d=FL_DARK[id];if(d!=null&&!(A.dark>0))A.dark=d;if(id==="fl_porcelain"&&!A.level&&aiData&&aiData.faces.length)setLevel(35);}else A.dark=0;retDirty=true;schedule();pushHistory();renderToolUI();};g.appendChild(b);});
@@ -2502,7 +2542,7 @@ function panelFor(t){
   }
   return box;
 }
-const beautyOpen={fine:false,brush:false};
+const beautyOpen={fine:false,brush:false};let flashAutoStamp=-1;
 function setLevel(v){const A=state.ai;A.level=v;const f=v/100;A.skin=Math.round(70*f);A.bright=Math.round(50*f);A.acne=v>0?Math.round(40+60*f):0;
   const faces=aiData&&aiData.faces.length;A.eyes=faces?Math.round(22*f):0;A.slim=faces?Math.round(25*f):0;}
 let bT=null;function beautyLive(){clearTimeout(bT);bT=setTimeout(()=>{retDirty=true;schedule();},90);}
@@ -2536,6 +2576,7 @@ function setTool(t){
   if(!desk&&t&&mTab!=="edit")setMTab("edit");
   if(desk&&t&&typeof dMain!=="undefined"&&dMain!=="tools"){dMain="tools";document.querySelectorAll("[data-dm]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.dm==="tools")));["presets","color","tools"].forEach(x=>$("dm-"+x).hidden=x!=="tools");}
   if(prev!==t&&$("mDrawer"))$("mDrawer").classList.remove("min");
+  if(t==="flash"&&!state.ai.flash&&flashAutoStamp!==srcStamp){flashAutoStamp=srcStamp;state.ai.flash=80;retDirty=true;schedule();pushHistory();}
   if((t==="beauty"||t==="ai"||t==="flash")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
   renderToolUI();schedule();
 }
