@@ -1652,7 +1652,7 @@ function wire(){buildMenus();renderTools();renderOpts();
   $("fOpen").onchange=e=>{openFile(e.target.files[0]);e.target.value="";};$("fPlace").onchange=e=>{placeFiles(e.target.files);e.target.value="";};
   $("wOpen").onclick=()=>$("fOpen").click();$("wPsd").onclick=()=>$("fOpen").click();
   document.querySelectorAll("[data-new]").forEach(b=>b.onclick=()=>{const [w,h]=b.dataset.new.split("x").map(Number);newDoc(w,h,"#ffffff");});
-  $("wSample").onclick=()=>{const img=new Image();img.onload=()=>{docFromImage(img,"Ảnh mẫu");};img.onerror=()=>toast("Không tải được ảnh mẫu");img.src="demo/lake.jpg";};
+  $("wSample").onclick=()=>{const img=new Image();img.onload=()=>{docFromImage(img,"Ảnh mẫu");};img.onerror=()=>toast("Không tải được ảnh mẫu");img.src="demo/facade.jpg";};
   $("mMode").onclick=e=>{e.stopPropagation();$("modeMenu").hidden=!$("modeMenu").hidden;};
   document.addEventListener("click",e=>{if(!e.target.closest("#modeMenu,#mMode"))$("modeMenu").hidden=true;if(!e.target.closest(".menu"))closeMenus();});
   document.body.addEventListener("dragover",e=>e.preventDefault());document.body.addEventListener("drop",e=>{e.preventDefault();const f=e.dataTransfer.files;if(!f.length)return;if(!DOC)openFile(f[0]);else placeFiles(f);});

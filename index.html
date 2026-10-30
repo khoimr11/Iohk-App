@@ -100,17 +100,26 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 #split::after{content:"";position:absolute;top:50%;left:-14px;width:26px;height:26px;margin-top:-13px;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 2px 10px rgba(0,0,0,.4)}
 #split::before{content:"TRƯỚC      SAU";position:absolute;top:12px;left:-60px;width:120px;text-align:center;font:600 10px var(--font-ui);letter-spacing:.2em;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);white-space:pre}
 .flag{position:absolute;top:14px;left:50%;transform:translateX(-50%);font:600 10.5px var(--font-ui);letter-spacing:.22em;background:rgba(244,241,234,.94);color:#111;padding:5px 12px;border-radius:999px;z-index:3}
-.drag #stage{outline:1.5px dashed var(--accent);outline-offset:-8px;border-radius:14px}
+
 .errbox{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
 
 /* Sample photos picker */
-.samples{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:999px;max-width:calc(100% - 24px);box-sizing:border-box}
-.samples>span{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
-.slist{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.slist::-webkit-scrollbar{display:none}
-.sthumb{width:34px;height:34px;border-radius:50%;flex:none;background-size:cover;background-position:center;border:2px solid transparent;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
-.sthumb[aria-pressed="true"]{border-color:var(--fg)}
-.samples .tbtn{border-radius:999px;height:34px;white-space:nowrap}
+.samples{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:12px;padding:7px 18px 7px 7px;border-radius:999px;max-width:calc(100% - 24px);box-sizing:border-box;text-align:left;transition:transform .2s,background .2s}
+.samples:hover{background:rgba(40,41,46,.78);transform:translateX(-50%) translateY(-1px)}
+.samples:active{transform:translateX(-50%) scale(.98)}
+.upi{width:38px;height:38px;border-radius:50%;background:var(--fg);color:#121212;display:grid;place-items:center;flex:none}
+.upt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.upt b{font-size:13px;font-weight:600}
+.upt small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dropzone{position:absolute;inset:10px;z-index:6;border:2px dashed rgba(244,241,234,.55);border-radius:18px;background:rgba(10,10,11,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.dropzone div{display:flex;flex-direction:column;align-items:center;gap:8px}
+.dropzone svg.i{width:34px;height:34px}
+.dropzone b{font:500 26px var(--font-display)}
+.dropzone small{color:var(--muted);font-size:12.5px}
+.drag .dropzone{display:flex}
+.loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;display:flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;background:rgba(20,21,24,.86);font-size:13px;font-weight:500}
+.loading i{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ---------- Desktop ---------- */
 .m-only{display:none!important}
@@ -240,10 +249,11 @@ body.mob #center{inset:0;padding:env(safe-area-inset-top,0px) 0 0;height:100dvh;
 .modemenu a small{font-weight:400;font-size:11.5px;color:var(--faint)}
 .modemenu a[aria-current="page"]{background:var(--well-hi)}
 body.mob #stage{margin:0}
-body.mob .samples{bottom:10px;padding:4px 4px 4px 12px;gap:8px}
-body.mob .samples>span{display:none}
+body.mob .samples{bottom:12px;padding:6px 16px 6px 6px}
 body.mob.tooling .samples{display:none}
-body.mob .sthumb{width:30px;height:30px}
+.m-only.upt small,.upt small.m-only{display:none}
+body.mob .upt small.m-only{display:block!important}
+body.mob .upt small.d-only{display:none!important}
 .mdock{flex:none;flex-direction:column;position:relative;z-index:5;background:rgba(10,10,11,.86);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .mpane{height:var(--ctx);flex-direction:column;justify-content:center;gap:8px;padding:0 0 2px;box-sizing:border-box}
 .mchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 12px;flex:none}
@@ -430,7 +440,9 @@ details.fold>.tpane-in{margin-top:10px}
   <main id="stage" aria-label="Ảnh đang chỉnh">
     <div id="wrap"><div id="holder"><canvas id="view" aria-label="Xem trước ảnh"></canvas><div id="split" hidden role="slider" aria-label="Vị trí chia so sánh" tabindex="0"></div><div id="cropBox" hidden><i data-h="nw"></i><i data-h="ne"></i><i data-h="sw"></i><i data-h="se"></i></div></div></div>
     <div class="flag" id="cmpFlag" hidden>ẢNH GỐC</div>
-    <div class="samples glass" id="badge"><span>Ảnh mẫu</span><div class="slist" id="sampleList" role="group" aria-label="Chọn ảnh mẫu"></div><button class="tbtn" id="sampleOpen" type="button">Mở ảnh của bạn</button></div>
+    <button class="samples glass" id="badge" type="button" aria-label="Mở ảnh của bạn"><span class="upi"><svg class="i"><use href="#i-open"/></svg></span><span class="upt"><b>Mở ảnh của bạn</b><small class="d-only">Bấm, kéo thả hoặc dán Ctrl+V · JPG, PNG, WEBP</small><small class="m-only">Chọn từ thư viện ảnh</small></span></button>
+    <div class="dropzone" id="dropzone"><div><svg class="i"><use href="#i-open"/></svg><b>Thả ảnh vào đây</b><small>Ảnh mở ngay, giữ nguyên chất lượng gốc</small></div></div>
+    <div class="loading" id="loading" hidden><i></i><span>Đang mở ảnh…</span></div>
   </main>
 
   <section class="mdock m-only" aria-label="Công cụ">
@@ -1265,11 +1277,11 @@ function setSource(src,sample){
   resetZoom();thumbCache.clear();queueAllThumbs();draw();
 }
 function loadFile(f){
-  if(!f||!/^image\//.test(f.type)){toast("Hãy chọn một file ảnh (JPG, PNG, WEBP, HEIC…)");return;}
-  const url=URL.createObjectURL(f),img=new Image();
-  img.onload=()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);
+  if(!f||!/^image\//.test(f.type)&&!/\.(jpe?g|png|webp|heic|heif|gif|bmp|avif)$/i.test(f.name)){toast("Hãy chọn một file ảnh (JPG, PNG, WEBP, HEIC…)");return;}
+  const url=URL.createObjectURL(f),img=new Image();$("loading").hidden=false;
+  img.onload=()=>{$("loading").hidden=true;const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);
     URL.revokeObjectURL(url);setSource(c,false);toast("Đã mở ảnh "+img.naturalWidth+"×"+img.naturalHeight);};
-  img.onerror=()=>{URL.revokeObjectURL(url);toast("Không đọc được ảnh này. Thử ảnh JPG hoặc PNG khác.");};
+  img.onerror=()=>{$("loading").hidden=true;URL.revokeObjectURL(url);toast(/hei[cf]/i.test(f.type+f.name)?"Trình duyệt này chưa đọc được ảnh HEIC. Trên iPhone hãy chọn ảnh từ Ảnh (tự chuyển sang JPG), hoặc dùng Safari.":"Không đọc được ảnh này. Thử ảnh JPG hoặc PNG khác.");};
   img.src=url;
 }
 function makeSample(){
@@ -1655,9 +1667,9 @@ function drawerMin(on){$("mDrawer").classList.toggle("min",on);layoutDrawer();}
 function layoutDrawer(){const dr=$("mDrawer"),w=$("wrap");let ob=0;if(!desk&&dr&&!dr.hidden){const a=stage.getBoundingClientRect(),b=dr.getBoundingClientRect();ob=Math.max(0,Math.min(a.height*0.6,a.bottom-b.top+6));}
   const nv=ob?ob+"px":"";if(w.style.bottom!==nv){w.style.bottom=nv;fitView();if(typeof placeCrop==="function")placeCrop();}}
 if(window.ResizeObserver)new ResizeObserver(()=>layoutDrawer()).observe($("mDrawer"));
-const SAMPLES=[["facade","Mặt tiền"],["lake","Hồ trên núi"],["street","Phố gạch đỏ"],["temple","Đền Nhật"],["sakura","Anh đào"],["neon","Phố neon"],["desk","Bàn làm việc"],["canoe","Thuyền mưa"],["autumn","Đường thu"]];
+const SAMPLES=[["facade","Ảnh mẫu"]];
 let sampleIdx=0;
-function buildSamples(){const box=$("sampleList");box.innerHTML="";SAMPLES.forEach(([id,name],i)=>{const b=document.createElement("button");b.type="button";b.className="sthumb";
+function buildSamples(){return;const box=null;SAMPLES.forEach(([id,name],i)=>{const b=document.createElement("button");b.type="button";b.className="sthumb";
   b.style.backgroundImage="url(demo/"+id+".jpg)";b.title=name;b.setAttribute("aria-label","Ảnh mẫu: "+name);b.setAttribute("aria-pressed",String(i===sampleIdx));b.onclick=()=>loadSample(i);box.appendChild(b);});}
 const TH=192;let refThumb=null;
 function loadRefThumb(){const img=new Image();img.onload=()=>{const s=Math.min(img.naturalWidth,img.naturalHeight),t=document.createElement("canvas");t.width=t.height=TH;
@@ -1665,7 +1677,7 @@ function loadRefThumb(){const img=new Image();img.onload=()=>{const s=Math.min(i
 function loadSample(i,fallback){sampleIdx=i;const img=new Image();img.decoding="async";
   img.onload=()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext("2d").drawImage(img,0,0);setSource(c,true);
     document.querySelectorAll(".sthumb").forEach((b,j)=>b.setAttribute("aria-pressed",String(j===i)));};
-  img.onerror=()=>{if(fallback)setSource(makeSample(),true);$("sampleList").hidden=true;};
+  img.onerror=()=>{if(fallback)setSource(makeSample(),true);};
   img.src="demo/"+SAMPLES[i][0]+".jpg";}
 function openSheet(){const s=$("sheet");s.classList.add("open");s.setAttribute("aria-hidden","false");$("scrim").hidden=false;syncCard();}
 function closeSheet(){const s=$("sheet");s.classList.remove("open","full");s.setAttribute("aria-hidden","true");$("scrim").hidden=true;}
@@ -1682,7 +1694,7 @@ function wire(){
   document.querySelectorAll("[data-dm]").forEach(b=>b.onclick=()=>setDM(b.dataset.dm));
   $("mMode").onclick=e=>{e.stopPropagation();const m=$("modeMenu");m.hidden=!m.hidden;$("mMode").setAttribute("aria-expanded",String(!m.hidden));};
   document.addEventListener("click",e=>{const m=$("modeMenu");if(!m.hidden&&!e.target.closest("#modeMenu,#mMode")){m.hidden=true;$("mMode").setAttribute("aria-expanded","false");}});
-  $("sampleOpen").onclick=()=>$("file").click();buildSamples();
+  $("badge").onclick=()=>$("file").click();
   $("mDrawerMin").onclick=()=>drawerMin(!$("mDrawer").classList.contains("min"));
   $("mDrawerDone").onclick=()=>setTool(null);
   $("mDrawer").querySelector(".dhead b").onclick=()=>drawerMin(false);
