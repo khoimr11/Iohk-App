@@ -1392,7 +1392,7 @@ async function mixAudio(){const has=P.clips.some(c=>c.kind==="video"&&c.vol>0)||
   if(!any)return null;return await oc.startRendering();}
 async function exportWebCodecs(W,H,fps,br,prog){
   const vc=await pickVideoCodec(W,H,fps,br);if(!window.Mp4Muxer){prog(0,"Tải bộ đóng gói MP4…");await loadScript(MUXER_URL);}
-  prog(0,"Trộn âm thanh…");const ab=await mixAudio();if(expCancel)throw new Error("cancel");const ac=ab?await pickAudioCodec():null;
+  prog(0,"Trộn âm thanh…");const ab=await mixAudio();if(expCancel)throw new Error("cancel");const ac=ab?await pickAudioCodec():null;if(ab&&!ac)throw new Error("no audio encoder");
   const target=new Mp4Muxer.ArrayBufferTarget();
   const mux=new Mp4Muxer.Muxer({target,video:{codec:vc.k,width:W,height:H,frameRate:fps},audio:ac?{codec:ac.k,numberOfChannels:2,sampleRate:48000}:undefined,fastStart:"in-memory",firstTimestampBehavior:"offset"});
   let err=null,nOut=0;const ve=new VideoEncoder({output:(ch,meta)=>{nOut++;mux.addVideoChunk(ch,meta);},error:e=>{err=e;}});ve.configure(vc.cfg);
