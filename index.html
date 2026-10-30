@@ -1163,7 +1163,7 @@ F("dy_lamp","Đèn vàng","daily","warm atmo","Đèn sợi đốt buổi tối: 
  {contrast:10,shadows:-6,temp:26,tint:4,saturation:-4,hiHue:38,hiAmt:20,glow:18,grain:10});
 
 F("fl_iohk","IOHK","flash","cool pastel atmo","Flash trắng kiểu IOHK: khử ám màu, giữ màu da thật, môi má ửng hồng nhẹ, da căng bóng, quầng sáng mềm. Dùng cùng Flash AI kiểu IOHK.",
- {exposure:2,contrast:6,highlights:-8,shadows:2,tint:2,vibrance:6,hiHue:350,hiAmt:4,glow:18,bloom:5,grain:2,grainSize:20,vignette:6});
+ {exposure:2,contrast:6,highlights:-8,shadows:2,tint:2,vibrance:6,hiHue:350,hiAmt:4,glow:11,bloom:4,grain:2,grainSize:20,vignette:6});
 FAMS.unshift(["flash","Flash"],["digi","Digi & CCD"],["asia","Chân dung Á Đông"]);
 FAMS.push(["daily","Hằng ngày"]);
 })();
@@ -2154,16 +2154,19 @@ void main(){vec4 I4=texture2D(u_I,v);vec3 I=I4.rgb;float m=texture2D(u_M,v).r;ve
   vec3 sm=b+(I-bf)*0.75;float g=1.0-smoothstep(0.08,0.2,abs(lumi(I)-lumi(b)));gl_FragColor=vec4(clamp(mix(I,sm,clamp(m*u_s*g,0.0,1.0)),0.0,1.0),I4.a);}`,
  bblur:`uniform sampler2D u_I,u_M,u_B;uniform vec2 u_szB;uniform float u_s;
 void main(){vec4 I4=texture2D(u_I,v);float m=texture2D(u_M,v).r;gl_FragColor=vec4(mix(I4.rgb,bicubic(u_B,v,u_szB).rgb,clamp(m*u_s,0.0,1.0)),I4.a);}`,
- rel:`uniform sampler2D u_I,u_F,u_S,u_P;uniform float u_cast,u_k,u_hasF,u_gw,u_tintA,u_bgd,u_skA,u_auto,u_blush,u_desat,u_hk,u_a0,u_ang,u_lip,u_cheek,u_shine;uniform vec2 u_fc,u_fr;uniform vec3 u_sg,u_gg,u_tg,u_tint,u_lipT;
+ rel:`uniform sampler2D u_I,u_F,u_S,u_P;uniform vec2 u_tx;uniform float u_sharp;uniform float u_cast,u_k,u_hasF,u_gw,u_tintA,u_bgd,u_skA,u_auto,u_blush,u_desat,u_hk,u_a0,u_ang,u_lip,u_cheek,u_shine;uniform vec2 u_fc,u_fr;uniform vec3 u_sg,u_gg,u_tg,u_tint,u_lipT;
 float lum(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}
 vec3 toLum(vec3 c,float l1){float l0=max(lum(c),0.002);float r=l1/l0;float mx=max(max(c.r,c.g),c.b);float rm=0.95/max(mx,0.004);
   if(r<=rm)return c*r;vec3 o=c*rm;float lo=lum(o);return mix(o,vec3(1.0),clamp((l1-lo)/max(1.0-lo,0.001),0.0,1.0));}
 float angW(vec3 c){float cb=-0.168736*c.r-0.331264*c.g+0.5*c.b;float cr=0.5*c.r-0.418688*c.g-0.081312*c.b;float da=atan(cr,cb)-u_a0;da=atan(sin(da),cos(da));
   return exp(-0.5*(da/0.38)*(da/0.38))*smoothstep(0.025,0.07,length(vec2(cb,cr)))*smoothstep(0.06,0.16,lum(c));}
 void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;vec2 d=(v-u_fc)/u_fr;float fall=1.0/(1.0+dot(d,d)*0.35);vec4 P=texture2D(u_P,v);float lip=P.r,chk=P.g;
+  float lb=0.0;for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){lb+=lum(texture2D(u_I,v+vec2(float(i),float(j))*u_tx*1.6).rgb);}lb/=9.0;
+  float lb2=0.0;for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){lb2+=lum(texture2D(u_I,v+vec2(float(i),float(j))*u_tx*4.0).rgb);}lb2/=9.0;
+  float det=lum(c)-mix(lb,lb2,0.8);det=sign(det)*max(abs(det)-0.014,0.0);
   float m=u_hasF>0.5?texture2D(u_F,v).r:clamp(1.25-length(d*vec2(1.0,0.55))*0.45,0.0,1.0);float k=u_k;
   float sk=texture2D(u_S,v).r*(u_hasF>0.5?smoothstep(0.1,0.6,m):0.6+0.4*m);
-  if(u_ang>0.5)sk*=0.15+0.85*angW(c);sk*=1.0-lip;
+  if(u_ang>0.5)sk*=smoothstep(0.15,0.6,angW(c));sk*=1.0-lip;
   c=mix(c,c*u_gg,u_gw*k*(0.2+0.8*max(m,sk)));
   c=mix(c,c*u_sg,k*(0.15+0.25*m+0.6*sk));
   float g=k*u_auto*(0.12+0.88*max(sk,0.28*m))*(0.8+0.2*fall);float l0=lum(c);
@@ -2176,6 +2179,7 @@ void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;vec2 d=(v-u_fc)/u_fr;float fa
   lit=mix(lit,lit*u_tint,u_tintA*k*m*(0.4+0.6*fall));
   lit=mix(vec3(lum(lit)),lit,1.0-u_desat*k*(1.0-sk)*(1.0-lip)*(1.0-0.75*fall)*(0.2+0.8*m));
   lit*=1.0-k*u_bgd*(1.0-m);
+  {float lq=lum(lit);lit=toLum(lit,clamp(lq+det*u_sharp*k*(0.4+0.6*m)*(1.0-0.35*sk)*(1.0+lq),0.0,0.97));}
   vec3 ov=max(lit-0.92,0.0);lit=min(lit,vec3(0.92))+0.08*(1.0-exp(-ov/0.08));
   gl_FragColor=vec4(clamp(lit,0.0,1.0),I4.a);}`,
  jbu:`uniform sampler2D u_I,u_M,u_G;uniform vec2 u_szM;uniform float u_sr;
@@ -2401,9 +2405,9 @@ function flashGeom(){let fc=[0.5,0.44],fr=[0.34,0.3];const fs=aiData&&aiData.fac
   if(fs&&fs.length){let best=null,ba=0;fs.forEach(f=>{let a=1,b=1,c=0,d=0;f.forEach(p=>{a=Math.min(a,p.x);b=Math.min(b,p.y);c=Math.max(c,p.x);d=Math.max(d,p.y);});const ar=(c-a)*(d-b);if(ar>ba){ba=ar;best=[a,b,c,d];}});
     if(best){fc=[(best[0]+best[2])/2,(best[1]+best[3])/2+(best[3]-best[1])*0.15];fr=[Math.max(0.08,(best[2]-best[0])*1.5),Math.max(0.08,(best[3]-best[1])*1.5)];}}
   return {fc,fr};}
-const FL_STYLES={iohk:{tg:[1,.8,.72],skA:.85,gw:1,wb:1,lift:1.05,hk:0,tint:[1,1,1],tintA:0,bgd:0,blush:.08,lip:.45,cheek:.35,shine:.7,lipT:[.84,.4,.44]},pink:{tg:[1,.87,.86],skA:.55,gw:0,tint:[1,1,1],tintA:0,bgd:.04,blush:.25,lip:.35,cheek:.35,shine:.3,lipT:[.84,.38,.46]},white:{tg:[1,.82,.74],skA:.4,gw:.9,wb:1,lip:.3,cheek:.2,shine:.3,lipT:[.8,.4,.45],tint:[1,1,1],tintA:0,bgd:0},
+const FL_STYLES={iohk:{tg:[1,.79,.7],skA:.85,gw:1,wb:1,lift:1.05,hk:0,tint:[1,1,1],tintA:0,bgd:0,blush:.08,lip:.45,cheek:.35,shine:.6,sharp:.9,lipT:[.84,.4,.44]},pink:{tg:[1,.87,.86],skA:.55,gw:0,tint:[1,1,1],tintA:0,bgd:.04,blush:.25,lip:.35,cheek:.35,shine:.3,lipT:[.84,.38,.46]},white:{tg:[1,.82,.74],skA:.4,gw:.9,wb:1,lip:.3,cheek:.2,shine:.3,lipT:[.8,.4,.45],tint:[1,1,1],tintA:0,bgd:0},
   red:{tg:[1,.84,.8],skA:.2,gw:0,tint:[1.0,.5,.45],tintA:.6,bgd:.42},warm:{tg:[1,.84,.75],skA:.3,gw:0,tint:[1.05,.97,.88],tintA:.45,bgd:.06}};
-function flashStats(cv,fg){const N=300,r=N/Math.max(cv.width,cv.height),w=Math.max(1,Math.round(cv.width*r)),h=Math.max(1,Math.round(cv.height*r)),m=mk(w,h);m.x.drawImage(cv,0,0,w,h);
+function flashStats(cv,fg){const N=480,r=N/Math.max(cv.width,cv.height),w=Math.max(1,Math.round(cv.width*r)),h=Math.max(1,Math.round(cv.height*r)),m=mk(w,h);m.x.drawImage(cv,0,0,w,h);
   const p=m.x.getImageData(0,0,w,h).data,n=w*h,Y=new Float32Array(n),CB=new Float32Array(n),CR=new Float32Array(n);let M=[0,0,0];
   for(let i=0;i<n;i++){const R=p[i*4],G=p[i*4+1],B=p[i*4+2];M[0]+=R;M[1]+=G;M[2]+=B;Y[i]=0.299*R+0.587*G+0.114*B;CB[i]=128-0.168736*R-0.331264*G+0.5*B;CR[i]=128+0.5*R-0.418688*G-0.081312*B;}
   const hasFace=!!(aiData&&aiData.faces&&aiData.faces.length);let cb0=102,cr0=152,sb=26,sr=22;
@@ -2418,8 +2422,8 @@ function flashStats(cv,fg){const N=300,r=N/Math.max(cv.width,cv.height),w=Math.m
     wt*=Math.min(1,Math.max(0,(Y[i]-25)/30));S[i]=wt;
     if(wt>0.4){s0[0]+=p[i*4]*wt;s0[1]+=p[i*4+1]*wt;s0[2]+=p[i*4+2]*wt;sw+=wt;ly+=Y[i]*wt;}}
   /* smooth the skin map so the effect never breaks into patches */
-  const T=new Float32Array(n);for(let pass=0;pass<3;pass++){for(let j=0;j<h;j++)for(let i=0;i<w;i++){let a=0,c=0;for(let k=-2;k<=2;k++){const x=i+k;if(x>=0&&x<w){a+=S[j*w+x];c++;}}T[j*w+i]=a/c;}
-    for(let j=0;j<h;j++)for(let i=0;i<w;i++){let a=0,c=0;for(let k=-2;k<=2;k++){const y=j+k;if(y>=0&&y<h){a+=T[y*w+i];c++;}}S[j*w+i]=a/c;}}
+  const T=new Float32Array(n);for(let pass=0;pass<2;pass++){for(let j=0;j<h;j++)for(let i=0;i<w;i++){let a=0,c=0;for(let k=-1;k<=1;k++){const x=i+k;if(x>=0&&x<w){a+=S[j*w+x];c++;}}T[j*w+i]=a/c;}
+    for(let j=0;j<h;j++)for(let i=0;i<w;i++){let a=0,c=0;for(let k=-1;k<=1;k++){const y=j+k;if(y>=0&&y<h){a+=T[y*w+i];c++;}}S[j*w+i]=a/c;}}
   const id=m.x.createImageData(w,h);for(let i=0;i<n;i++){const vv=Math.round(Math.min(1,S[i]*(st1.wb?1.7:1.25))*255);id.data[i*4]=id.data[i*4+1]=id.data[i*4+2]=vv;id.data[i*4+3]=255;}m.x.putImageData(id,0,0);
   const pm=mk(w,h);pm.x.fillStyle="#000";pm.x.fillRect(0,0,w,h);
   if(hasFace){pm.x.globalCompositeOperation="lighter";aiData.faces.forEach(f=>{let a=1,c=0;f.forEach(q=>{a=Math.min(a,q.x);c=Math.max(c,q.x);});const fw=(c-a)*w;
@@ -2464,7 +2468,7 @@ function bgStage(cv){
   if(!fl&&!doBg)return cv;
   const W=cv.width,H=cv.height;let I=gUp(cv),F=null;
   if(hasBg){const T=bgTextures();F=gT(W,H);gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});}
-  if(fl){const R=gT(W,H),g=flashGeom(),st=FL_STYLES[A.flashStyle]||FL_STYLES.pink,fs=flashStats(cv,g),ST=gUp(fs.map),PT=gUp(fs.pmap);gRun(GQ.rel,R,[["u_I",I],["u_F",F||I],["u_S",ST],["u_P",PT]],{u_cast:fs.cast==null?1:fs.cast,u_a0:fs.a0,u_ang:fs.ang,u_lip:st.lip||0,u_cheek:st.cheek||0,u_shine:st.shine||0,u_lipT:st.lipT||[.8,.4,.45],u_auto:fs.auto,u_k:Math.min(1,A.flash/100),u_hasF:F?1:0,u_fc:g.fc,u_fr:g.fr,u_sg:fs.sg,u_gg:fs.gg,u_gw:st.gw,u_tg:st.tg,u_skA:st.skA,u_tint:st.tint,u_tintA:st.tintA,u_bgd:st.bgd,u_blush:st.blush||0,u_desat:fs.desat||0,u_hk:st.hk||0});gDel(ST);gDel(PT);gDel(I);I=R;}
+  if(fl){const R=gT(W,H),g=flashGeom(),st=FL_STYLES[A.flashStyle]||FL_STYLES.pink,fs=flashStats(cv,g),ST=gUp(fs.map),PT=gUp(fs.pmap);gRun(GQ.rel,R,[["u_I",I],["u_F",F||I],["u_S",ST],["u_P",PT]],{u_tx:[1/W,1/H],u_sharp:st.sharp==null?0.5:st.sharp,u_cast:fs.cast==null?1:fs.cast,u_a0:fs.a0,u_ang:fs.ang,u_lip:st.lip||0,u_cheek:st.cheek||0,u_shine:st.shine||0,u_lipT:st.lipT||[.8,.4,.45],u_auto:fs.auto,u_k:Math.min(1,A.flash/100),u_hasF:F?1:0,u_fc:g.fc,u_fr:g.fr,u_sg:fs.sg,u_gg:fs.gg,u_gw:st.gw,u_tg:st.tg,u_skA:st.skA,u_tint:st.tint,u_tintA:st.tintA,u_bgd:st.bgd,u_blush:st.blush||0,u_desat:fs.desat||0,u_hk:st.hk||0});gDel(ST);gDel(PT);gDel(I);I=R;}
   const spk=()=>{};if(!doBg){const c=gRead(I);gDel(I);if(F)gDel(F);if(fl)addSpark(c);return c;}
   let B=null;if(A.bg==="blur"){const P=gT(Math.ceil(W/2),Math.ceil(H/2));gRun(GQ.pbg,P,[["u_I",I],["u_F",F]],{});B=gBlur(P,Math.max(1.5,Math.max(W,H)*0.012*A.bgBlur/100));gDel(P);}
   const O=gT(W,H),col=A.bgColor.match(/\w\w/g).map(h=>parseInt(h,16)/255);
