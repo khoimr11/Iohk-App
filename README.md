@@ -34,3 +34,4 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 - **Flash AI** làm theo cách đèn flash của Meitu: rọi sáng người (mạnh nhất ở da), khử ám màu trên mặt, đưa da về tông trắng hồng, giữ đen sâu ở tóc và quần áo, nền gần như giữ nguyên. Bốn màu đèn: Hồng, Trắng (khử ám cả khung hình), Ấm, Đỏ. Mở công cụ Flash là tự bật ở mức 80.
 - Các kiểu cũ chuyển thành **Flash Pro · phong cách**.
 - Giao diện dùng font **Be Vietnam Pro**, nhãn tối thiểu 11px, tương phản đạt chuẩn; kiểm tra bằng [Impeccable](https://github.com/pbakaus/impeccable) không còn cảnh báo. Xem `PRODUCT.md`.
+- **Kiểu đèn IOHK**: lấy màu da trên khuôn mặt làm chuẩn để cân bằng trắng cả ảnh (khử được ám cam/vàng của đèn quán, kể cả khi kênh xanh gần như mất), đưa da về trắng sứ má hồng, thêm quầng sáng lấp lánh và nền tối. Kiểu Trắng cũng dùng cách cân bằng trắng theo da này.
