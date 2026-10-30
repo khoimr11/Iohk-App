@@ -149,6 +149,11 @@ body.no-insp .insp{transform:translateX(calc(100% + 28px));opacity:0;pointer-eve
 .search{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:10px;padding:0 10px;height:36px;color:var(--faint)}
 .search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);height:100%;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
+.flgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.flcard{display:flex;flex-direction:column;gap:5px;padding:0;background:none;border:0;color:var(--muted);font-size:11px;text-align:left;min-width:0}
+.flcard canvas{width:100%;aspect-ratio:1;border-radius:8px;display:block;outline:1px solid var(--line);outline-offset:-1px;background:var(--well)}
+.flcard[aria-pressed="true"]{color:var(--fg)}.flcard[aria-pressed="true"] canvas{outline:2px solid var(--fg);outline-offset:1px}
+.flcard span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chip{height:28px;padding:0 11px;border-radius:999px;background:var(--well);border:1px solid var(--line);font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
 .chip:hover{color:var(--fg)}
 .chip[aria-pressed="true"]{background:var(--fg);color:#121212;border-color:var(--fg)}
@@ -389,6 +394,7 @@ details.fold>.tpane-in{margin-top:10px}
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3.5L7 20z"/></symbol>
   <symbol id="i-wand" viewBox="0 0 24 24"><path d="M5 19L15.5 8.5M14 4.5v2.5M19.5 10h-2.5M18 6l-1.6 1.6M11 7l1.2 1.2"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-t-flash" viewBox="0 0 24 24"><path d="M13.5 2.8 5.5 13.2h5.6l-1.6 8 8-10.4h-5.6z"/></symbol>
   <symbol id="i-t-crop" viewBox="0 0 24 24"><path d="M7 3v14h14M3 7h14v14"/></symbol>
   <symbol id="i-t-beauty" viewBox="0 0 24 24"><path d="M12 3.5c4.3 0 7 3.4 7 7.6 0 5-3.4 9.4-7 9.4s-7-4.4-7-9.4c0-4.2 2.7-7.6 7-7.6z"/><path d="M9.3 11.5h.01M14.7 11.5h.01M9.8 15.2c1.2 1 3.2 1 4.4 0"/><path d="M19.5 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></symbol>
   <symbol id="i-t-reshape" viewBox="0 0 24 24"><path d="M8 4c-3 3-3 13 0 16M16 4c3 3 3 13 0 16"/><path d="M10.5 12h3M12.5 10.5L14 12l-1.5 1.5"/></symbol>
@@ -570,7 +576,7 @@ details.fold>.tpane-in{margin-top:10px}
 "use strict";
 /* ---------- Params & presets ---------- */
 const NEUTRAL = {exposure:0,contrast:0,highlights:0,shadows:0,fade:0,temp:0,tint:0,saturation:0,vibrance:0,bw:0,
-  shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0};
+  shHue:200,shAmt:0,hiHue:40,hiAmt:0,duo:0,grain:0,grainSize:35,halation:0,bloom:0,leak:0,aberration:0,vignette:0,lofi:0,chroma:0,date:0,flash:0,glow:0};
 const NOSCALE = new Set(["shHue","hiHue","grainSize","date"]);
 const Z9 = [0,0,0,0,0,0,0,0,0];
 const FAMS = [["jp","Nhật Bản"],["hk","Hong Kong"],["fuji","Fujifilm"],["nikon","Nikon"],["leica","Leica"],["color","Film màu cổ điển"],["cine","Điện ảnh"],["retro","Retro / Y2K"],["vintage","Vintage"],["bw","Đen trắng"],["special","Đặc biệt"]];
@@ -766,6 +772,7 @@ const GROUPS = [
  {id:"split",tab:"adjust",title:"Phủ màu",items:[["shHue","Màu vùng tối",0,360,"hue"],["shAmt","Độ đậm vùng tối",0,100],["hiHue","Màu vùng sáng",0,360,"hue"],["hiAmt","Độ đậm vùng sáng",0,100],["duo","Duotone",0,100]]},
  {id:"grain",tab:"fx",title:"Hạt film",items:[["grain","Lượng hạt",0,100],["grainSize","Cỡ hạt",0,100]]},
  {id:"glow",tab:"fx",title:"Ánh sáng film",items:[["halation","Halation",0,100],["bloom","Bloom",0,100],["leak","Light leak",0,100]]},
+ {id:"flash",tab:"fx",title:"Đèn flash",items:[["flash","Cường độ flash",0,100],["glow","Quầng mềm",0,100]]},
  {id:"lens",tab:"fx",title:"Ống kính",items:[["aberration","Lệch màu viền",0,100],["vignette","Tối góc",0,100]]},
  {id:"digital",tab:"fx",title:"Máy số đời đầu",items:[["lofi","Độ phân giải thấp",0,100],["chroma","Nhiễu màu",0,100]]},
 ];
@@ -1072,6 +1079,93 @@ DATA.split("\n").forEach(line=>{
 FAMS.push(["vsco","VSCO Cổ điển"],["vscofilm","VSCO Film X"],["vscolab","VSCO Đặc biệt"]);
 })();
 
+/* ---------- Flash, Digi/CCD, portrait & everyday looks (own recipes, inspired by phone-camera trends) ---------- */
+(function(){
+const F=(id,name,fam,moods,desc,p,mix)=>PRESETS.push(D(id,name,fam,moods,desc,p,mix));
+/* Flash: frontal light with fall-off, cool cast, blown highlights; best indoors or at night */
+F("fl_direct","Flash thẳng","flash","cool contrast","Đèn flash bật thẳng mặt: chủ thể sáng gắt, nền tối dần, hơi lạnh. Hợp ảnh trong nhà, buổi tối.",
+ {flash:70,glow:12,exposure:6,contrast:18,highlights:-8,shadows:-10,temp:-10,saturation:-6,grain:14,grainSize:30,vignette:10});
+F("fl_porcelain","Sứ","flash","cool pastel atmo","Da trong như sứ, quầng sáng mềm quanh chủ thể, nền chìm vào bóng tối. Hợp chân dung áo trắng, nền tối.",
+ {flash:60,glow:50,exposure:6,contrast:6,highlights:-20,shadows:-18,temp:-8,tint:5,saturation:-28,vibrance:-5,hiHue:345,hiAmt:14,shHue:220,shAmt:12,grain:8,grainSize:22,vignette:25});
+F("fl_night","Flash đêm","flash","contrast cool grainy","Chụp đêm có flash: nền gần như đen, chủ thể nổi bật, hạt rõ.",
+ {flash:85,glow:18,exposure:4,contrast:30,highlights:-5,shadows:-35,temp:-12,tint:3,saturation:-4,grain:30,grainSize:40,vignette:20});
+F("fl_party","Tiệc","flash","vivid warm contrast","Ánh flash giữa bữa tiệc: màu đậm, da ấm, bóng đổ gắt phía sau.",
+ {flash:75,glow:20,contrast:28,shadows:-20,temp:6,saturation:18,vibrance:12,hiHue:30,hiAmt:12,grain:20,grainSize:35,halation:12});
+F("fl_paparazzi","Paparazzi","flash","mono contrast grainy","Đen trắng tương phản cao kiểu ảnh báo lá cải, flash rọi thẳng, hạt thô.",
+ {flash:80,glow:15,bw:100,contrast:40,shadows:-30,highlights:-6,grain:38,grainSize:48,vignette:22});
+F("fl_rose","Hồng sương","flash","pastel warm atmo","Flash mềm phủ hồng: má ửng, vùng sáng phớt hồng, quầng nhẹ.",
+ {flash:50,glow:42,exposure:8,contrast:4,highlights:-18,shadows:-8,temp:2,tint:10,saturation:-10,hiHue:340,hiAmt:28,shHue:300,shAmt:10,grain:10,grainSize:25});
+F("fl_mirror","Selfie gương","flash","cool natural","Flash đánh vào gương: điểm sáng chói ở giữa, viền tối, màu trung tính.",
+ {flash:65,glow:30,exposure:5,contrast:15,shadows:-12,temp:-6,saturation:-8,grain:16,grainSize:30,aberration:8});
+F("fl_film","Flash film","flash","warm grainy faded","Flash trên film âm bản: vùng tối phai xanh, da vàng ấm, hạt film.",
+ {flash:60,glow:22,contrast:12,shadows:-10,fade:14,temp:12,shHue:180,shAmt:22,hiHue:40,hiAmt:18,grain:32,grainSize:42,halation:22});
+F("fl_blue","Giờ xanh","flash","cool atmo","Flash lúc chạng vạng: trời xanh thẫm, chủ thể sáng trắng.",
+ {flash:62,glow:25,contrast:16,shadows:-14,temp:-28,tint:-4,saturation:6,shHue:220,shAmt:35,hiHue:50,hiAmt:6,grain:14,grainSize:30});
+F("fl_studio","Studio đen","flash","contrast natural","Phông đen studio, một đèn chính: sạch, sắc nét, tương phản cao.",
+ {flash:72,glow:10,exposure:2,contrast:26,highlights:-12,shadows:-40,saturation:-4,vignette:30});
+
+/* Digi / CCD: early compact digital cameras */
+F("dg_ccd08","CCD 2008","digi","cool vivid","Máy compact CCD đời đầu: lạnh, nét gắt, nhiễu màu nhẹ, có ngày chụp.",
+ {flash:40,exposure:4,contrast:20,highlights:12,temp:-14,tint:-3,saturation:14,vibrance:8,aberration:14,lofi:12,chroma:16,date:1});
+F("dg_ixus","Digi bạc","digi","cool natural","Máy ảnh số thân bạc: trắng hơi xanh, chi tiết sắc, màu trong.",
+ {contrast:14,highlights:10,temp:-10,saturation:6,aberration:10,lofi:8,chroma:10});
+F("dg_warm","Digi nắng","digi","warm vivid","Máy số đời đầu chụp nắng: vàng cam, bão hoà, vùng sáng cháy nhẹ.",
+ {exposure:8,contrast:16,highlights:18,temp:22,tint:4,saturation:20,hiHue:40,hiAmt:16,lofi:10,chroma:12,date:1});
+F("dg_green","Digi xanh rêu","digi","faded cool","Ám xanh lá của cảm biến CCD cũ, phai nhẹ.",
+ {contrast:10,fade:12,temp:-6,tint:-16,saturation:-4,shHue:150,shAmt:22,aberration:12,lofi:10,chroma:18});
+F("dg_night","Digi đêm","digi","grainy contrast cool","Chụp đêm máy compact: nhiễu màu dày, đèn đường loang, flash nhẹ.",
+ {flash:45,glow:20,contrast:22,shadows:-18,temp:-12,saturation:8,grain:20,lofi:14,chroma:32,halation:15,date:1});
+F("dg_y2k","Y2K","digi","vivid pastel","Năm 2000: hồng tím, bão hoà, lệch màu viền, nét vỡ nhẹ.",
+ {exposure:6,contrast:10,temp:-4,tint:14,saturation:18,hiHue:320,hiAmt:20,shHue:260,shAmt:18,aberration:22,lofi:18,chroma:14,bloom:15});
+F("dg_webcam","Webcam","digi","faded cool grainy","Webcam laptop cũ: tương phản thấp, độ phân giải thấp, nhiễu.",
+ {exposure:-4,contrast:-12,fade:16,temp:-8,saturation:-14,lofi:35,chroma:26,grain:10});
+F("dg_phone","Điện thoại nắp gập","digi","warm faded grainy","Camera VGA điện thoại cũ: mờ, ám vàng, vỡ hạt.",
+ {exposure:4,contrast:-6,highlights:20,fade:10,temp:16,saturation:-8,lofi:55,chroma:30,grain:12});
+F("dg_mono","Digi đơn sắc","digi","mono contrast","Chế độ B&W của máy compact: xám lạnh, nét gắt.",
+ {bw:100,contrast:24,highlights:10,lofi:10,chroma:0,grain:14,grainSize:25,flash:30});
+F("dg_stamp","Ngày tháng","digi","warm faded","Ảnh gia đình có in ngày góc phải, màu ấm phai.",
+ {contrast:6,fade:18,temp:14,saturation:-6,hiHue:35,hiAmt:16,grain:18,lofi:6,date:1});
+
+/* Á Đông: bright, clean portrait looks popular in Chinese and Korean beauty apps */
+F("as_milk","Sữa","asia","pastel warm","Trắng sữa, mềm, da sáng; tông kem nhẹ.",
+ {exposure:18,contrast:-16,highlights:-24,shadows:22,fade:10,temp:4,tint:4,saturation:-14,hiHue:30,hiAmt:10,glow:20});
+F("as_clear","Trong veo","asia","cool pastel natural","Trong và sạch kiểu Hàn: sáng, hơi lạnh, da hồng nhẹ.",
+ {exposure:14,contrast:-8,highlights:-20,shadows:18,temp:-8,tint:5,saturation:-6,vibrance:8,hiHue:340,hiAmt:8,glow:12});
+F("as_peach","Hồng đào","asia","warm pastel","Má hồng, vùng sáng phớt đào, ấm áp.",
+ {exposure:10,contrast:-6,highlights:-16,shadows:12,temp:8,tint:12,saturation:-4,hiHue:15,hiAmt:22,glow:15});
+F("as_pearl","Ngọc trai","asia","cool atmo pastel","Da óng như ngọc trai, quầng sáng mềm, hơi lạnh.",
+ {exposure:12,contrast:-4,highlights:-26,shadows:10,temp:-6,tint:6,saturation:-18,hiHue:280,hiAmt:10,glow:38,bloom:10});
+F("as_cloud","Mây","asia","faded pastel","Phai trắng như sương sớm, tương phản rất thấp.",
+ {exposure:16,contrast:-26,highlights:-30,shadows:30,fade:26,temp:-2,saturation:-22,glow:18});
+F("as_mochi","Mochi","asia","pastel warm","Kem và hồng, mềm như bánh mochi; hợp ảnh đồ ngọt, chân dung.",
+ {exposure:12,contrast:-12,highlights:-18,shadows:16,fade:8,temp:10,tint:8,saturation:-10,hiHue:20,hiAmt:14,shHue:330,shAmt:8});
+F("as_seoul","Seoul cafe","asia","warm natural","Quán cafe Seoul: be ấm, gỗ sáng, bóng mềm.",
+ {exposure:8,contrast:-4,highlights:-14,shadows:10,temp:14,tint:2,saturation:-12,hiHue:38,hiAmt:16,shHue:30,shAmt:10,grain:6});
+F("as_jade","Ngọc bích","asia","cool natural","Xanh ngọc nhẹ ở vùng tối, da sáng; hợp cảnh cây lá.",
+ {exposure:8,contrast:4,highlights:-14,shadows:8,temp:-4,tint:-6,saturation:-6,shHue:165,shAmt:24,hiHue:40,hiAmt:8});
+F("as_ink","Thuỷ mặc","asia","mono faded","Đen trắng mềm như tranh thuỷ mặc, phai và trong.",
+ {bw:100,exposure:10,contrast:-14,highlights:-20,shadows:20,fade:18,glow:15});
+F("as_dusk","Hoàng hôn Á","asia","warm atmo","Nắng chiều cam hồng trên da, quầng ấm.",
+ {exposure:4,contrast:8,highlights:-18,temp:24,tint:8,saturation:6,hiHue:20,hiAmt:22,shHue:280,shAmt:12,glow:22,halation:12});
+
+/* Hằng ngày: food, landscape, night */
+F("dy_food","Món ngon","daily","warm vivid","Đồ ăn tươi, ấm, sáng; tăng độ ngon mắt mà không rực quá.",
+ {exposure:8,contrast:12,highlights:-12,shadows:10,temp:10,saturation:10,vibrance:22});
+F("dy_coffee","Cà phê","daily","warm contrast","Nâu đậm, bóng sâu, sáng vàng; hợp cà phê, bánh nướng.",
+ {contrast:22,highlights:-10,shadows:-8,temp:16,saturation:-6,hiHue:38,hiAmt:18,shHue:25,shAmt:16,vignette:20});
+F("dy_sky","Trời xanh","daily","cool vivid","Trời xanh trong, mây trắng, cây xanh tươi.",
+ {contrast:12,highlights:-24,shadows:12,temp:-10,saturation:12,vibrance:22,shHue:210,shAmt:10});
+F("dy_sea","Biển","daily","cool vivid pastel","Nước biển xanh ngọc, cát sáng.",
+ {exposure:8,contrast:6,highlights:-20,shadows:10,temp:-6,tint:-6,saturation:6,vibrance:20,shHue:180,shAmt:18});
+F("dy_neon","Phố đêm","daily","cool contrast atmo","Đèn neon thành phố: xanh tím ở bóng, hồng cam ở đèn, quầng sáng.",
+ {contrast:20,highlights:-10,shadows:-12,temp:-14,tint:10,saturation:14,shHue:230,shAmt:30,hiHue:330,hiAmt:18,bloom:30,halation:15});
+F("dy_lamp","Đèn vàng","daily","warm atmo","Đèn sợi đốt buổi tối: vàng ấm, bóng nâu, quầng nhẹ.",
+ {contrast:10,shadows:-6,temp:26,tint:4,saturation:-4,hiHue:38,hiAmt:20,glow:18,grain:10});
+
+FAMS.unshift(["flash","Flash"],["digi","Digi & CCD"],["asia","Chân dung Á Đông"]);
+FAMS.push(["daily","Hằng ngày"]);
+})();
+
 /* ---------- WebGL engine ---------- */
 const glc = document.createElement("canvas");
 const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
@@ -1105,10 +1199,10 @@ void main(){
   gl_FragColor=vec4(clamp(c,0.0,1.0),1.0);
 }`;
 const FS_BRIGHT = HEAD+`
-uniform sampler2D u_src;uniform vec2 u_tx;
+uniform sampler2D u_src;uniform vec2 u_tx;uniform float u_t0;
 void main(){
   vec3 c=(texture2D(u_src,v+u_tx*vec2(-1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,-1.0)).rgb+texture2D(u_src,v+u_tx*vec2(-1.0,1.0)).rgb+texture2D(u_src,v+u_tx*vec2(1.0,1.0)).rgb)*0.25;
-  gl_FragColor=vec4(c*smoothstep(0.55,0.95,luma(c)),1.0);
+  gl_FragColor=vec4(c*smoothstep(u_t0,0.95,luma(c)),1.0);
 }`;
 const FS_BLUR = HEAD+`
 uniform sampler2D u_src;uniform vec2 u_dir;
@@ -1121,7 +1215,7 @@ void main(){
   gl_FragColor=vec4(c,1.0);
 }`;
 const FS_COMP = HEAD+`
-uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed,u_lofi,u_chroma;uniform vec2 u_res;
+uniform sampler2D u_a,u_b;uniform float u_bloom,u_hal,u_ab,u_vig,u_grain,u_gsize,u_leak,u_aspect,u_seed,u_lofi,u_chroma,u_flash,u_glow;uniform vec2 u_res,u_fc;
 float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
   float a=hash(i+u_seed),b=hash(i+vec2(1.0,0.0)+u_seed),c=hash(i+vec2(0.0,1.0)+u_seed),d=hash(i+vec2(1.0,1.0)+u_seed);
@@ -1140,6 +1234,12 @@ void main(){
   float lk=smoothstep(0.5,1.08,v.x)*(0.55+0.45*sin(v.y*4.0+1.3));
   vec3 lc=mix(vec3(1.0,0.22,0.08),vec3(1.0,0.62,0.22),v.y);
   c=1.0-(1.0-c)*(1.0-clamp(lc*lk*u_leak*1.1,0.0,1.0));
+  if(u_glow>0.001){vec3 sc2=1.0-(1.0-c)*(1.0-clamp(b*1.25,0.0,1.0));c=mix(c,sc2,u_glow*0.8);c=mix(c,c*0.92+0.08*vec3(1.0,0.97,0.98),u_glow*0.25);}
+  if(u_flash>0.001){vec2 q=(v-u_fc)*vec2(u_aspect,1.0);float rr=length(q)/max(1.0,u_aspect)*1.9;float fall=1.0/(1.0+rr*rr*3.2);
+    vec3 lit=c*mix(0.2,1.18,fall)*vec3(0.95,0.985,1.05);
+    vec3 ov=max(lit-0.72,0.0);lit=min(lit,vec3(0.72))+0.28*(1.0-exp(-ov/0.28));
+    lit+=smoothstep(0.6,0.95,luma(lit))*0.06*fall;
+    lit=mix(vec3(luma(lit)),lit,0.88+0.12*fall);c=mix(c,lit,u_flash);}
   float r=length((v-0.5)*vec2(u_aspect,1.0))/(0.5*sqrt(u_aspect*u_aspect+1.0));
   c*=1.0-u_vig*0.85*pow(r,2.3);
   float cell=mix(0.8,3.6,u_gsize)*sc;
@@ -1187,6 +1287,7 @@ function pass(prog,target,w,h,texs){
 }
 function hue2rgb(h){h=((h%360)+360)%360/60;const x=1-Math.abs(h%2-1);return [[1,x,0],[x,1,0],[0,1,x],[0,x,1],[x,0,1],[1,0,x]][Math.floor(h)%6];}
 let seed=Math.random()*100;
+const FLASH_C=[0.5,0.56]; /* flash centre in GL uv (y up); photo editor moves it onto the detected face */
 
 function render(srcTex,W,H,e){
   if(glc.width!==W)glc.width=W; if(glc.height!==H)glc.height=H;
@@ -1201,10 +1302,10 @@ function render(srcTex,W,H,e){
   const m=e.mix;
   gl.uniformMatrix3fv(c.u.u_mix,false,new Float32Array([1+m[0],m[3],m[6],m[1],1+m[4],m[7],m[2],m[5],1+m[8]]));
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-  const needGlow=e.bloom>0.5||e.halation>0.5;
+  const fl=e.flash||0,gw=e.glow||0,needGlow=e.bloom>0.5||e.halation>0.5||gw>0.5;
   if(needGlow){
     const sw=TB1.w,sh=TB1.h,b=PR.bright;
-    pass(b,TB1,sw,sh,[["u_src",TA.tex]]);gl.uniform2f(b.u.u_tx,1/W,1/H);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    pass(b,TB1,sw,sh,[["u_src",TA.tex]]);gl.uniform2f(b.u.u_tx,1/W,1/H);gl.uniform1f(b.u.u_t0,0.55-0.18*Math.min(1,gw/100));gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     const bl=PR.blur;
     [[1,0,1,TB1,TB2],[0,1,1,TB2,TB1],[1,0,2.6,TB1,TB2],[0,1,2.6,TB2,TB1]].forEach(s=>{
       pass(bl,s[4],sw,sh,[["u_src",s[3].tex]]);gl.uniform2f(bl.u.u_dir,s[0]*s[2]/sw,s[1]*s[2]/sh);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);});
@@ -1214,6 +1315,7 @@ function render(srcTex,W,H,e){
   gl.uniform1f(k.u.u_ab,e.aberration/100);gl.uniform1f(k.u.u_vig,e.vignette/100);gl.uniform1f(k.u.u_grain,e.grain/100);
   gl.uniform1f(k.u.u_gsize,e.grainSize/100);gl.uniform1f(k.u.u_leak,e.leak/100);gl.uniform1f(k.u.u_aspect,W/H);
   gl.uniform1f(k.u.u_lofi,e.lofi/100);gl.uniform1f(k.u.u_chroma,e.chroma/100);
+  gl.uniform1f(k.u.u_flash,fl/100);gl.uniform1f(k.u.u_glow,needGlow?gw/100:0);gl.uniform2f(k.u.u_fc,FLASH_C[0],FLASH_C[1]);
   gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 }
@@ -1739,7 +1841,7 @@ function wire(){
 
 /* ---------- Editing tools: pipeline ---------- */
 const GEO0={rot:0,flipH:false,flipV:false,angle:0,crop:null,aspect:"free"};
-const AI0={bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
+const AI0={dark:0,bg:"keep",bgColor:"#f2ede4",bgBlur:60,level:0,skin:0,bright:0,acne:0,lips:0,lipColor:"#c2334d",eyes:0,slim:0};
 const OPS=[];
 Object.assign(state,{geo:Object.assign({},GEO0),opsLen:0,overlays:[],frame:"none",ai:Object.assign({},AI0)});
 let tool=null,origPrev=null,retPrev=null,geoPrev=null,geoOrig=null,geoInfo=null,imgRect={x:0,y:0,w:1,h:1},selId=null,cropDraft=null,handMode=false;
@@ -1779,7 +1881,14 @@ function setSource(src,sample){
 }
 
 function beautyKey(){const A=state.ai;return [A.acne,A.skin,A.bright,A.eyes,A.slim,A.lips,A.lipColor,aiStamp,srcStamp].join("|");}
-function bgKey(){const A=state.ai;return [A.bg,A.bgColor,A.bgBlur,aiStamp].join("|");}
+function bgKey(){const A=state.ai;return [A.bg,A.bgColor,A.bgBlur,A.dark,aiStamp].join("|");}
+const FL_DARK={fl_direct:25,fl_porcelain:70,fl_night:55,fl_studio:80,fl_paparazzi:40,fl_mirror:20,fl_blue:30};
+let flKey="";
+function updFlashC(){const g=state.geo,k=aiStamp+"|"+JSON.stringify(g);if(k===flKey)return;flKey=k;let x=0.5,y=0.44;
+  if(aiData){const fs=aiData.faces;if(fs&&fs.length){let best=null,ba=0;fs.forEach(f=>{let a=1,b=1,c=0,d=0;f.forEach(p=>{a=Math.min(a,p.x);b=Math.min(b,p.y);c=Math.max(c,p.x);d=Math.max(d,p.y);});const ar=(c-a)*(d-b);if(ar>ba){ba=ar;best=[(a+c)/2,(b+d)/2+(d-b)*0.35];}});if(best){x=best[0];y=best[1];}}
+    else if(aiData.bg){const w=aiData.w,h=aiData.h;let sx=0,sy=0,sn=0,top=h;for(let j=0;j<h;j+=2)for(let i=0;i<w;i+=2){const f=1-aiData.bg[j*w+i];if(f>0.5){sx+=i;sy+=j;sn++;if(j<top)top=j;}}if(sn>20){x=sx/sn/w;y=(top/h*0.6+sy/sn/h*0.4);}}}
+  if(g.rot||g.angle||g.flipH||g.flipV){x=0.5;y=0.44;}else if(g.crop){x=(x-g.crop.x)/g.crop.w;y=(y-g.crop.y)/g.crop.h;}
+  FLASH_C[0]=Math.max(0.05,Math.min(0.95,x));FLASH_C[1]=Math.max(0.05,Math.min(0.95,1-y));}
 function buildRet(src,c){
   c=c||{};
   if(c.src!==src||c.bKey!==beautyKey()){c.src=src;c.bKey=beautyKey();c.base=beautyStage(src);c.ops=null;c.opsArr=[];c.out=null;}
@@ -1853,7 +1962,7 @@ async function analyzeAI(silent){
     aiData={w:res?res.w:1,h:res?res.h:1,bg:res?res.bg:null,skin:res?res.skin:null,faces};aiStamp++;
     if(state.ai.level>0)setLevel(state.ai.level);
     aiFailed=false;retDirty=true;if(!silent)toast(faces.length?"Đã nhận diện "+faces.length+" khuôn mặt":"Không thấy khuôn mặt; vẫn dùng được phần nền");
-  }catch(err){aiData=null;aiFailed=true;if(!silent)toast("Không tải được AI. Tính năng này cần bản web GitHub và mạng internet.");if(window.console)console.warn(err);}
+  }catch(err){aiData=null;aiFailed=true;if(!silent)toast("Chưa tải được mô hình AI. Kiểm tra kết nối mạng rồi thử lại.");if(window.console)console.warn(err);}
   finally{aiBusy=false;renderToolUI();schedule();}
 }
 const LIP_OUT=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185],LIP_IN=[78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,13,82,81,80,191];
@@ -1910,7 +2019,7 @@ function composeTo(x,img,W,H,fr,opt){
 
 /* ---------- Draw & export ---------- */
 function draw(){
-  queued=false;if(!origPrev||!PR)return;rebuildPrev();
+  queued=false;if(!origPrev||!PR)return;rebuildPrev();updFlashC();
   const W=geoPrev.width,H=geoPrev.height,fr=frameGeom(W,H);
   if(view.width!==fr.OW)view.width=fr.OW;if(view.height!==fr.OH)view.height=fr.OH;
   imgRect={x:fr.x,y:fr.y,w:W,h:H};
@@ -2049,11 +2158,13 @@ void main(){vec3 c=texture2D(u_I,v).rgb;vec2 p=v*u_szM-0.5;vec2 b=floor(p);float
     vec3 dc=c-texture2D(u_G,uv).rgb;float w=wsp*exp(-dot(dc,dc)/(2.0*u_sr*u_sr))+1e-6;acc+=w*texture2D(u_M,uv).r;ws+=w;}
   float f=smoothstep(0.3,0.7,1.0-acc/ws);gl_FragColor=vec4(f,f,f,1.0);}`,
  pbg:`uniform sampler2D u_I,u_F;void main(){vec3 c=texture2D(u_I,v).rgb;float w=1.0-texture2D(u_F,v).r;w=w*w;gl_FragColor=vec4(c*w,w);}`,
- bgc:`uniform sampler2D u_I,u_F,u_B;uniform vec2 u_szB;uniform vec3 u_col;uniform float u_mode;
+ bgc:`uniform sampler2D u_I,u_F,u_B;uniform vec2 u_szB;uniform vec3 u_col;uniform float u_mode,u_dark;
 void main(){vec4 I4=texture2D(u_I,v);float f=texture2D(u_F,v).r;
   if(u_mode<0.5){vec4 b=bicubic(u_B,v,u_szB);gl_FragColor=vec4(mix(nrm(b),I4.rgb,f),I4.a);}
   else if(u_mode<1.5){gl_FragColor=vec4(mix(u_col,I4.rgb,f),I4.a);}
-  else{gl_FragColor=vec4(I4.rgb,I4.a*f);}}`
+  else if(u_mode<2.5){gl_FragColor=vec4(I4.rgb,I4.a*f);}
+  else{gl_FragColor=I4;}
+  float k=u_dark*(1.0-smoothstep(0.15,0.85,f));gl_FragColor.rgb*=1.0-k*0.94;}`
 };
 const GQ={};
 function initGPU(){for(const k in GFS)GQ[k]=program(GHEAD+GFS[k]);}
@@ -2261,18 +2372,18 @@ function bgTextures(){const key=srcStamp+"|"+aiStamp;if(bgTexC&&bgKeyC===key)ret
   const w=aiData.w,h=aiData.h,m=mk(w,h),id=m.x.createImageData(w,h),p=id.data;for(let i=0;i<w*h;i++){p[i*4]=Math.round(aiData.bg[i]*255);p[i*4+3]=255;}m.x.putImageData(id,0,0);
   const g=mk(w,h);g.x.imageSmoothingQuality="high";g.x.drawImage(aiSrc,0,0,w,h);bgTexC={M:gUp(m.c),G:gUp(g.c)};bgKeyC=key;return bgTexC;}
 function bgStage(cv){
-  const A=state.ai;if(!aiData||!aiData.bg||A.bg==="keep")return cv;
+  const A=state.ai;if(!aiData||!aiData.bg||(A.bg==="keep"&&!(A.dark>0)))return cv;
   const W=cv.width,H=cv.height,T=bgTextures(),I=gUp(cv),F=gT(W,H);
   gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});
   let B=null;if(A.bg==="blur"){const P=gT(Math.ceil(W/2),Math.ceil(H/2));gRun(GQ.pbg,P,[["u_I",I],["u_F",F]],{});B=gBlur(P,Math.max(1.5,Math.max(W,H)*0.012*A.bgBlur/100));gDel(P);}
   const O=gT(W,H),col=A.bgColor.match(/\w\w/g).map(h=>parseInt(h,16)/255);
-  gRun(GQ.bgc,O,[["u_I",I],["u_F",F],["u_B",B||F]],{u_szB:B?sz(B):sz(F),u_col:col,u_mode:A.bg==="blur"?0:A.bg==="color"?1:2});
+  gRun(GQ.bgc,O,[["u_I",I],["u_F",F],["u_B",B||F]],{u_szB:B?sz(B):sz(F),u_col:col,u_mode:A.bg==="blur"?0:A.bg==="color"?1:A.bg==="remove"?2:3,u_dark:(A.dark||0)/100});
   const c=gRead(O);[I,F,O].forEach(gDel);if(B)gDel(B);return c;
 }
 function cloneCanvas(c){const m=mk(c.width,c.height);m.x.drawImage(c,0,0);return m.c;}
 
 /* ---------- Tool UI ---------- */
-const TOOLS=[["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];
+const TOOLS=[["flash","Flash"],["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];
 const BRUSH_T=new Set(["beauty","reshape","blur"]);
 const COLORS=["#ffffff","#111111","#f2a33a","#ff4d5e","#ff8fc7","#7a5cff","#3ec9ff","#5fe08a","#ffe45c"];
 const LIPS=["#c2334d","#e0566f","#a8323e","#d9776b","#8e2a4f","#f08a8a"];
@@ -2304,10 +2415,26 @@ function panelFor(t){
     const r2=el("div","btnrow");r2.append(btn("Đặt lại","",()=>{state.geo=Object.assign({},GEO0);cropDraft={x:0,y:0,w:1,h:1};geoDirty=true;pushHistory();renderToolUI();schedule();}),
       btn("Áp dụng","primary",()=>{setTool(null);toast("Đã cắt ảnh");}));box.append(r2,hint("Kéo khung trên ảnh để chọn vùng giữ lại. Kéo bốn góc để đổi cỡ."));
   }
+  else if(t==="flash"){
+    const A=state.ai,P=state.params,list=PRESETS.filter(p=>p.fam==="flash");
+    const s=sec("Kiểu đèn"),g=el("div","flgrid");
+    [["none","Tắt"]].concat(list.map(p=>[p.id,p.name])).forEach(([id,name])=>{const b=el("button","flcard");b.type="button";b.setAttribute("aria-pressed",String(state.presetId===id));
+      const c=document.createElement("canvas");c.width=c.height=TH;c.dataset.thumb=id;b.appendChild(c);if(thumbCache.has(id))requestAnimationFrame(()=>paintThumb(id));
+      b.appendChild(el("span",null,name));b.onclick=()=>{selectPreset(id);if(id!=="none"){const d=FL_DARK[id];if(d!=null&&!(A.dark>0))A.dark=d;if(id==="fl_porcelain"&&!A.level&&aiData&&aiData.faces.length)setLevel(35);}else A.dark=0;retDirty=true;schedule();pushHistory();renderToolUI();};g.appendChild(b);});
+    s.appendChild(g);box.appendChild(s);
+    const s2=sec("Tinh chỉnh");
+    s2.append(sld("Cường độ flash",0,100,P.flash||0,v=>{P.flash=v;schedule();},()=>{syncAll();pushHistory();}),
+      sld("Quầng mềm",0,100,P.glow||0,v=>{P.glow=v;schedule();},()=>{syncAll();pushHistory();}));
+    if(aiData&&aiData.bg)s2.appendChild(sld("Làm tối nền",0,100,A.dark||0,v=>{A.dark=v;},v=>{retDirty=true;schedule();pushHistory();}));
+    s2.appendChild(chipRow([[0,"Không in ngày"],[1,"In ngày góc ảnh"]],P.date?1:0,v=>{P.date=v;schedule();pushHistory();renderToolUI();}));
+    box.appendChild(s2);
+    if(!aiData||!aiData.bg){const b=btn(aiBusy?"Đang tìm chủ thể…":"Tìm chủ thể để làm tối nền","",()=>{aiFailed=false;analyzeAI(false);});b.disabled=aiBusy;box.appendChild(b);}
+    box.appendChild(hint(aiData&&aiData.faces.length?"Đèn đang rọi vào khuôn mặt trong ảnh. Flash đẹp nhất với ảnh chụp trong nhà, buổi tối hoặc nền tối.":"Flash đẹp nhất với ảnh chụp trong nhà, buổi tối hoặc nền tối. Có khuôn mặt trong ảnh, đèn sẽ tự rọi đúng vào mặt."));
+  }
   else if(t==="beauty"){
     const A=state.ai,faces=aiData?aiData.faces.length:0;
     const s=sec("Làm đẹp một chạm");
-    s.appendChild(el("p","note",aiBusy?"Đang phân tích khuôn mặt…":aiData?(faces?"Đã nhận diện "+faces+" khuôn mặt. Làm đẹp cả da, mắt và khuôn mặt.":"Không thấy khuôn mặt rõ; vẫn làm đẹp da."):"Chế độ cơ bản: nhận vùng da theo màu. Mở bản web GitHub để làm đẹp chính xác hơn bằng AI."));
+    s.appendChild(el("p","note",aiBusy?"Đang phân tích khuôn mặt…":aiData?(faces?"Đã nhận diện "+faces+" khuôn mặt. Làm đẹp cả da, mắt và khuôn mặt.":"Không thấy khuôn mặt rõ; vẫn làm đẹp da."):"Đang làm đẹp theo màu da. Khi có mạng, AI nhận diện khuôn mặt để chỉnh mắt, môi, dáng mặt chính xác hơn."));
     s.appendChild(chipRow([[0,"Tắt"],[35,"Tự nhiên"],[60,"Rạng rỡ"],[85,"Lung linh"]],[0,35,60,85].includes(A.level)?A.level:-1,v=>{setLevel(v);retDirty=true;schedule();pushHistory();renderToolUI();}));
     s.appendChild(sld("Mức làm đẹp",0,100,A.level,v=>{setLevel(v);beautyLive();},()=>{pushHistory();renderToolUI();}));
     box.appendChild(s);
@@ -2363,7 +2490,7 @@ function panelFor(t){
   }
   else if(t==="frame"){const s=sec("Khung");s.appendChild(chipRow(FRAMES,state.frame,v=>{state.frame=v;pushHistory();renderToolUI();schedule();}));box.append(s,hint("Khung được thêm vào ảnh khi lưu."));}
   else if(t==="ai"){
-    if(!aiData||!aiData.bg){box.appendChild(hint("AI chạy ngay trên máy bạn để tách người khỏi nền, không tốn token Claude. Lần đầu cần tải khoảng 20MB mô hình. Chỉ chạy được trên bản web GitHub, không chạy trong khung xem của Claude."));
+    if(!aiData||!aiData.bg){box.appendChild(hint("Tách người khỏi nền ngay trên máy của bạn, ảnh không được gửi đi đâu. Lần đầu cần tải khoảng 20MB."));
       const b=btn(aiBusy?"Đang tải và phân tích…":"Phân tích ảnh bằng AI","primary",()=>{aiFailed=false;analyzeAI(false);});b.disabled=aiBusy;box.appendChild(b);}
     else{const A=state.ai,upd=()=>{retDirty=true;schedule();};
       const s=sec("Nền");s.appendChild(chipRow([["keep","Giữ nguyên"],["blur","Làm mờ"],["color","Đổi màu"],["remove","Xoá nền"]],A.bg,v=>{A.bg=v;upd();pushHistory();renderToolUI();}));
@@ -2409,7 +2536,7 @@ function setTool(t){
   if(!desk&&t&&mTab!=="edit")setMTab("edit");
   if(desk&&t&&typeof dMain!=="undefined"&&dMain!=="tools"){dMain="tools";document.querySelectorAll("[data-dm]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.dm==="tools")));["presets","color","tools"].forEach(x=>$("dm-"+x).hidden=x!=="tools");}
   if(prev!==t&&$("mDrawer"))$("mDrawer").classList.remove("min");
-  if((t==="beauty"||t==="ai")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
+  if((t==="beauty"||t==="ai"||t==="flash")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
   renderToolUI();schedule();
 }
 function setMTab(t){
