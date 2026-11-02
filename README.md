@@ -35,3 +35,9 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 - Các kiểu cũ chuyển thành **Flash Pro · phong cách**.
 - Giao diện dùng font **Be Vietnam Pro**, nhãn tối thiểu 11px, tương phản đạt chuẩn; kiểm tra bằng [Impeccable](https://github.com/pbakaus/impeccable) không còn cảnh báo. Xem `PRODUCT.md`.
 - **Kiểu đèn IOHK**: lấy màu da trên khuôn mặt làm chuẩn để cân bằng trắng cả ảnh (khử được ám cam/vàng của đèn quán, kể cả khi kênh xanh gần như mất), đưa da về trắng sứ má hồng, thêm quầng sáng lấp lánh và nền tối. Kiểu Trắng cũng dùng cách cân bằng trắng theo da này.
+
+### Cập nhật 2/11
+
+- **Làm đẹp không còn nhoè viền**: mịn da giữ khối (chỉ làm phẳng vết thâm, lỗ chân lông), xoá mụn không lan ra đường hàm, son môi và trắng răng chỉ tô đúng môi, răng.
+- **Video – Sửa đồng bộ**: trong bố cục nhiều ô, bật "Sửa đồng bộ cả N ô" để preset, màu, hiệu ứng, hoạt ảnh, mask, tách nền áp cho mọi ô.
+- **Kho nhạc miễn phí**: mục Âm thanh có kho nhạc Creative Commons (Openverse, không cần đăng ký) chỉ gồm bài được dùng thương mại; dán Client ID Jamendo miễn phí để có bảng thịnh hành theo tuần. App tự lưu dòng ghi công tác giả để dán khi đăng.

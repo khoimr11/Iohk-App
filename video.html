@@ -193,6 +193,13 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 .tr.off{background:rgba(20,20,22,.9);color:var(--fg);border:1px solid rgba(255,255,255,.3)}
 .tlempty{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);color:var(--faint);font-size:12.5px;pointer-events:none;text-align:center;z-index:2}
 /* library cards */
+.mlist{display:flex;flex-direction:column;gap:6px}
+.mrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px;border-radius:10px;border:1px solid transparent}
+.mrow:hover,.mrow.on{background:var(--well);border-color:var(--line)}
+.mplay{width:44px;height:44px;border-radius:8px;background:var(--well-hi) center/cover;display:grid;place-items:center;color:#fff;position:relative;overflow:hidden}
+.mplay::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35)}.mplay svg{position:relative;z-index:1;width:16px;height:16px;fill:currentColor;stroke:none}
+.mtx{min-width:0;display:flex;flex-direction:column;gap:2px}.mtx b{font-weight:500;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mtx small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-audio .field{width:100%;box-sizing:border-box}.lib-audio textarea.field{font-size:11.5px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mitem{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/10;display:block;text-align:left;cursor:grab}
@@ -1835,7 +1842,7 @@ function libPanel(k){const box=el("div","sec");box.style.gap="14px";const sel0=s
   if(k==="media"){const d=el("div","drop");d.append("Kéo thả video, ảnh vào đây hoặc vào dòng thời gian");const r=el("div","btnrow");r.append(tbtn("Nhập file",()=>$("file").click(),"primary"),tbtn("Thêm lớp phủ",addOverlay));d.appendChild(r);box.appendChild(d);
     const g=el("div","grid2");media.forEach(m=>{if(m.kind!=="audio")g.appendChild(mediaItem(m));});box.appendChild(g);if(!g.children.length)box.appendChild(el("p","hint","Video và ảnh xử lý ngay trên máy bạn, không tải lên đâu cả. Dự án tự lưu trong trình duyệt."));}
   else if(k==="audio"){const r=el("div","btnrow");r.append(tbtn("Nhập nhạc",()=>$("fileAudio").click(),"primary"),tbtn(rec?"Dừng ghi âm":"Ghi âm lồng tiếng",toggleRecord));box.appendChild(r);
-    const g=el("div","grid2");media.forEach(m=>{if(m.kind==="audio")g.appendChild(mediaItem(m));});box.appendChild(g);box.appendChild(el("p","hint","Mẹo: chọn một clip video rồi bấm nút “Tách âm thanh” trên thanh dòng thời gian để chỉnh tiếng riêng."));}
+    const g=el("div","grid2");media.forEach(m=>{if(m.kind==="audio")g.appendChild(mediaItem(m));});box.appendChild(g);box.appendChild(musicBrowser());box.appendChild(el("p","hint","Mẹo: chọn một clip video rồi bấm nút “Tách âm thanh” trên thanh dòng thời gian để chỉnh tiếng riêng."));}
   else if(k==="text"){box.appendChild(tbtn("+ Thêm chữ mặc định",()=>addText(),"primary"));const g=el("div","grid2");TEXT_TPL.forEach(tp=>{const c=el("button","card");c.type="button";const pv2=el("div","tt");const f=TFONTS[tp.o.font];
       pv2.style.cssText="font:"+(tp.o.italic?"italic ":"")+f[0]+" 17px "+f[1]+";color:"+tp.o.color+(tp.o.style==="outline"?";-webkit-text-stroke:1px "+(tp.o.stroke||"#111"):"")+(tp.o.style==="neon"?";text-shadow:0 0 8px "+tp.o.color+",0 0 16px "+tp.o.color:"")+(tp.o.style==="shadow"?";text-shadow:0 2px 6px rgba(0,0,0,.7)":"")+(tp.o.ls?";letter-spacing:"+tp.o.ls/20+"em":"");
       const sp=el("span",null,tp.o.upper?tp.n.toUpperCase():tp.n);if(tp.o.style==="hl"||tp.o.style==="box"||tp.o.style==="lower")sp.style.cssText="background:"+(tp.o.box||"rgba(0,0,0,.6)")+";padding:3px 8px;border-radius:5px";pv2.appendChild(sp);c.appendChild(pv2);c.onclick=()=>addText(tp);g.appendChild(c);});box.appendChild(g);}
@@ -2028,6 +2035,67 @@ pv.addEventListener("pointermove",e=>{if(!pptr.has(e.pointerId))return;pptr.set(
 const pEnd=e=>{pptr.delete(e.pointerId);if(pptr.size)return;const d=pdrag;pdrag=null;snapG.x=snapG.y=false;if(d&&d.moved)commit();else requestDraw();};pv.addEventListener("pointerup",pEnd);pv.addEventListener("pointercancel",pEnd);
 pv.addEventListener("wheel",e=>{const it=selItem();if(!it||it.type==="audio"||it.type==="fx")return;e.preventDefault();const lt=clamp(T-it._start,0,it._dur);setProp(it,"s",clamp(val(it,"s",lt)*Math.exp(-e.deltaY*.0015),5,800),lt);requestDraw();clearTimeout(comT);comT=setTimeout(()=>commit(),400);},{passive:false});
 pv.addEventListener("dblclick",()=>{const it=selItem();if(it&&it.type==="text"){if(isDesk()){curPanel="text";showInspector();const ta=document.querySelector("#ibody textarea");if(ta){ta.focus();ta.select();}}else openPanel("text");}});
+
+/* ---------- Free licensed music: Openverse (no key) + Jamendo (optional free client id) ---------- */
+const MUSIC_TAGS=[["trend","Thịnh hành",""],["lofi","Lofi","lofi"],["chill","Chill","chill"],["happy","Vui tươi","happy upbeat"],["cine","Điện ảnh","cinematic"],["acoustic","Acoustic","acoustic"],["edm","EDM","electronic dance"],["love","Tình cảm","romantic"],["hiphop","Hip hop","hiphop"],["piano","Piano","piano"]];
+const mus={tag:"trend",q:"",items:[],busy:false,err:"",page:1,player:null,playing:null,key:""};
+function musKey(){try{return localStorage.getItem("iohk.jamendo")||"";}catch(e){return "";}}
+function musSetKey(v){try{v?localStorage.setItem("iohk.jamendo",v):localStorage.removeItem("iohk.jamendo");}catch(e){}}
+function musFmt(s){s=Math.round(s||0);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+async function musFetch(){
+  mus.busy=true;mus.err="";renderLibIfAudio();const key=musKey(),t=MUSIC_TAGS.find(x=>x[0]===mus.tag)||MUSIC_TAGS[0],q=(mus.q||t[2]||"").trim();
+  try{
+    if(key){
+      const u=new URL("https://api.jamendo.com/v3.0/tracks/");const ps={client_id:key,format:"json",limit:"24",include:"licenses",audioformat:"mp32",offset:String((mus.page-1)*24)};
+      if(mus.q)ps.search=mus.q;else if(t[2])ps.fuzzytags=t[2].replace(/ /g,"+");
+      ps[mus.q?"boost":"order"]=mus.q?"popularity_week":"popularity_week";Object.entries(ps).forEach(([k,v])=>u.searchParams.set(k,v));
+      const r=await fetch(u);if(!r.ok)throw new Error("http "+r.status);const j=await r.json();if(j.headers&&j.headers.status!=="success")throw new Error(j.headers.error_message||"jamendo");
+      const L=(j.results||[]).filter(x=>!/\/nc|-nc/i.test(x.license_ccurl||"")&&(x.audiodownload_allowed!==false));
+      mus.items=L.map(x=>({id:"j"+x.id,title:x.name,artist:x.artist_name,dur:x.duration,img:x.album_image||x.image,url:x.audiodownload||x.audio,stream:x.audio,lic:licName(x.license_ccurl),licUrl:x.license_ccurl,page:x.shareurl,src:"Jamendo"}));
+    }else{
+      const u=new URL("https://api.openverse.org/v1/audio/");const ps={q:q||"music",category:"music",license_type:"commercial",page_size:"24",page:String(mus.page),mature:"false"};
+      Object.entries(ps).forEach(([k,v])=>u.searchParams.set(k,v));
+      const r=await fetch(u);if(!r.ok)throw new Error("http "+r.status);const j=await r.json();
+      mus.items=(j.results||[]).filter(x=>x.url&&(!x.license||!/nc/i.test(x.license))).map(x=>({id:"o"+x.id,title:x.title||"Không tên",artist:x.creator||"",dur:(x.duration||0)/1000,img:x.thumbnail,url:x.url,stream:x.url,
+        lic:(x.license||"").toUpperCase()+(x.license_version?" "+x.license_version:""),licUrl:x.license_url,page:x.foreign_landing_url,src:x.source||x.provider||"Openverse",attribution:x.attribution}));
+    }
+    if(!mus.items.length)mus.err="Không tìm thấy bài phù hợp. Thử từ khoá khác.";
+  }catch(e){mus.items=[];mus.err="Chưa tải được kho nhạc. Kiểm tra kết nối mạng rồi thử lại.";if(window.console)console.warn(e);}
+  mus.busy=false;renderLibIfAudio();}
+function licName(u){if(!u)return "";const m=u.match(/licenses\/([a-z-]+)\/([\d.]+)/i);return m?("CC "+m[1].toUpperCase()+" "+m[2]):(/publicdomain/.test(u)?"CC0":"CC");}
+function musCredit(it){return (it.attribution||("“"+it.title+"” — "+(it.artist||"Không rõ")+" ("+it.lic+")"+(it.page?" · "+it.page:"")));}
+function renderLibIfAudio(){if(cat==="audio")renderLib();if(!isDesk()&&typeof sheetKind!=="undefined"&&sheetKind==="lib"&&cat==="audio"){const b=document.querySelector("#sheet .lib-audio");if(b)b.replaceWith(musicBrowser());}}
+function musPreview(it){if(!mus.player){mus.player=new Audio();mus.player.preload="none";mus.player.onended=()=>{mus.playing=null;renderLibIfAudio();};}
+  if(mus.playing===it.id){mus.player.pause();mus.playing=null;}else{mus.player.src=it.stream;mus.player.play().catch(()=>toast("Không phát thử được bài này"));mus.playing=it.id;}renderLibIfAudio();}
+async function musAdd(it,btn){if(btn){btn.disabled=true;btn.textContent="Đang tải…";}
+  try{const r=await fetch(it.url);if(!r.ok)throw new Error("http "+r.status);const b=await r.blob();const ext=/ogg/.test(b.type)?"ogg":/wav/.test(b.type)?"wav":"mp3";
+    const f=new File([b],(it.title||"nhac").replace(/[\\/:*?"<>|]/g,"").slice(0,60)+"."+ext,{type:b.type||"audio/mpeg"});
+    await importFiles([f]);P.credits=P.credits||[];if(!P.credits.includes(musCredit(it)))P.credits.push(musCredit(it));commit();
+    toast(it.lic&&!/CC0/.test(it.lic)?"Đã thêm nhạc. Nhớ ghi công tác giả khi đăng (mục Ghi công)":"Đã thêm nhạc vào dòng thời gian");}
+  catch(e){toast("Nguồn này không cho tải bài hát. Thử bài khác nhé");if(btn){btn.disabled=false;btn.textContent="Thêm";}}}
+function musicBrowser(){const w=el("div","lib-audio");w.style.display="flex";w.style.flexDirection="column";w.style.gap="10px";const key=musKey();
+  w.appendChild(el("h3",null,key?"Kho nhạc Jamendo · được dùng thương mại":"Kho nhạc miễn phí · được dùng thương mại"));
+  const sr=el("div","msearch"),inp=document.createElement("input");inp.type="search";inp.className="field";inp.placeholder="Tìm bài, thể loại, tâm trạng…";inp.value=mus.q;inp.setAttribute("aria-label","Tìm nhạc");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){mus.q=inp.value.trim();mus.page=1;musFetch();}});sr.appendChild(inp);w.appendChild(sr);
+  w.appendChild(chipRow(MUSIC_TAGS.map(t=>[t[0],t[0]==="trend"&&!key?"Gợi ý":t[1]]),mus.q?"":mus.tag,v=>{mus.tag=v;mus.q="";mus.page=1;musFetch();}));
+  if(mus.busy)w.appendChild(el("p","hint","Đang tải danh sách nhạc…"));
+  else if(mus.err)w.appendChild(el("p","hint",mus.err));
+  const list=el("div","mlist");mus.items.forEach(it=>{const row=el("div","mrow"+(mus.playing===it.id?" on":""));
+    const pb=el("button","mplay");pb.type="button";pb.setAttribute("aria-label",(mus.playing===it.id?"Dừng ":"Nghe thử ")+it.title);pb.innerHTML=mus.playing===it.id?'<svg class="i"><use href="#i-pause"/></svg>':'<svg class="i"><use href="#i-play"/></svg>';
+    if(it.img)pb.style.backgroundImage="url('"+it.img+"')";pb.onclick=()=>musPreview(it);
+    const tx=el("div","mtx");tx.append(el("b",null,it.title),el("small",null,[it.artist,musFmt(it.dur),it.lic].filter(Boolean).join(" · ")));
+    const ab=el("button","tbtn","Thêm");ab.type="button";ab.onclick=()=>musAdd(it,ab);row.append(pb,tx,ab);list.appendChild(row);});
+  w.appendChild(list);
+  if(mus.items.length){const nr=el("div","btnrow");if(mus.page>1)nr.appendChild(tbtn("Trang trước",()=>{mus.page--;musFetch();}));nr.appendChild(tbtn("Thêm bài khác",()=>{mus.page++;musFetch();}));w.appendChild(nr);}
+  if(P.credits&&P.credits.length){const d=document.createElement("details");d.className="fold";d.appendChild(el("summary",null,"Ghi công nhạc ("+P.credits.length+")"));const ta=el("textarea","field");ta.readOnly=true;ta.rows=3;ta.value=P.credits.join("\n");
+    d.append(ta,tbtn("Sao chép ghi công",()=>{try{navigator.clipboard.writeText(ta.value);toast("Đã sao chép, dán vào mô tả khi đăng");}catch(e){ta.select();}}));w.appendChild(d);}
+  const kd=document.createElement("details");kd.className="fold";kd.appendChild(el("summary",null,key?"Nguồn: Jamendo (đang bật)":"Muốn nhạc thịnh hành theo tuần?"));
+  const ki=document.createElement("input");ki.className="field";ki.placeholder="Dán Client ID Jamendo";ki.value=key;ki.setAttribute("aria-label","Jamendo Client ID");
+  const kr=el("div","btnrow");kr.append(tbtn(key?"Cập nhật":"Bật Jamendo",()=>{musSetKey(ki.value.trim());mus.page=1;musFetch();},"primary"));if(key)kr.appendChild(tbtn("Tắt",()=>{musSetKey("");mus.page=1;musFetch();}));
+  const hp=el("p","hint");hp.innerHTML='Tạo Client ID miễn phí tại <a href="https://devportal.jamendo.com" target="_blank" rel="noopener">devportal.jamendo.com</a> để có bảng bài hát thịnh hành theo tuần. Không có mã, app dùng kho nhạc Creative Commons của Openverse. App chỉ hiện bài cho phép dùng thương mại.';
+  kd.append(ki,kr,hp);w.appendChild(kd);
+  if(!mus.items.length&&!mus.busy&&!mus.err)setTimeout(musFetch,0);
+  return w;}
 
 /* ================= Projects (IndexedDB), export, wiring ================= */
 const DB=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open("iohk-video",1);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains("projects"))d.createObjectStore("projects",{keyPath:"id"});if(!d.objectStoreNames.contains("media"))d.createObjectStore("media",{keyPath:"id"});};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));
