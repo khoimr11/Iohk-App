@@ -245,6 +245,10 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 .kfb.on{color:var(--sel)}
 .kfb.on svg{fill:currentColor}
 .seg{display:flex;padding:3px;border-radius:9px;background:rgba(0,0,0,.3)}
+.syncbar{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:10px;background:var(--well);border:1px solid var(--line)}
+.syncbar.on{border-color:rgba(233,180,92,.55);background:rgba(233,180,92,.08)}
+.syncbar .tbtn{width:100%;height:34px}
+.syncbar .hint{margin:0}
 .seg button{flex:1;height:28px;border-radius:7px;font-size:12px;font-weight:500;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:var(--fg)}
 .hint{font-size:12px;color:var(--faint);line-height:1.5;margin:0}
@@ -336,6 +340,7 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
   <symbol id="i-fx" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
   <symbol id="i-trans" viewBox="0 0 24 24"><rect x="3" y="6" width="8" height="12" rx="1.5"/><rect x="13" y="6" width="8" height="12" rx="1.5"/><path d="M10 12h4"/></symbol>
   <symbol id="i-filter" viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
   <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M12 3.5v17M12 12h8.5"/></symbol>
   <symbol id="i-cc" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 10.2a2.3 2.3 0 1 0 0 3.6M17 10.2a2.3 2.3 0 1 0 0 3.6"/></symbol>
   <symbol id="i-adj" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.3" fill="#0e0e10"/><circle cx="15" cy="17" r="2.3" fill="#0e0e10"/></symbol>
@@ -1720,12 +1725,12 @@ tlv.addEventListener("drop",e=>{e.preventDefault();const r=tlv.getBoundingClient
 /* ================= Editing operations, library, inspector ================= */
 let hist=[],hIdx=-1;
 function snapshot(){return JSON.stringify({P,sel,mainMuted},(k,v)=>k[0]==="_"?undefined:v);}
-function commit(noSave){layout();if(playing)schedAudio();const ids=new Set(P.main.map(c=>c.id));P.tracks.forEach(t=>t.items.forEach(i=>ids.add(i.id)));dropDecoders(ids);const s=snapshot();if(hist[hIdx]!==s){hist=hist.slice(0,hIdx+1);hist.push(s);if(hist.length>120)hist.shift();hIdx=hist.length-1;if(!noSave)autosave();}
+function commit(noSave){syncCells();layout();if(playing)schedAudio();const ids=new Set(P.main.map(c=>c.id));P.tracks.forEach(t=>t.items.forEach(i=>ids.add(i.id)));dropDecoders(ids);const s=snapshot();if(hist[hIdx]!==s){hist=hist.slice(0,hIdx+1);hist.push(s);if(hist.length>120)hist.shift();hIdx=hist.length-1;if(!noSave)autosave();}
   T=clamp(T,0,total);renderTL();showInspector();requestDraw();fitIfRatio();updHist();}
 function restore(i){if(i<0||i>=hist.length)return;hIdx=i;const o=JSON.parse(hist[i]);P=o.P;sel=o.sel;mainMuted=!!o.mainMuted;layout();T=clamp(T,0,total);renderTL();showInspector();fitPreview();updHist();autosave();}
 function updHist(){$("bUndo").disabled=hIdx<=0;$("bRedo").disabled=hIdx>=hist.length-1;}
 let lastRatio=null;function fitIfRatio(){const k=P.ratio+"|"+(P.ratio==="orig"&&P.main[0]?P.main[0].mid:"");if(k!==lastRatio){lastRatio=k;fitPreview();syncProjSel();}}
-let liveT=null;function live(){layout();requestDraw();clearTimeout(liveT);liveT=setTimeout(()=>{renderTL();},150);}
+let liveT=null;function live(){syncCells();layout();requestDraw();clearTimeout(liveT);liveT=setTimeout(()=>{renderTL();},150);}
 let comT=null;function liveCommit(){live();clearTimeout(comT);comT=setTimeout(()=>commit(),450);}
 
 /* ---------- add / import ---------- */
@@ -1889,6 +1894,13 @@ function showInspector(){if(sel&&!selItem())sel=null;const L=panelsFor();const k
   if(isDesk()){const tabs=$("itabs");tabs.innerHTML="";L.forEach(([k,l])=>{const b=el("button","itab",l);b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(k===curPanel));b.onclick=()=>{curPanel=k;showInspector();};tabs.appendChild(b);});
     const body=$("ibody"),ae=document.activeElement;if(ae&&body.contains(ae)&&(ae.tagName==="TEXTAREA"||ae.tagName==="INPUT"&&ae.type==="text"))return;const st=body.scrollTop;body.innerHTML="";body.appendChild(buildPanel(curPanel));body.scrollTop=st;if(cat==="fx"||cat==="trans"||cat==="layout"||cat==="filter"&&libSel!==sel)renderLib();}
   else{buildMTools();const s=$("sheet");if(s.classList.contains("open")&&sheetKind==="insp"){if(L.some(p=>p[0]===curPanel))openPanel(curPanel);else closeSheet();}}}
+const SYNC_KEYS=["preset","strength","adj","fx","fxAmt","ain","aout","loop","motion","fit","flipH","flipV","blend","bgr","chroma","mask"];
+function syncCells(){const it=selItem();if(!it||!it.cell||!it.cell.sync||it.kind==="empty")return;cellGroup(it).forEach(o=>{if(o===it||o.kind==="empty")return;SYNC_KEYS.forEach(k=>{const v=it[k];o[k]=v&&typeof v==="object"?JSON.parse(JSON.stringify(v)):v;});});}
+function toggleCellSync(it){const grp=cellGroup(it),on=!it.cell.sync;grp.forEach(o=>{o.cell=Object.assign({},o.cell,{sync:on});});
+  if(on){syncCells();toast("Đang sửa đồng bộ "+grp.filter(o=>o.kind!=="empty").length+" ô theo ô này");}else toast("Đã tắt đồng bộ, mỗi ô sửa riêng");commit();}
+function syncBar(it){const n=cellGroup(it).filter(o=>o.kind!=="empty").length,w=el("div","syncbar"+(it.cell.sync?" on":""));
+  const b=el("button","tbtn"+(it.cell.sync?" primary":""),it.cell.sync?"Đang sửa đồng bộ "+n+" ô":"Sửa đồng bộ cả "+n+" ô");b.type="button";b.setAttribute("aria-pressed",String(!!it.cell.sync));b.onclick=()=>toggleCellSync(it);
+  w.append(b,el("p","hint",it.cell.sync?"Preset, màu, hiệu ứng, hoạt ảnh, mask, tách nền áp cho mọi ô trong bố cục. Vị trí và tốc độ mỗi ô vẫn giữ riêng.":"Bật để chỉnh một lần, mọi ô trong bố cục đổi theo."));return w;}
 function sec(t){const s=el("div","sec");if(t)s.appendChild(el("h3",null,t));return s;}
 function chipRow(opts,cur,on){const r=el("div","chips");opts.forEach(([v,l])=>{const b=el("button","chip",l);b.type="button";b.setAttribute("aria-pressed",String(v===cur));b.onclick=()=>{on(v);r.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});return r;}
 function segRow(opts,cur,on){const r=el("div","seg");opts.forEach(([v,l])=>{const b=el("button",null,l);b.type="button";b.setAttribute("aria-pressed",String(v===cur));b.onclick=()=>{on(v);r.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});return r;}
@@ -1901,7 +1913,7 @@ function kfSld(it,k,label,min,max,fmt){const lt=()=>clamp(T-it._start,0,it._dur)
 function swRow(cols,cur,on,onCh){const r=el("div","swatches");cols.forEach(c=>{const b=el("button","swatch");b.type="button";b.style.background=c;b.setAttribute("aria-pressed",String(c===cur));b.onclick=()=>{on(c);if(onCh)onCh(c);r.querySelectorAll(".swatch").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};r.appendChild(b);});
   const ci=document.createElement("input");ci.type="color";ci.value=/^#[0-9a-f]{6}$/i.test(cur)?cur:"#ffffff";ci.oninput=()=>on(ci.value);ci.onchange=()=>{if(onCh)onCh(ci.value);else commit();};r.appendChild(ci);return r;}
 function tbtn(label,on,cls){const b=el("button","tbtn"+(cls?" "+cls:""),label);b.type="button";b.onclick=on;return b;}
-function buildPanel(k){const box=el("div","sec");box.style.gap="16px";const it=selItem();
+function buildPanel(k){const box=el("div","sec");box.style.gap="16px";const it=selItem();if(it&&it.type==="clip"&&it.cell&&it.kind!=="empty"&&cellGroup(it).filter(o=>o.kind!=="empty").length>1)box.appendChild(syncBar(it));
   if(k==="project"){box.appendChild(el("p","hint","Chưa chọn gì. Đây là cài đặt chung của dự án. Bấm một clip, chữ hay đoạn nhạc trên dòng thời gian để chỉnh riêng."));
     const s=sec("Tỉ lệ khung hình");s.appendChild(chipRow(RATIOS.map(r=>[r[0],r[0]==="orig"?"Gốc":r[0]]),P.ratio,v=>{P.ratio=v;commit();}));box.appendChild(s);
     const s2=sec("Nền");s2.appendChild(chipRow(BGS,P.bg,v=>{P.bg=v;commit();}));if(P.bg==="color")s2.appendChild(swRow(["#000000","#141414","#f4f1ea","#e9b45c","#ff5a5f","#7ad7ff","#2b2236","#1f6f63"],P.bgColor,v=>{P.bgColor=v;requestDraw();}));box.appendChild(s2);
@@ -1984,7 +1996,7 @@ function buildMTools(){if(isDesk())return;const box=$("mtools");box.innerHTML=""
   B("left","Xong",()=>{sel=null;closeSheet();renderTL();showInspector();requestDraw();});
   if(it.type==="clip"&&it.kind==="empty"){B("plus","Thêm video",()=>fillEmpty(it));B("layout","Bố cục",()=>openPanel("cell"),"cell");B("trash","Xoá",delSel);return;}
   if(it.type==="clip"){B("split","Tách",splitAt);B("tf","Cơ bản",()=>openPanel("basic"),"basic");B("filter","Màu",()=>openPanel("color"),"color");B("anim","Hoạt ảnh",()=>openPanel("anim"),"anim");B("speed","Tốc độ",()=>openPanel("speed"),"speed");if(it.kind==="video")B("vol","Âm thanh",()=>openPanel("audio"),"audio");
-    B("fx","Nâng cao",()=>openPanel("adv"),"adv");if(isMain(it)&&P.main.indexOf(it)>0)B("trans","Chuyển cảnh",()=>openPanel("trans"),"trans");if(it.cell)B("layout","Bố cục",()=>openPanel("cell"),"cell");
+    B("fx","Nâng cao",()=>openPanel("adv"),"adv");if(isMain(it)&&P.main.indexOf(it)>0)B("trans","Chuyển cảnh",()=>openPanel("trans"),"trans");if(it.cell){B("layout","Bố cục",()=>openPanel("cell"),"cell");B("link",it.cell.sync?"Đồng bộ: Bật":"Đồng bộ ô",()=>{toggleCellSync(it);buildMTools();});}
     B("kf","Keyframe",kfToggle);B("freeze","Đóng băng",freezeFrame);if(it.kind==="video")B("detach","Tách tiếng",detachAudio);B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}
   else if(it.type==="text"){B("text","Sửa",()=>openPanel("text"),"text");B("tf","Vị trí",()=>openPanel("basic"),"basic");B("anim","Hoạt ảnh",()=>openPanel("anim"),"anim");B("kf","Keyframe",kfToggle);B("split","Tách",splitAt);B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}
   else if(it.type==="fx"){B("fx","Chỉnh",()=>openPanel("fxl"),"fxl");B("split","Tách",splitAt);B("dup","Nhân đôi",dupSel);B("trash","Xoá",delSel);}
@@ -2145,7 +2157,7 @@ function wire(){
   window.addEventListener("beforeunload",()=>{if(saveT){clearTimeout(saveT);doSave();}});}
 try{initGL();wire();renderRail();$("projName").value=P.name;setPps(60);commit(true);fitPreview();renderLib();showInspector();setPlayIcon();
   showWelcome();
-  window.__VDEBUG={quickCreate,fitTimeline,decs,importFiles,findItem,P:()=>P,media:()=>media,T:()=>T,total:()=>total,seek:t=>seek(t),sel:id=>{sel=id;renderTL();showInspector();requestDraw();},commit:()=>commit(),layouts:LAYOUTS,applyLayout,fillEmptyWith:async(e,file)=>{const m=await addMedia(file);Object.assign(e,{kind:m.kind,mid:m.id,in:0,out:m.kind==="video"?Math.min(m.dur,e.out-e.in):e.out-e.in});commit();},
+  window.__VDEBUG={applyLayout,LAYOUTS,commit,toggleCellSync,cellGroup,selItem,quickCreate,fitTimeline,decs,importFiles,findItem,P:()=>P,media:()=>media,T:()=>T,total:()=>total,seek:t=>seek(t),sel:id=>{sel=id;renderTL();showInspector();requestDraw();},commit:()=>commit(),layouts:LAYOUTS,applyLayout,fillEmptyWith:async(e,file)=>{const m=await addMedia(file);Object.assign(e,{kind:m.kind,mid:m.id,in:0,out:m.kind==="video"?Math.min(m.dur,e.out-e.in):e.out-e.in});commit();},
     exportWC:async(r,f)=>{exporting=true;try{return await exportWebCodecs(...outDims(r||720),f||30,4e6,()=>{});}finally{exporting=false;}},drawAt:t=>{T=t;syncMedia(t,false);return drawFrame(pctx,pv.width,pv.height,t,false);},play,pause,addText,addFxLayer,kfToggle,setProp,newProject,openProject,showWelcome,doSave,TEXT_TPL};
 }catch(err){document.body.innerHTML='<div style="padding:40px;color:#ddd;font:15px system-ui">Trình duyệt này chưa bật WebGL nên trình dựng video không chạy được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';console.error(err);}
 
