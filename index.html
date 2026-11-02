@@ -2129,17 +2129,19 @@ void main(){vec4 I4=texture2D(u_I,v);vec3 I=I4.rgb;vec3 bf=bicubic(u_BF,v,u_szBF
   float sk=region(v)*colorP(I,u_ai);
   float sp=u_acne*clamp(bicubic(u_sp,v,u_szSp).r*2.2,0.0,1.0);
   vec4 w1=bicubic(u_W1,v,u_szW1),w2=bicubic(u_W2,v,u_szW2);vec3 big=nrm(w2);vec3 fill=mix(big,nrm(w1),smoothstep(0.04,0.25,w1.a));
+  sp*=colorP(I,u_ai)*(1.0-smoothstep(0.16,0.3,abs(lumi(I)-lumi(fill))))*smoothstep(0.02,0.25,w1.a)*(1.0-smoothstep(0.17,0.3,E));{float rt=lumi(I)/max(lumi(fill),0.02);sp*=smoothstep(0.5,0.68,rt)*(1.0-smoothstep(1.45,1.9,rt));}
   vec2 o1=vec2(u_texOff,u_texOff*0.4)*u_px,o2=vec2(-u_texOff*0.4,u_texOff)*u_px;float s1=bicubic(u_sp,v+o1,u_szSp).r,s2=bicubic(u_sp,v+o2,u_szSp).r;vec2 o=s1<=s2?o1:o2;
   vec3 tex=texture2D(u_I,v+o).rgb-bicubic(u_BF,v+o,u_szBF).rgb;
   vec3 c=mix(I,fill+tex*0.85,sp);
   if(u_smooth>0.001){vec4 ws=bicubic(u_Ws,v,u_szWs);vec3 base=mix(fill,nrm(ws),smoothstep(0.04,0.25,ws.a));vec3 det=mix(I-bf,tex,sp);
-    vec3 sm=base+det*(1.0-0.35*u_smooth);float g=1.0-smoothstep(0.07,0.18,abs(lumi(c)-lumi(base)))*(1.0-sp);
-    float w=clamp(u_smooth*0.95*sk*g*max(tg,sp),0.0,1.0);c=mix(c,sm,w);
+    vec3 cl=mix(bf,fill,sp);vec3 mid=cl-base;float km=mix(1.0-0.82*u_smooth,1.0,smoothstep(0.018,0.065,abs(lumi(mid)))*(1.0-sp));
+    vec3 sm=base+mid*km+det*(1.0-0.3*u_smooth);
+    float w=clamp(u_smooth*sk*max(tg,sp)*1.05,0.0,1.0);c=mix(c,sm,w);
     float ex=redn(c)-redn(big);float pull=smoothstep(0.015,0.05,ex)*(1.0-smoothstep(0.12,0.18,ex))*clamp(ex,0.0,0.12);
     c-=vec3(0.667,-0.333,-0.333)*pull*u_smooth*0.9*sk*max(tg,0.4);}
-  if(u_acne>0.5){float halo=clamp(bicubic(u_sp,v,u_szSp).g*6.0,0.0,1.0);float ex=redn(c)-redn(big);float pull=smoothstep(0.01,0.04,ex)*clamp(ex,0.0,0.14);c-=vec3(0.667,-0.333,-0.333)*pull*halo*sk;}
+  if(u_acne>0.5){float halo=clamp(bicubic(u_sp,v,u_szSp).g*6.0,0.0,1.0)*(1.0-smoothstep(0.1,0.22,abs(lumi(I)-lumi(big))))*tg;float ex=redn(c)-redn(big);float pull=smoothstep(0.01,0.04,ex)*clamp(ex,0.0,0.14);c-=vec3(0.667,-0.333,-0.333)*pull*halo*sk;}
   if(u_bright>0.001){vec4 wb=bicubic(u_Ws,v,u_szWs);float Lb=lumi(nrm(wb));float Lbn=Lb+u_bright*0.16*(1.0-Lb);float m=Lbn/max(Lb,0.05);
-    vec3 cb=c*m;float lb=lumi(cb);cb=mix(cb,vec3(lb)+(cb-vec3(lb))*0.92,u_bright*0.5);cb.b+=u_bright*0.01*lb;c=mix(c,clamp(cb,0.0,1.0),regionB(v)*colorP(nrm(wb),u_ai));}
+    vec3 cb=c*m;float lb=lumi(cb);cb=mix(cb,vec3(lb)+(cb-vec3(lb))*0.92,u_bright*0.5);cb.b+=u_bright*0.01*lb;c=mix(c,clamp(cb,0.0,1.0),regionB(v)*colorP(nrm(wb),u_ai)*colorP(I,u_ai)*(1.0-smoothstep(0.06,0.16,abs(lumi(I)-Lb))));}
   gl_FragColor=vec4(clamp(c,0.0,1.0),I4.a);}`,
  bheal:`uniform sampler2D u_I,u_M,u_BF,u_W1,u_W2;uniform vec2 u_px,u_szBF,u_szW1,u_szW2;uniform float u_off,u_s;
 void main(){vec4 I4=texture2D(u_I,v);float m=texture2D(u_M,v).r;vec4 w1=bicubic(u_W1,v,u_szW1),w2=bicubic(u_W2,v,u_szW2);
@@ -2263,7 +2265,9 @@ function skinMaskTex(){
     if(aiData.skin){const s=aiData.skin,w=aiData.w,h=aiData.h,id=m.x.getImageData(0,0,M,N),q=id.data;
       for(let y=0;y<N;y++)for(let x=0;x<M;x++){const v=s[Math.min(h-1,Math.floor(y*h/N))*w+Math.min(w-1,Math.floor(x*w/M))],o=(y*M+x)*4;q[o]=Math.max(q[o],Math.round(255*Math.min(1,v*1.2)));}m.x.putImageData(id,0,0);}
     const pr=mk(M,N);pr.x.fillStyle="#fff";
-    aiData.faces.forEach(f=>{polyFill(pr.x,f,EYE_L,1.6,M,N);polyFill(pr.x,f,EYE_R,1.6,M,N);polyFill(pr.x,f,BROW_L,1.35,M,N);polyFill(pr.x,f,BROW_R,1.35,M,N);polyFill(pr.x,f,LIP_OUT,1.04,M,N);polyFill(pr.x,f,[98,2,327,1],1.3,M,N);});
+    aiData.faces.forEach(f=>{polyFill(pr.x,f,EYE_L,1.6,M,N);polyFill(pr.x,f,EYE_R,1.6,M,N);polyFill(pr.x,f,BROW_L,1.35,M,N);polyFill(pr.x,f,BROW_R,1.35,M,N);polyFill(pr.x,f,LIP_OUT,1.16,M,N);polyFill(pr.x,f,[98,2,327,1],1.3,M,N);
+      const fw=Math.abs(f[454].x-f[234].x)*M;pr.x.strokeStyle="#fff";pr.x.lineJoin="round";pr.x.lineCap="round";pr.x.lineWidth=Math.max(2,fw*0.045);pr.x.beginPath();
+      [234,93,132,58,172,136,150,149,176,148,152,377,400,378,379,365,397,288,361,323,454].forEach((i,k)=>{const X=f[i].x*M,Y=f[i].y*N;k?pr.x.lineTo(X,Y):pr.x.moveTo(X,Y);});pr.x.stroke();});
     const pd=pr.x.getImageData(0,0,M,N).data,md=m.x.getImageData(0,0,M,N);for(let i=0;i<M*N;i++){md.data[i*4+1]=pd[i*4+3];md.data[i*4+2]=md.data[i*4];md.data[i*4+3]=255;}m.x.putImageData(md,0,0);
     cv=gBlurCanvas(m.c,1.5);
     let fw=0;aiData.faces.forEach(f=>{fw=Math.max(fw,Math.hypot((f[234].x-f[454].x)*fullSrc.width,(f[234].y-f[454].y)*fullSrc.height));});
@@ -2332,7 +2336,13 @@ function cpuBrush(x,op,pts,r){
       w=sstep(0.32,0.55,l)*(1-sstep(0.3,0.55,sat)),L=l*255,nr=Math.min(255,(R*0.4+L*0.6)*1.1+4),ng=Math.min(255,(G*0.4+L*0.6)*1.11+4),nb=Math.min(255,(B*0.4+L*0.6)*1.14+10);
       eff[i]=R+(nr-R)*w;eff[i+1]=G+(ng-G)*w;eff[i+2]=B+(nb-B)*w;}}
   const s=op.k==="mosaic"?1:op.k==="lips"?op.s*0.7:op.s;
-  for(let i=0;i<p.length;i+=4){const a=md[i]/255*s;if(a<=0)continue;p[i]+=(eff[i]-p[i])*a;p[i+1]+=(eff[i+1]-p[i+1])*a;p[i+2]+=(eff[i+2]-p[i+2])*a;}
+  let fm=null;if((op.k==="lips"||op.k==="teeth")&&aiData&&aiData.faces&&aiData.faces.length){const q=mk(b.bw,b.bh),fe=Math.max(1.5,r*0.12);
+    q.x.shadowColor="#fff";q.x.shadowBlur=fe;q.x.shadowOffsetX=b.bw+50;q.x.fillStyle="#fff";
+    const poly=(f,ids,sc)=>{let cx=0,cy=0;ids.forEach(i=>{cx+=f[i].x;cy+=f[i].y;});cx/=ids.length;cy/=ids.length;q.x.beginPath();ids.forEach((i,k)=>{const X=(cx+(f[i].x-cx)*sc)*W-b.bx-(b.bw+50),Y=(cy+(f[i].y-cy)*sc)*H-b.by;k?q.x.lineTo(X,Y):q.x.moveTo(X,Y);});q.x.closePath();q.x.fill();};
+    aiData.faces.forEach(f=>{if(op.k==="lips")poly(f,LIP_OUT,1.06);else poly(f,LIP_IN,1.02);});
+    if(op.k==="lips"){q.x.globalCompositeOperation="destination-out";aiData.faces.forEach(f=>poly(f,LIP_IN,0.92));}
+    fm=q.x.getImageData(0,0,b.bw,b.bh).data;}
+  for(let i=0;i<p.length;i+=4){const a=md[i]/255*s*(fm?fm[i+3]/255:1);if(a<=0)continue;p[i]+=(eff[i]-p[i])*a;p[i+1]+=(eff[i+1]-p[i+1])*a;p[i+2]+=(eff[i+2]-p[i+2])*a;}
   x.putImageData(img,b.bx,b.by);
 }
 
