@@ -236,7 +236,7 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 .qc .chips,.lib-audio .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.qc .chips::-webkit-scrollbar,.lib-audio .chips::-webkit-scrollbar{display:none}
 .qtray{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;max-height:260px;overflow:auto;padding:2px}
 .qitem{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--well);border:1px solid var(--line)}
-.qitem img,.qitem video{width:100%;height:100%;object-fit:cover;display:block}
+.qitem img,.qitem video,.qitem .qth{width:100%;height:100%;object-fit:cover;display:block}
 .qnum{position:absolute;left:5px;top:5px;font-size:11px;font-weight:600;background:rgba(0,0,0,.6);padding:1px 6px;border-radius:999px}
 .qbadge{position:absolute;right:5px;top:5px;font-size:11px;background:rgba(0,0,0,.6);padding:1px 6px;border-radius:999px}
 .qctl{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:4px}
@@ -1354,23 +1354,29 @@ function cleanTracks(){P.tracks=P.tracks.filter(t=>t.items.length);}
 
 /* ---------- Media ---------- */
 function mediaKind(f){return /^video\//.test(f.type)?"video":/^image\//.test(f.type)?"image":/^audio\//.test(f.type)?"audio":/\.(mp4|mov|webm|m4v|mkv)$/i.test(f.name)?"video":/\.(mp3|wav|m4a|aac|ogg|flac)$/i.test(f.name)?"audio":/\.(jpe?g|png|webp|gif|heic)$/i.test(f.name)?"image":null;}
+/* heavy per-media work (thumbnails, audio peaks, saving) runs one job at a time in the background */
+const bgQ=[];let bgBusy=false,bgHold=0;function bgRun(fn){bgQ.push(fn);if(!bgBusy)bgPump();}
+async function bgPump(){bgBusy=true;while(bgQ.length){while((typeof playing!=="undefined"&&playing)||Date.now()-bgHold<900)await new Promise(r=>setTimeout(r,250));const fn=bgQ.shift();try{await fn();}catch(e){}await new Promise(r=>setTimeout(r,0));}bgBusy=false;}
+async function decodeSmall(f,maxL){if(!window.createImageBitmap)return null;try{const bm=await createImageBitmap(f,{imageOrientation:"from-image"});const s=Math.min(1,maxL/Math.max(bm.width,bm.height));
+    const c=document.createElement("canvas");c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);const x=c.getContext("2d");x.imageSmoothingQuality="low";x.drawImage(bm,0,0,c.width,c.height);bm.close&&bm.close();return c;}catch(e){return null;}}
 function addMedia(f,opts){opts=opts||{};return new Promise(res=>{const kind=mediaKind(f);if(!kind){toast("Không nhận định dạng: "+f.name);res(null);return;}
   const m={id:opts.id||uid(),kind,name:f.name.replace(/\.[^.]+$/,""),file:f,url:URL.createObjectURL(f),w:0,h:0,dur:0,thumbs:[],peaks:null,ready:false};media.set(m.id,m);renderLibIfMedia();
-  const done=()=>{m.ready=true;renderLibIfMedia();if(!opts.restore)saveMedia(m);res(m);};const fail=msg=>{media.delete(m.id);renderLibIfMedia();toast(msg);res(null);};
-  if(kind==="image"){const img=new Image();img.onload=()=>{const s=Math.min(1,2560/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);
+  const done=()=>{m.ready=true;renderLibIfMedia();if(!opts.restore)bgRun(()=>saveMedia(m));res(m);};const fail=msg=>{media.delete(m.id);renderLibIfMedia();toast(msg);res(null);};
+  if(kind==="image"){const finish=c=>{m.canvas=c;m.w=c.width;m.h=c.height;m.dur=4;const th=document.createElement("canvas");th.height=80;th.width=Math.round(80*c.width/c.height);th.getContext("2d").drawImage(c,0,0,th.width,th.height);m.thumbs=[th];m.thumbsN=1;done();};
+    decodeSmall(f,2160).then(c=>{if(c){finish(c);return;}const img=new Image();img.onload=()=>{const s=Math.min(1,2560/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);
       c.getContext("2d").drawImage(img,0,0,c.width,c.height);m.canvas=c;m.w=c.width;m.h=c.height;m.dur=4;const th=document.createElement("canvas");th.height=80;th.width=Math.round(80*c.width/c.height);th.getContext("2d").drawImage(c,0,0,th.width,th.height);m.thumbs=[th];m.thumbsN=1;done();};
-    img.onerror=()=>fail("Không đọc được ảnh "+f.name);img.src=m.url;}
+    img.onerror=()=>fail("Không đọc được ảnh "+f.name);img.src=m.url;});}
   else if(kind==="video"){const v=document.createElement("video");v.preload="auto";v.muted=true;v.playsInline=true;v.src=m.url;
-    v.onloadedmetadata=()=>{m.w=v.videoWidth;m.h=v.videoHeight;m.dur=isFinite(v.duration)&&v.duration>0?v.duration:10;probeMp4(m).then(()=>{if(m.vt){requestDraw();}}).catch(()=>{}).finally(()=>{done();makeThumbs(m,v);decodePeaks(m);});};
+    v.onloadedmetadata=()=>{m.w=v.videoWidth;m.h=v.videoHeight;m.dur=isFinite(v.duration)&&v.duration>0?v.duration:10;probeMp4(m).then(()=>{if(m.vt){requestDraw();}}).catch(()=>{}).finally(()=>{done();bgRun(()=>decodePeaks(m));bgRun(()=>makeThumbs(m,v));});};
     v.onerror=()=>fail("Trình duyệt không mở được video "+f.name+". Hãy dùng MP4 (H.264) hoặc WebM.");}
-  else{const a=document.createElement("audio");a.preload="auto";a.src=m.url;a.onloadedmetadata=()=>{m.dur=isFinite(a.duration)?a.duration:30;done();decodePeaks(m);};a.onerror=()=>fail("Không đọc được âm thanh "+f.name);}});}
-async function makeThumbs(m,v){const n=Math.max(6,Math.min(40,Math.ceil(m.dur/1.2)));const H=80,W=Math.max(1,Math.round(H*m.w/m.h));m.thumbsN=n;
+  else{const a=document.createElement("audio");a.preload="auto";a.src=m.url;a.onloadedmetadata=()=>{m.dur=isFinite(a.duration)?a.duration:30;done();bgRun(()=>decodePeaks(m));};a.onerror=()=>fail("Không đọc được âm thanh "+f.name);}});}
+async function makeThumbs(m,v){const n=Math.max(4,Math.min(16,Math.ceil(m.dur/2)));const H=80,W=Math.max(1,Math.round(H*m.w/m.h));m.thumbsN=n;
   for(let i=0;i<n;i++){const t=Math.min(m.dur-.05,(i+.5)*m.dur/n);await new Promise(r=>{let done=false;const fin=()=>{if(!done){done=true;r();}};v.onseeked=fin;setTimeout(fin,1500);v.currentTime=t;});
     const c=document.createElement("canvas");c.width=W;c.height=H;try{c.getContext("2d").drawImage(v,0,0,W,H);}catch(e){}m.thumbs[i]=c;if(i===0)renderLibIfMedia();if(i%4===3||i===n-1)dirtyTL();}
   v.removeAttribute("src");v.load();dirtyTL();}
 const bufCache=new Map();
 function decodeBuf(m){if(bufCache.has(m.id))return bufCache.get(m.id);const pr=(async()=>{try{const ab=await m.file.arrayBuffer();const oc=new OfflineAudioContext(2,1,48000);return await oc.decodeAudioData(ab);}catch(e){return null;}})();bufCache.set(m.id,pr);return pr;}
-async function decodePeaks(m){if(m.file.size>700e6)return;const b=await decodeBuf(m);if(!b){if(m.kind==="video")m.silent=true;return;}m._ab=b;if(playing)schedAudio();const ch=b.getChannelData(0),N=1200,st=Math.max(1,Math.floor(ch.length/N)),pk=new Float32Array(N);
+async function decodePeaks(m){if(m.file.size>(m.kind==="video"?150e6:700e6))return;const b=await decodeBuf(m);if(!b){if(m.kind==="video")m.silent=true;return;}m._ab=b;if(playing)schedAudio();const ch=b.getChannelData(0),N=1200,st=Math.max(1,Math.floor(ch.length/N)),pk=new Float32Array(N);
   for(let i=0;i<N;i++){let mx=0;for(let j=i*st,e=Math.min(ch.length,(i+1)*st);j<e;j+=4){const a=Math.abs(ch[j]);if(a>mx)mx=a;}pk[i]=mx;}m.peaks=pk;dirtyTL();}
 
 /* ================= Frame-accurate decoding with WebCodecs (MP4 / MOV) =================
@@ -1685,7 +1691,7 @@ function tick(now){if(!playing)return;let clockT=AC&&AC.state==="running"&&ac0?T
   fpsN++;if(now-fpsT>1000){$("fps").textContent=Math.round(fpsN*1000/(now-fpsT))+" fps";fpsN=0;fpsT=now;}
   updTime();scrollToT();raf=requestAnimationFrame(tick);}
 function fitPreviewKeep(){const was=playing;playing=false;fitPreview();playing=was;}
-function seek(t,keepScroll){T=clamp(t,0,total);if(playing){T0=T;clk0=performance.now();syncMedia(T,true);schedAudio();}else requestDraw();updTime(true);if(!keepScroll)scrollToT();}
+function seek(t,keepScroll){bgHold=Date.now();T=clamp(t,0,total);if(playing){T0=T;clk0=performance.now();syncMedia(T,true);schedAudio();}else requestDraw();updTime(true);if(!keepScroll)scrollToT();}
 
 /* ================= Timeline ================= */
 const tlv=$("tlView"),tli=$("tlInner"),heads=$("headsIn");let ignoreScroll=false,tlDirty=true,ROWS=[];
@@ -1845,12 +1851,21 @@ const qc={files:[],music:null,musicItem:null,musicMode:"lib",style:"film",trans:
 function qcURL(f){if(!qc.urls.has(f))qc.urls.set(f,URL.createObjectURL(f));return qc.urls.get(f);}
 function qcAddFiles(fs){const ok=[...fs].filter(f=>/^(image|video)\//.test(f.type)||/\.(heic|heif|mov|mp4|webm|m4v|jpe?g|png|webp|gif)$/i.test(f.name));const skip=fs.length-ok.length;
   ok.forEach(f=>{if(!qc.files.some(x=>x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified))qc.files.push(f);});if(skip)toast("Bỏ qua "+skip+" file không phải ảnh / video");qcRender();}
-function qcClose(){$("expBox").hidden=true;qc.urls.forEach(u=>URL.revokeObjectURL(u));qc.urls.clear();if(mus.player)try{mus.player.pause();mus.playing=null;}catch(e){}}
+const qcTh=new Map(),qcTQ=[];let qcTBusy=false,qcVid=null;
+function qcThumb(f,isV){let c=qcTh.get(f);if(!c){c=document.createElement("canvas");c.width=c.height=168;c.className="qth";qcTh.set(f,c);qcTQ.push([f,c,isV]);if(!qcTBusy)qcThumbPump();}
+  else if(c.parentNode)c.parentNode.removeChild(c);return c;}
+async function qcThumbPump(){qcTBusy=true;while(qcTQ.length){const [f,c,isV]=qcTQ.shift();const x=c.getContext("2d");
+    try{if(isV){if(!qcVid){qcVid=document.createElement("video");qcVid.muted=true;qcVid.playsInline=true;qcVid.preload="auto";}const u=qcURL(f);
+        await new Promise(r=>{let ok=false;const fin=()=>{if(!ok){ok=true;r();}};qcVid.onloadeddata=()=>{qcVid.currentTime=Math.min(0.5,(qcVid.duration||1)/3);};qcVid.onseeked=fin;qcVid.onerror=fin;setTimeout(fin,2500);qcVid.src=u;});
+        if(qcVid.videoWidth){const s=Math.max(168/qcVid.videoWidth,168/qcVid.videoHeight),w=qcVid.videoWidth*s,h=qcVid.videoHeight*s;x.drawImage(qcVid,(168-w)/2,(168-h)/2,w,h);}}
+      else{let bm=null;if(window.createImageBitmap){try{bm=await createImageBitmap(f,{resizeWidth:240,resizeQuality:"low"});}catch(e){try{bm=await createImageBitmap(f);}catch(e2){}}}
+        if(!bm){bm=await new Promise(r=>{const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=qcURL(f);});}
+        if(bm){const W=bm.width||bm.naturalWidth,H=bm.height||bm.naturalHeight,s=Math.max(168/W,168/H);x.drawImage(bm,(168-W*s)/2,(168-H*s)/2,W*s,H*s);bm.close&&bm.close();}}}
+    catch(e){}await new Promise(r=>setTimeout(r,0));}qcTBusy=false;if(qcVid){qcVid.removeAttribute("src");qcVid.load();}}
+function qcClose(){$("expBox").hidden=true;qc.urls.forEach(u=>URL.revokeObjectURL(u));qc.urls.clear();qcTh.clear();qcTQ.length=0;if(mus.player)try{mus.player.pause();mus.playing=null;}catch(e){}}
 function qcRender(){const d=$("expDlg");if(!d||!d.querySelector(".qc"))return;const tray=d.querySelector(".qtray"),info=d.querySelector(".qinfo"),go=d.querySelector(".qgo");tray.innerHTML="";
   qc.files.forEach((f,i)=>{const t=el("div","qitem");const isV=/^video\//.test(f.type)||/\.(mov|mp4|webm|m4v)$/i.test(f.name);
-    if(isV){const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="metadata";v.src=qcURL(f)+"#t=0.1";t.appendChild(v);t.appendChild(el("span","qbadge","Video"));}
-    else if(/heic|heif/i.test(f.type+f.name)){t.appendChild(el("span","qbadge","HEIC"));}
-    else{const im=new Image();im.decoding="async";im.loading="lazy";im.src=qcURL(f);im.alt="";t.appendChild(im);}
+    const cv=qcThumb(f,isV);t.appendChild(cv);if(isV)t.appendChild(el("span","qbadge","Video"));
     t.appendChild(el("span","qnum",String(i+1)));
     const ctl=el("div","qctl");const mv=(dx,lab,txt)=>{const b=el("button",null,txt);b.type="button";b.setAttribute("aria-label",lab);b.onclick=()=>{const j=i+dx;if(j<0||j>=qc.files.length)return;[qc.files[i],qc.files[j]]=[qc.files[j],qc.files[i]];qcRender();};return b;};
     const rm=el("button",null,"✕");rm.type="button";rm.setAttribute("aria-label","Bỏ file "+(i+1));rm.onclick=()=>{qc.files.splice(i,1);qcRender();};ctl.append(mv(-1,"Dời lên trước","‹"),rm,mv(1,"Dời ra sau","›"));t.appendChild(ctl);tray.appendChild(t);});
@@ -1875,7 +1890,9 @@ function quickCreate(){if(playing)pause();const d=$("expDlg");d.innerHTML="";con
   $("welcome").hidden=true;$("expBox").hidden=false;qcRender();}
 async function qcBuild(go,bw){if(!qc.files.length)return;go.disabled=true;const files=qc.files.slice(),pid={film:"v_KP4",clean:"tokyo400",cine:"kowloon",iohk:"fl_iohk",bw,none:"none"}[qc.style],TR=["fade","slideL","leak","zoom"];
   let musicFile=qc.music;if(qc.music&&qc.musicItem)musAddCredit(qc.musicItem);if(!musicFile&&qc.musicItem){go.textContent="Đang tải nhạc…";try{musicFile=await musFile(qc.musicItem);musAddCredit(qc.musicItem);}catch(e){toast("Không tải được bài nhạc đã chọn, dựng video không nhạc");}}
-  const added=[];let fail=0;for(let i=0;i<files.length;i++){go.textContent="Đang thêm "+(i+1)+"/"+files.length+"…";let m=null;try{m=await addMedia(files[i]);}catch(e){m=null;}if(!m||m.kind==="audio"){fail++;continue;}added.push(m);}
+  const res=new Array(files.length);let fail=0,doneN=0,next=0;go.textContent="Đang thêm 0/"+files.length+"…";
+  const worker=async()=>{while(next<files.length){const i=next++;let m=null;try{m=await addMedia(files[i]);}catch(e){m=null;}res[i]=m;doneN++;go.textContent="Đang thêm "+doneN+"/"+files.length+"…";}};
+  await Promise.all([worker(),worker()]);const added=[];res.forEach(m=>{if(!m||m.kind==="audio")fail++;else added.push(m);});
   if(!added.length){go.disabled=false;go.textContent="Tạo video";return toast("Không đọc được file nào. Thử lại với ảnh JPG/PNG hoặc video MP4");}
   let mDur=0,mm=null;if(musicFile){go.textContent="Đang thêm nhạc…";try{mm=await addMedia(musicFile);mDur=mm?Math.max(0,mm.dur-(qc.mStart||0)):0;}catch(e){mm=null;}}
   const nI=added.filter(m=>m.kind==="image").length,vids=added.filter(m=>m.kind==="video");let vLen=vids.reduce((a,m)=>a+Math.min(m.dur,6),0),per=qc.per;
@@ -1922,7 +1939,7 @@ async function toggleRecord(){if(rec){rec.mr.stop();return;}let stream;try{strea
 const CATS=[["media","Media","media"],["audio","Âm thanh","music"],["text","Chữ","text"],["sticker","Sticker","sticker"],["fx","Hiệu ứng","fx"],["trans","Chuyển cảnh","trans"],["filter","Bộ lọc","filter"],["layout","Bố cục","layout"],["cc","Phụ đề","cc"]];
 let cat="media";
 function renderRail(){const r=$("rail");r.innerHTML="";CATS.forEach(([k,l,ic])=>{const b=el("button","rb");b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(k===cat));b.innerHTML='<svg class="i"><use href="#i-'+ic+'"/></svg>'+l;b.onclick=()=>{cat=k;renderRail();renderLib();};r.appendChild(b);});}
-function renderLibIfMedia(){if(cat==="media"||cat==="audio")renderLib();}
+let rlT=0;function renderLibIfMedia(){if(cat!=="media"&&cat!=="audio")return;if(rlT)return;rlT=setTimeout(()=>{rlT=0;renderLib();},250);}
 let libSel=null;function renderLib(){if(!isDesk())return;libSel=sel;const c=CATS.find(x=>x[0]===cat);$("libTitle").textContent=c[1];$("libSub").textContent="";const b=$("libBody");b.innerHTML="";b.appendChild(libPanel(cat));}
 function libPanel(k){const box=el("div","sec");box.style.gap="14px";const sel0=selItem();
   if(k==="media"){const d=el("div","drop");d.append("Kéo thả video, ảnh vào đây hoặc vào dòng thời gian");const r=el("div","btnrow");r.append(tbtn("Nhập file",()=>$("file").click(),"primary"),tbtn("Thêm lớp phủ",addOverlay));d.appendChild(r);box.appendChild(d);
@@ -2406,7 +2423,7 @@ function wire(){
   window.addEventListener("beforeunload",()=>{if(saveT){clearTimeout(saveT);doSave();}});}
 try{initGL();wire();renderRail();$("projName").value=P.name;setPps(60);commit(true);fitPreview();renderLib();showInspector();setPlayIcon();
   showWelcome();
-  window.__VDEBUG={applyLayout,LAYOUTS,commit,toggleCellSync,cellGroup,selItem,quickCreate,fitTimeline,decs,importFiles,findItem,P:()=>P,media:()=>media,T:()=>T,total:()=>total,seek:t=>seek(t),sel:id=>{sel=id;renderTL();showInspector();requestDraw();},commit:()=>commit(),layouts:LAYOUTS,applyLayout,fillEmptyWith:async(e,file)=>{const m=await addMedia(file);Object.assign(e,{kind:m.kind,mid:m.id,in:0,out:m.kind==="video"?Math.min(m.dur,e.out-e.in):e.out-e.in});commit();},
+  window.__VDEBUG={addMedia,applyLayout,LAYOUTS,commit,toggleCellSync,cellGroup,selItem,quickCreate,fitTimeline,decs,importFiles,findItem,P:()=>P,media:()=>media,T:()=>T,total:()=>total,seek:t=>seek(t),sel:id=>{sel=id;renderTL();showInspector();requestDraw();},commit:()=>commit(),layouts:LAYOUTS,applyLayout,fillEmptyWith:async(e,file)=>{const m=await addMedia(file);Object.assign(e,{kind:m.kind,mid:m.id,in:0,out:m.kind==="video"?Math.min(m.dur,e.out-e.in):e.out-e.in});commit();},
     exportWC:async(r,f)=>{exporting=true;try{return await exportWebCodecs(...outDims(r||720),f||30,4e6,()=>{});}finally{exporting=false;}},drawAt:t=>{T=t;syncMedia(t,false);return drawFrame(pctx,pv.width,pv.height,t,false);},play,pause,addText,addFxLayer,kfToggle,setProp,newProject,openProject,showWelcome,doSave,TEXT_TPL};
 }catch(err){document.body.innerHTML='<div style="padding:40px;color:#ddd;font:15px system-ui">Trình duyệt này chưa bật WebGL nên trình dựng video không chạy được. Hãy thử Chrome, Safari hoặc Edge bản mới.</div>';console.error(err);}
 
