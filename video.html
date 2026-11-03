@@ -193,6 +193,24 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 .tr.off{background:rgba(20,20,22,.9);color:var(--fg);border:1px solid rgba(255,255,255,.3)}
 .tlempty{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);color:var(--faint);font-size:12.5px;pointer-events:none;text-align:center;z-index:2}
 /* library cards */
+.qc{display:flex;flex-direction:column;gap:12px}
+#expDlg:has(.qc){width:min(640px,100%);max-height:92vh}
+@media (max-width:600px){#expBox:has(.qc){padding:8px}#expDlg:has(.qc){padding:16px;max-height:96vh}}
+.qc .sec h3{font:600 11px/1.2 var(--font-ui);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+.qc .chips,.lib-audio .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.qc .chips::-webkit-scrollbar,.lib-audio .chips::-webkit-scrollbar{display:none}
+.qtray{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;max-height:260px;overflow:auto;padding:2px}
+.qitem{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--well);border:1px solid var(--line)}
+.qitem img,.qitem video{width:100%;height:100%;object-fit:cover;display:block}
+.qnum{position:absolute;left:5px;top:5px;font-size:11px;font-weight:600;background:rgba(0,0,0,.6);padding:1px 6px;border-radius:999px}
+.qbadge{position:absolute;right:5px;top:5px;font-size:11px;background:rgba(0,0,0,.6);padding:1px 6px;border-radius:999px}
+.qctl{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:4px}
+.qctl button{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.14);font-size:13px;color:#fff}
+.qadd{aspect-ratio:1;border-radius:9px;border:1.5px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.qadd:hover{border-color:var(--fg);color:var(--fg)}
+#expDlg.qdrop{outline:2px dashed var(--accent);outline-offset:-6px}
+.qfit{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.qc .lib-audio .mlist{max-height:220px;overflow:auto}
+.mrow.pick{border-color:rgba(233,180,92,.6);background:rgba(233,180,92,.08)}
 .mlist{display:flex;flex-direction:column;gap:6px}
 .mrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px;border-radius:10px;border:1px solid transparent}
 .mrow:hover,.mrow.on{background:var(--well);border-color:var(--line)}
@@ -1749,7 +1767,7 @@ function addToTimeline(m,o){o=o||{};let it;
   else{const c=newClip(m);let at=P.main.length;if(o.at!=null){at=P.main.filter(x=>x._start+x._dur/2<o.at).length;}else if(P.main.length){const i=P.main.findIndex(x=>T<x._start+x._dur/2);at=i<0?P.main.length:i;}
     P.main.splice(at,0,c);if(P.main[0])P.main[0].trans.type="none";it=c;}
   sel=it.id;commit();if(!o.quiet)toast("Đã thêm “"+m.name+"”");return it;}
-function pickFile(accept,multiple){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept=accept;i.multiple=!!multiple;i.onchange=()=>res([...i.files]);i.click();});}
+function pickFile(accept,multiple){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept=accept;i.multiple=!!multiple;i.style.cssText="position:fixed;left:-9999px;opacity:0";document.body.appendChild(i);i.onchange=()=>{res([...i.files]);i.remove();};i.click();});}
 async function addOverlay(){const fs=await pickFile("video/*,image/*",true);if(!fs.length)return;importFiles(fs,{overlay:true,at:T});}
 function addText(tpl,emoji){const base={id:uid(),type:"text",text:emoji||"Nhập chữ",start:Math.min(T,Math.max(0,total-.5)),dur:3,font:"inter",size:emoji?14:7,color:"#ffffff",style:emoji?"plain":"shadow",box:"rgba(0,0,0,.6)",stroke:"#111111",align:"center",ls:0,italic:false,upper:false,emoji:!!emoji,
     tf:{x:50,y:emoji?40:72,s:100,rot:0,op:100},kf:{},ain:{type:emoji?"pop":"fade",dur:.5},aout:{type:"fade",dur:.4},loop:"none"};
@@ -1787,19 +1805,51 @@ function kfToggle(){const it=selItem()||mainAt(T)[0];if(it&&!sel){sel=it.id;}if(
   const on=toggleKf(it,lt);commit();toast(on?"Đã thêm keyframe — di chuyển đầu phát rồi chỉnh vị trí / cỡ để tạo chuyển động":"Đã bỏ keyframe");}
 
 /* ---------- quick create (auto-edit) ---------- */
-function quickCreate(){if(playing)pause();const d=$("expDlg");d.innerHTML="";d.appendChild(el("h3",null,"Tạo video nhanh"));d.appendChild(el("p","hint","Chọn ảnh / video và nhạc, app tự dựng: chia thời lượng, thêm chuyển cảnh, chuyển động ảnh, màu film và khớp nhạc. Sau đó bạn vẫn chỉnh tay được mọi thứ."));
-  let files=[],music=null,style="film",trans="fade",per=2.5;const info=el("p","hint");const upd=()=>{info.textContent=(files.length?files.length+" file đã chọn":"Chưa chọn file")+(music?" · nhạc: "+music.name:"");go.disabled=!files.length;};
-  const r1=el("div","btnrow");r1.append(tbtn("Chọn ảnh / video",async()=>{files=await pickFile("video/*,image/*",true);upd();},"primary"),tbtn("Chọn nhạc (tuỳ chọn)",async()=>{const f=await pickFile("audio/*");music=f[0]||null;upd();}));d.append(r1,info);
+const qc={files:[],music:null,musicItem:null,musicMode:"lib",style:"film",trans:"fade",per:2.5,fit:true,urls:new Map()};
+function qcURL(f){if(!qc.urls.has(f))qc.urls.set(f,URL.createObjectURL(f));return qc.urls.get(f);}
+function qcAddFiles(fs){const ok=[...fs].filter(f=>/^(image|video)\//.test(f.type)||/\.(heic|heif|mov|mp4|webm|m4v|jpe?g|png|webp|gif)$/i.test(f.name));const skip=fs.length-ok.length;
+  ok.forEach(f=>{if(!qc.files.some(x=>x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified))qc.files.push(f);});if(skip)toast("Bỏ qua "+skip+" file không phải ảnh / video");qcRender();}
+function qcClose(){$("expBox").hidden=true;qc.urls.forEach(u=>URL.revokeObjectURL(u));qc.urls.clear();if(mus.player)try{mus.player.pause();mus.playing=null;}catch(e){}}
+function qcRender(){const d=$("expDlg");if(!d||!d.querySelector(".qc"))return;const tray=d.querySelector(".qtray"),info=d.querySelector(".qinfo"),go=d.querySelector(".qgo");tray.innerHTML="";
+  qc.files.forEach((f,i)=>{const t=el("div","qitem");const isV=/^video\//.test(f.type)||/\.(mov|mp4|webm|m4v)$/i.test(f.name);
+    if(isV){const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="metadata";v.src=qcURL(f)+"#t=0.1";t.appendChild(v);t.appendChild(el("span","qbadge","Video"));}
+    else if(/heic|heif/i.test(f.type+f.name)){t.appendChild(el("span","qbadge","HEIC"));}
+    else{const im=new Image();im.decoding="async";im.loading="lazy";im.src=qcURL(f);im.alt="";t.appendChild(im);}
+    t.appendChild(el("span","qnum",String(i+1)));
+    const ctl=el("div","qctl");const mv=(dx,lab,txt)=>{const b=el("button",null,txt);b.type="button";b.setAttribute("aria-label",lab);b.onclick=()=>{const j=i+dx;if(j<0||j>=qc.files.length)return;[qc.files[i],qc.files[j]]=[qc.files[j],qc.files[i]];qcRender();};return b;};
+    const rm=el("button",null,"✕");rm.type="button";rm.setAttribute("aria-label","Bỏ file "+(i+1));rm.onclick=()=>{qc.files.splice(i,1);qcRender();};ctl.append(mv(-1,"Dời lên trước","‹"),rm,mv(1,"Dời ra sau","›"));t.appendChild(ctl);tray.appendChild(t);});
+  const add=el("button","qadd");add.type="button";add.innerHTML='<svg class="i"><use href="#i-plus"/></svg><span>'+(qc.files.length?"Thêm nữa":"Chọn ảnh / video")+'</span>';add.onclick=async()=>{qcAddFiles(await pickFile("video/*,image/*",true));};tray.appendChild(add);
+  const nI=qc.files.filter(f=>!/^video\//.test(f.type)&&!/\.(mov|mp4|webm|m4v)$/i.test(f.name)).length,nV=qc.files.length-nI;
+  info.textContent=qc.files.length?(nI?nI+" ảnh":"")+(nI&&nV?" · ":"")+(nV?nV+" video":"")+" · kéo thả thêm file vào đây":"Chọn bao nhiêu ảnh, video cũng được, chọn nhiều lần để cộng dồn, hoặc kéo thả file vào đây.";
+  go.disabled=!qc.files.length;const mi=d.querySelector(".qmusic");if(mi)mi.textContent=qc.music?"Nhạc: "+qc.music.name:qc.musicItem?"Nhạc: "+qc.musicItem.title+(qc.musicItem.artist?" — "+qc.musicItem.artist:""):"Chưa chọn nhạc";}
+function quickCreate(){if(playing)pause();const d=$("expDlg");d.innerHTML="";const box=el("div","qc");d.appendChild(box);
+  box.appendChild(el("h3",null,"Tạo video nhanh"));box.appendChild(el("p","hint qinfo"));const tray=el("div","qtray");box.appendChild(tray);
+  const so=el("div","btnrow");so.append(tbtn("Sắp theo ngày chụp",()=>{qc.files.sort((a,b)=>a.lastModified-b.lastModified);qcRender();}),tbtn("Đảo thứ tự",()=>{qc.files.reverse();qcRender();}),tbtn("Bỏ hết",()=>{qc.files=[];qcRender();}));box.appendChild(so);
+  ["dragover","dragenter"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add("qdrop");}));d.addEventListener("dragleave",()=>d.classList.remove("qdrop"));
+  d.addEventListener("drop",e=>{e.preventDefault();d.classList.remove("qdrop");if(e.dataTransfer&&e.dataTransfer.files.length)qcAddFiles(e.dataTransfer.files);});
+  const sm=sec("Nhạc nền");sm.appendChild(el("p","hint qmusic"));const mwrap=el("div");
+  const showM=()=>{mwrap.innerHTML="";if(qc.musicMode==="lib")mwrap.appendChild(musicBrowser({pick:{get cur(){return qc.musicItem;},set:it=>{qc.musicItem=it;qc.music=null;qcRender();}}}));};
+  sm.appendChild(chipRow([["lib","Kho nhạc miễn phí"],["file","Nhạc trong máy"],["none","Không nhạc"]],qc.musicMode,async v=>{qc.musicMode=v;if(v==="none"){qc.music=null;qc.musicItem=null;}if(v==="file"){const f=await pickFile("audio/*");if(f[0]){qc.music=f[0];qc.musicItem=null;}}showM();qcRender();}));
+  sm.appendChild(mwrap);const fitRow=el("label","qfit");const cb=document.createElement("input");cb.type="checkbox";cb.checked=qc.fit;cb.onchange=()=>{qc.fit=cb.checked;};fitRow.append(cb,document.createTextNode(" Tự khớp độ dài video với bài nhạc"));sm.appendChild(fitRow);box.appendChild(sm);showM();
   const bw=(PRESETS.find(p=>p.fam==="bw")||PRESETS[0]).id;
-  const s1=sec("Phong cách màu");s1.appendChild(chipRow([["film","Film ấm"],["clean","Trong trẻo"],["cine","Điện ảnh"],["bw","Đen trắng"],["none","Giữ nguyên"]],style,v=>style=v));d.appendChild(s1);
-  const s2=sec("Chuyển cảnh");s2.appendChild(chipRow([["fade","Hoà tan"],["slideL","Trượt"],["leak","Loé sáng film"],["zoom","Phóng"],["none","Cắt thẳng"]],trans,v=>trans=v));d.appendChild(s2);
-  d.appendChild(sld("Thời lượng mỗi ảnh",1,6,.5,per,v=>v.toFixed(1)+"s",v=>{per=v;},()=>{}));
-  const go=tbtn("Tạo video",async()=>{if(!files.length)return;$("expBox").hidden=true;const pid={film:"v_KP4",clean:"tokyo400",cine:"kowloon",bw,none:"none"}[style];toast("Đang dựng…",8000);
-    const start=P.main.length;for(const f of files){const m=await addMedia(f);if(!m)continue;const c=newClip(m,{preset:findP(pid).id,strength:style==="none"?100:80,fit:"fill",trans:{type:P.main.length?trans:"none",dur:.6},motion:m.kind==="image"?["zoomin","zoomout","panL","panR"][P.main.length%4]:"none"});
-      if(m.kind==="image")c.out=per;else if(m.dur>8){c.in=Math.max(0,m.dur/2-3);c.out=Math.min(m.dur,c.in+6);}P.main.push(c);}
-    if(P.main[0])P.main[0].trans.type="none";layout();if(music){const m=await addMedia(music);if(m){const a={id:uid(),type:"audio",mid:m.id,start:0,in:0,out:Math.min(m.dur,total),vol:85,fadeIn:.5,fadeOut:1.5};freeTrack("audio",0,a.out).items.push(a);P.main.forEach(c=>{if(c.kind==="video")c.vol=25;});}}
-    sel=null;T=0;commit();fitTimeline();toast("Đã dựng xong "+(P.main.length-start)+" cảnh. Bấm phát để xem.");},"primary");go.disabled=true;
-  const r=el("div","btnrow");r.append(tbtn("Huỷ",()=>{$("expBox").hidden=true;}),go);d.appendChild(r);$("welcome").hidden=true;$("expBox").hidden=false;}
+  const s1=sec("Phong cách màu");s1.appendChild(chipRow([["film","Film ấm"],["clean","Trong trẻo"],["cine","Điện ảnh"],["iohk","IOHK sáng"],["bw","Đen trắng"],["none","Giữ nguyên"]],qc.style,v=>qc.style=v));box.appendChild(s1);
+  const s2=sec("Chuyển cảnh");s2.appendChild(chipRow([["fade","Hoà tan"],["slideL","Trượt"],["leak","Loé sáng film"],["zoom","Phóng"],["mix","Ngẫu nhiên"],["none","Cắt thẳng"]],qc.trans,v=>qc.trans=v));box.appendChild(s2);
+  box.appendChild(sld("Thời lượng mỗi ảnh (khi không khớp nhạc)",1,6,.5,qc.per,v=>v.toFixed(1)+"s",v=>{qc.per=v;},()=>{}));
+  const go=tbtn("Tạo video",()=>qcBuild(go,bw),"primary qgo");const r=el("div","btnrow");r.append(tbtn("Huỷ",qcClose),go);box.appendChild(r);
+  $("welcome").hidden=true;$("expBox").hidden=false;qcRender();}
+async function qcBuild(go,bw){if(!qc.files.length)return;go.disabled=true;const files=qc.files.slice(),pid={film:"v_KP4",clean:"tokyo400",cine:"kowloon",iohk:"fl_iohk",bw,none:"none"}[qc.style],TR=["fade","slideL","leak","zoom"];
+  let musicFile=qc.music;if(!musicFile&&qc.musicItem){go.textContent="Đang tải nhạc…";try{musicFile=await musFile(qc.musicItem);musAddCredit(qc.musicItem);}catch(e){toast("Không tải được bài nhạc đã chọn, dựng video không nhạc");}}
+  const added=[];let fail=0;for(let i=0;i<files.length;i++){go.textContent="Đang thêm "+(i+1)+"/"+files.length+"…";let m=null;try{m=await addMedia(files[i]);}catch(e){m=null;}if(!m||m.kind==="audio"){fail++;continue;}added.push(m);}
+  if(!added.length){go.disabled=false;go.textContent="Tạo video";return toast("Không đọc được file nào. Thử lại với ảnh JPG/PNG hoặc video MP4");}
+  let mDur=0,mm=null;if(musicFile){go.textContent="Đang thêm nhạc…";try{mm=await addMedia(musicFile);mDur=mm?mm.dur:0;}catch(e){mm=null;}}
+  const nI=added.filter(m=>m.kind==="image").length,vids=added.filter(m=>m.kind==="video");let vLen=vids.reduce((a,m)=>a+Math.min(m.dur,6),0),per=qc.per;
+  if(qc.fit&&mDur>0){if(nI)per=clamp((mDur-vLen)/nI,0.8,6);else if(vLen>0&&vLen<mDur){/* stretch videos a little up to their length */}}
+  const start=P.main.length;added.forEach((m,k)=>{const tt=qc.trans==="mix"?TR[k%TR.length]:qc.trans;
+    const c=newClip(m,{preset:findP(pid).id,strength:qc.style==="none"?100:80,fit:"fill",trans:{type:P.main.length?tt:"none",dur:Math.min(.6,per*0.3)},motion:m.kind==="image"?["zoomin","zoomout","panL","panR"][k%4]:"none"});
+    if(m.kind==="image")c.out=per;else{const want=qc.fit&&mDur>0&&!nI?Math.max(2,mDur/vids.length):6;if(m.dur>want){c.in=Math.max(0,m.dur/2-want/2);c.out=Math.min(m.dur,c.in+want);}}P.main.push(c);});
+  if(P.main[start])P.main[start].trans.type=start?P.main[start].trans.type:"none";layout();
+  if(mm){const a={id:uid(),type:"audio",mid:mm.id,start:P.main[start]?P.main[start]._start:0,in:0,out:Math.min(mm.dur,total),vol:85,fadeIn:.5,fadeOut:1.5};const tr=freeTrack("audio",a.start,total-a.start);tr.items.push(a);let at=a.start+a.out;while(at<total-0.5&&mm.dur>2){const b={id:uid(),type:"audio",mid:mm.id,start:at,in:0,out:Math.min(mm.dur,total-at),vol:85,fadeIn:.3,fadeOut:1.2};tr.items.push(b);at+=b.out;}P.main.forEach(c=>{if(c.kind==="video")c.vol=25;});}
+  qcClose();sel=null;T=0;commit();fitTimeline();toast("Đã dựng "+added.length+" cảnh"+(fail?", bỏ qua "+fail+" file lỗi":"")+". Bấm phát để xem.",4000);qc.files=[];qc.music=null;qc.musicItem=null;go.disabled=false;go.textContent="Tạo video";}
 
 /* ---------- layout frames ---------- */
 async function applyLayout(L,opts){let base=selItem();if(!base||base.type!=="clip")base=mainAt(T)[0];if(!base)return toast("Thêm ít nhất một clip trước khi chọn bố cục");
@@ -2036,64 +2086,92 @@ const pEnd=e=>{pptr.delete(e.pointerId);if(pptr.size)return;const d=pdrag;pdrag=
 pv.addEventListener("wheel",e=>{const it=selItem();if(!it||it.type==="audio"||it.type==="fx")return;e.preventDefault();const lt=clamp(T-it._start,0,it._dur);setProp(it,"s",clamp(val(it,"s",lt)*Math.exp(-e.deltaY*.0015),5,800),lt);requestDraw();clearTimeout(comT);comT=setTimeout(()=>commit(),400);},{passive:false});
 pv.addEventListener("dblclick",()=>{const it=selItem();if(it&&it.type==="text"){if(isDesk()){curPanel="text";showInspector();const ta=document.querySelector("#ibody textarea");if(ta){ta.focus();ta.select();}}else openPanel("text");}});
 
-/* ---------- Free licensed music: Openverse (no key) + Jamendo (optional free client id) ---------- */
-const MUSIC_TAGS=[["trend","Thịnh hành",""],["lofi","Lofi","lofi"],["chill","Chill","chill"],["happy","Vui tươi","happy upbeat"],["cine","Điện ảnh","cinematic"],["acoustic","Acoustic","acoustic"],["edm","EDM","electronic dance"],["love","Tình cảm","romantic"],["hiphop","Hip hop","hiphop"],["piano","Piano","piano"]];
-const mus={tag:"trend",q:"",items:[],busy:false,err:"",page:1,player:null,playing:null,key:""};
+/* ---------- Free licensed music, many sources in parallel ----------
+   Openverse (Jamendo, Freesound, ccMixter, Wikimedia… — no key), Wikimedia Commons (no key),
+   Internet Archive netlabels (no key), Jamendo (optional free client id, weekly trending).
+   Only licences that allow commercial use AND adaptation (no NC, no ND) are shown. */
+const MUSIC_TAGS=[["trend","Thịnh hành",""],["lofi","Lofi","lofi"],["chill","Chill","chill"],["happy","Vui tươi","happy upbeat"],["cine","Điện ảnh","cinematic"],["acoustic","Acoustic","acoustic"],["edm","EDM","electronic dance"],["love","Tình cảm","romantic"],["hiphop","Hip hop","hip hop"],["piano","Piano","piano"],["jazz","Jazz","jazz"],["rock","Rock","rock"],["classic","Cổ điển","classical"]];
+const MUSIC_SRC=[["all","Tất cả"],["openverse","Openverse"],["commons","Wikimedia"],["archive","Internet Archive"],["jamendo","Jamendo"]];
+const mus={tag:"trend",q:"",src:"all",items:[],busy:false,err:"",page:1,player:null,playing:null,note:""};
 function musKey(){try{return localStorage.getItem("iohk.jamendo")||"";}catch(e){return "";}}
 function musSetKey(v){try{v?localStorage.setItem("iohk.jamendo",v):localStorage.removeItem("iohk.jamendo");}catch(e){}}
-function musFmt(s){s=Math.round(s||0);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+function musFmt(s){if(!s)return "";s=Math.round(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+function licOK(s){s=(s||"").toLowerCase();if(!s)return false;return !/(^|[\/\- _])nc([\/\- _]|$)|noncommercial|non-commercial|(^|[\/\- _])nd([\/\- _]|$)|noderiv/.test(s);}
+function licName(u){if(!u)return "";if(/publicdomain|\/pd|cc0|zero/i.test(u))return /zero|cc0/i.test(u)?"CC0":"Public domain";const m=u.match(/licenses\/([a-z-]+)\/([\d.]+)/i);return m?("CC "+m[1].toUpperCase()+" "+m[2]):"CC";}
+const stripHtml=s=>String(s||"").replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim();
+async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error("http "+r.status);return r.json();}
+const MUS_ADAPT={
+  async openverse(q,page){const u=new URL("https://api.openverse.org/v1/audio/");
+    Object.entries({q:q||"music",category:"music",license_type:"commercial,modification",page_size:"20",page:String(page),mature:"false"}).forEach(([k,v])=>u.searchParams.set(k,v));
+    const j=await getJSON(u);return (j.results||[]).filter(x=>x.url&&licOK((x.license||"")+" "+(x.license_url||""))).map(x=>({id:"o"+x.id,title:x.title||"Không tên",artist:x.creator||"",dur:(x.duration||0)/1000,img:x.thumbnail,url:x.url,stream:x.url,
+      lic:licName(x.license_url)||(x.license||"").toUpperCase(),licUrl:x.license_url,page:x.foreign_landing_url,src:"Openverse"+(x.source?" · "+x.source:""),attribution:x.attribution}));},
+  async commons(q,page){const u=new URL("https://commons.wikimedia.org/w/api.php");
+    Object.entries({action:"query",format:"json",origin:"*",generator:"search",gsrnamespace:"6",gsrlimit:"20",gsroffset:String((page-1)*20),gsrsearch:"filetype:audio "+(q||"music")+" -speech -pronunciation",prop:"imageinfo",iiprop:"url|extmetadata|size|mime"}).forEach(([k,v])=>u.searchParams.set(k,v));
+    const j=await getJSON(u);const pages=j.query&&j.query.pages?Object.values(j.query.pages):[];
+    return pages.map(p=>{const ii=(p.imageinfo||[])[0]||{},em=ii.extmetadata||{},lic=(em.LicenseShortName&&em.LicenseShortName.value)||"",lu=(em.LicenseUrl&&em.LicenseUrl.value)||"";
+      if(!ii.url||!/audio|ogg|opus|mpeg|wav|flac/.test(ii.mime||"")||ii.size<300000||!(licOK(lic+" "+lu)&&(/cc|public|pd/i.test(lic+lu))))return null;
+      const title=stripHtml((em.ObjectName&&em.ObjectName.value)||p.title.replace(/^File:/,"").replace(/\.[a-z0-9]+$/i,""));const artist=stripHtml(em.Artist&&em.Artist.value).slice(0,60);
+      return {id:"w"+p.pageid,title,artist,dur:0,img:"",url:ii.url,stream:ii.url,lic:lic||licName(lu),licUrl:lu,page:ii.descriptionurl,src:"Wikimedia Commons"};}).filter(Boolean);},
+  async archive(q,page){const u=new URL("https://archive.org/advancedsearch.php");
+    const qq="("+(q||"music")+") AND mediatype:audio AND collection:(netlabels OR opensource_audio) AND (licenseurl:*licenses/by/* OR licenseurl:*licenses/by-sa/* OR licenseurl:*publicdomain*)";
+    u.searchParams.set("q",qq);["identifier","title","creator","licenseurl","downloads"].forEach(f=>u.searchParams.append("fl[]",f));u.searchParams.append("sort[]","downloads desc");
+    Object.entries({rows:"15",page:String(page),output:"json"}).forEach(([k,v])=>u.searchParams.set(k,v));
+    const j=await getJSON(u);return ((j.response&&j.response.docs)||[]).filter(d=>licOK(d.licenseurl)).map(d=>({id:"a"+d.identifier,title:stripHtml(Array.isArray(d.title)?d.title[0]:d.title)||d.identifier,artist:stripHtml(Array.isArray(d.creator)?d.creator[0]:d.creator),
+      dur:0,img:"https://archive.org/services/img/"+d.identifier,url:null,stream:null,lic:licName(d.licenseurl),licUrl:d.licenseurl,page:"https://archive.org/details/"+d.identifier,src:"Internet Archive",
+      resolve:async function(){const m=await getJSON("https://archive.org/metadata/"+encodeURIComponent(d.identifier));const f=(m.files||[]).find(x=>/mp3$/i.test(x.name)&&!/_64kb|sample/i.test(x.name))||(m.files||[]).find(x=>/\.(mp3|ogg)$/i.test(x.name));
+        if(!f)throw new Error("no file");this.url=this.stream="https://archive.org/download/"+encodeURIComponent(d.identifier)+"/"+f.name.split("/").map(encodeURIComponent).join("/");this.dur=+f.length||0;if(f.title)this.title=f.title;return this;}}));},
+  async jamendo(q,page,tag){const key=musKey();if(!key)throw new Error("nokey");const u=new URL("https://api.jamendo.com/v3.0/tracks/");
+    const ps={client_id:key,format:"json",limit:"20",include:"licenses",audioformat:"mp32",offset:String((page-1)*20)};if(mus.q)ps.search=mus.q;else if(tag)ps.fuzzytags=tag.replace(/ /g,"+");
+    ps[mus.q?"boost":"order"]="popularity_week";Object.entries(ps).forEach(([k,v])=>u.searchParams.set(k,v));
+    const j=await getJSON(u);if(j.headers&&j.headers.status!=="success")throw new Error(j.headers.error_message||"jamendo");
+    return (j.results||[]).filter(x=>licOK(x.license_ccurl)&&x.audiodownload_allowed!==false).map(x=>({id:"j"+x.id,title:x.name,artist:x.artist_name,dur:x.duration,img:x.album_image||x.image,url:x.audiodownload||x.audio,stream:x.audio,lic:licName(x.license_ccurl),licUrl:x.license_ccurl,page:x.shareurl,src:"Jamendo"}));}
+};
+function musSources(){const key=musKey();const all=["openverse","commons","archive"].concat(key?["jamendo"]:[]);return mus.src==="all"?all:[mus.src];}
+async function musSearch(q,tag,page,srcs){const res=await Promise.allSettled(srcs.map(s=>MUS_ADAPT[s](q,page,tag)));const lists=res.map(r=>r.status==="fulfilled"?r.value:[]),failed=srcs.filter((s,i)=>res[i].status!=="fulfilled");
+  const out=[],seen=new Set();for(let i=0;lists.some(l=>i<l.length);i++)lists.forEach(l=>{const it=l[i];if(!it)return;const k=(it.title+"|"+it.artist).toLowerCase();if(seen.has(k))return;seen.add(k);out.push(it);});return {items:out,failed};}
 async function musFetch(){
-  mus.busy=true;mus.err="";renderLibIfAudio();const key=musKey(),t=MUSIC_TAGS.find(x=>x[0]===mus.tag)||MUSIC_TAGS[0],q=(mus.q||t[2]||"").trim();
-  try{
-    if(key){
-      const u=new URL("https://api.jamendo.com/v3.0/tracks/");const ps={client_id:key,format:"json",limit:"24",include:"licenses",audioformat:"mp32",offset:String((mus.page-1)*24)};
-      if(mus.q)ps.search=mus.q;else if(t[2])ps.fuzzytags=t[2].replace(/ /g,"+");
-      ps[mus.q?"boost":"order"]=mus.q?"popularity_week":"popularity_week";Object.entries(ps).forEach(([k,v])=>u.searchParams.set(k,v));
-      const r=await fetch(u);if(!r.ok)throw new Error("http "+r.status);const j=await r.json();if(j.headers&&j.headers.status!=="success")throw new Error(j.headers.error_message||"jamendo");
-      const L=(j.results||[]).filter(x=>!/\/nc|-nc/i.test(x.license_ccurl||"")&&(x.audiodownload_allowed!==false));
-      mus.items=L.map(x=>({id:"j"+x.id,title:x.name,artist:x.artist_name,dur:x.duration,img:x.album_image||x.image,url:x.audiodownload||x.audio,stream:x.audio,lic:licName(x.license_ccurl),licUrl:x.license_ccurl,page:x.shareurl,src:"Jamendo"}));
-    }else{
-      const u=new URL("https://api.openverse.org/v1/audio/");const ps={q:q||"music",category:"music",license_type:"commercial",page_size:"24",page:String(mus.page),mature:"false"};
-      Object.entries(ps).forEach(([k,v])=>u.searchParams.set(k,v));
-      const r=await fetch(u);if(!r.ok)throw new Error("http "+r.status);const j=await r.json();
-      mus.items=(j.results||[]).filter(x=>x.url&&(!x.license||!/nc/i.test(x.license))).map(x=>({id:"o"+x.id,title:x.title||"Không tên",artist:x.creator||"",dur:(x.duration||0)/1000,img:x.thumbnail,url:x.url,stream:x.url,
-        lic:(x.license||"").toUpperCase()+(x.license_version?" "+x.license_version:""),licUrl:x.license_url,page:x.foreign_landing_url,src:x.source||x.provider||"Openverse",attribution:x.attribution}));
-    }
-    if(!mus.items.length)mus.err="Không tìm thấy bài phù hợp. Thử từ khoá khác.";
-  }catch(e){mus.items=[];mus.err="Chưa tải được kho nhạc. Kiểm tra kết nối mạng rồi thử lại.";if(window.console)console.warn(e);}
+  mus.busy=true;mus.err="";mus.note="";renderLibIfAudio();const t=MUSIC_TAGS.find(x=>x[0]===mus.tag)||MUSIC_TAGS[0],q=(mus.q||t[2]||"").trim(),srcs=musSources();
+  if(mus.src==="jamendo"&&!musKey()){mus.busy=false;mus.items=[];mus.err="Jamendo cần Client ID miễn phí, dán ở mục cuối bên dưới.";renderLibIfAudio();return;}
+  try{const r=await musSearch(q,t[2],mus.page,srcs);mus.items=r.items;
+    if(r.failed.length&&r.failed.length<srcs.length)mus.note="Tạm chưa tải được: "+r.failed.map(s=>(MUSIC_SRC.find(x=>x[0]===s)||[0,s])[1]).join(", ");
+    if(!mus.items.length)mus.err=r.failed.length===srcs.length?"Chưa tải được kho nhạc. Kiểm tra kết nối mạng rồi thử lại.":"Không tìm thấy bài phù hợp. Thử từ khoá khác.";}
+  catch(e){mus.items=[];mus.err="Chưa tải được kho nhạc. Kiểm tra kết nối mạng rồi thử lại.";}
   mus.busy=false;renderLibIfAudio();}
-function licName(u){if(!u)return "";const m=u.match(/licenses\/([a-z-]+)\/([\d.]+)/i);return m?("CC "+m[1].toUpperCase()+" "+m[2]):(/publicdomain/.test(u)?"CC0":"CC");}
-function musCredit(it){return (it.attribution||("“"+it.title+"” — "+(it.artist||"Không rõ")+" ("+it.lic+")"+(it.page?" · "+it.page:"")));}
-function renderLibIfAudio(){if(cat==="audio")renderLib();if(!isDesk()&&typeof sheetKind!=="undefined"&&sheetKind==="lib"&&cat==="audio"){const b=document.querySelector("#sheet .lib-audio");if(b)b.replaceWith(musicBrowser());}}
-function musPreview(it){if(!mus.player){mus.player=new Audio();mus.player.preload="none";mus.player.onended=()=>{mus.playing=null;renderLibIfAudio();};}
-  if(mus.playing===it.id){mus.player.pause();mus.playing=null;}else{mus.player.src=it.stream;mus.player.play().catch(()=>toast("Không phát thử được bài này"));mus.playing=it.id;}renderLibIfAudio();}
+function musCredit(it){return it.attribution||("“"+it.title+"” — "+(it.artist||"Không rõ tác giả")+" ("+it.lic+", "+it.src+")"+(it.page?" · "+it.page:""));}
+function renderLibIfAudio(){if(typeof cat!=="undefined"&&cat==="audio"){if(isDesk())renderLib();else{const b=document.querySelector("#sheet .lib-audio");if(b)b.replaceWith(musicBrowser());}}
+  const q=document.querySelector("#expDlg .lib-audio");if(q&&q.dataset.pick)q.replaceWith(musicBrowser({pick:q._pick}));}
+async function musResolve(it){if(!it.url&&it.resolve)await it.resolve();return it;}
+async function musPreview(it){if(!mus.player){mus.player=new Audio();mus.player.preload="none";mus.player.onended=()=>{mus.playing=null;renderLibIfAudio();};}
+  if(mus.playing===it.id){mus.player.pause();mus.playing=null;renderLibIfAudio();return;}
+  try{await musResolve(it);mus.player.src=it.stream;await mus.player.play();mus.playing=it.id;}catch(e){toast("Không phát thử được bài này");mus.playing=null;}renderLibIfAudio();}
+async function musFile(it){await musResolve(it);const r=await fetch(it.url);if(!r.ok)throw new Error("http "+r.status);const b=await r.blob();const ext=/ogg|opus/.test(b.type)||/\.og[ga]$/i.test(it.url)?"ogg":/wav/.test(b.type)?"wav":/flac/.test(b.type)?"flac":"mp3";
+  return new File([b],(it.title||"nhac").replace(/[\\/:*?"<>|]/g,"").slice(0,60)+"."+ext,{type:b.type||"audio/mpeg"});}
+function musAddCredit(it){P.credits=P.credits||[];const c=musCredit(it);if(!P.credits.includes(c))P.credits.push(c);}
 async function musAdd(it,btn){if(btn){btn.disabled=true;btn.textContent="Đang tải…";}
-  try{const r=await fetch(it.url);if(!r.ok)throw new Error("http "+r.status);const b=await r.blob();const ext=/ogg/.test(b.type)?"ogg":/wav/.test(b.type)?"wav":"mp3";
-    const f=new File([b],(it.title||"nhac").replace(/[\\/:*?"<>|]/g,"").slice(0,60)+"."+ext,{type:b.type||"audio/mpeg"});
-    await importFiles([f]);P.credits=P.credits||[];if(!P.credits.includes(musCredit(it)))P.credits.push(musCredit(it));commit();
-    toast(it.lic&&!/CC0/.test(it.lic)?"Đã thêm nhạc. Nhớ ghi công tác giả khi đăng (mục Ghi công)":"Đã thêm nhạc vào dòng thời gian");}
+  try{const f=await musFile(it);await importFiles([f]);musAddCredit(it);commit();toast(/CC0|Public/.test(it.lic)?"Đã thêm nhạc vào dòng thời gian":"Đã thêm nhạc. Nhớ ghi công tác giả khi đăng (mục Ghi công)");}
   catch(e){toast("Nguồn này không cho tải bài hát. Thử bài khác nhé");if(btn){btn.disabled=false;btn.textContent="Thêm";}}}
-function musicBrowser(){const w=el("div","lib-audio");w.style.display="flex";w.style.flexDirection="column";w.style.gap="10px";const key=musKey();
-  w.appendChild(el("h3",null,key?"Kho nhạc Jamendo · được dùng thương mại":"Kho nhạc miễn phí · được dùng thương mại"));
+function musicBrowser(opt){opt=opt||{};const w=el("div","lib-audio");w.style.display="flex";w.style.flexDirection="column";w.style.gap="10px";if(opt.pick){w.dataset.pick="1";w._pick=opt.pick;}const key=musKey();
+  if(!opt.pick)w.appendChild(el("h3",null,"Kho nhạc miễn phí · được dùng thương mại"));
   const sr=el("div","msearch"),inp=document.createElement("input");inp.type="search";inp.className="field";inp.placeholder="Tìm bài, thể loại, tâm trạng…";inp.value=mus.q;inp.setAttribute("aria-label","Tìm nhạc");
   inp.addEventListener("keydown",e=>{if(e.key==="Enter"){mus.q=inp.value.trim();mus.page=1;musFetch();}});sr.appendChild(inp);w.appendChild(sr);
-  w.appendChild(chipRow(MUSIC_TAGS.map(t=>[t[0],t[0]==="trend"&&!key?"Gợi ý":t[1]]),mus.q?"":mus.tag,v=>{mus.tag=v;mus.q="";mus.page=1;musFetch();}));
-  if(mus.busy)w.appendChild(el("p","hint","Đang tải danh sách nhạc…"));
-  else if(mus.err)w.appendChild(el("p","hint",mus.err));
-  const list=el("div","mlist");mus.items.forEach(it=>{const row=el("div","mrow"+(mus.playing===it.id?" on":""));
+  w.appendChild(chipRow(MUSIC_TAGS.map(t=>[t[0],t[1]]),mus.q?"":mus.tag,v=>{mus.tag=v;mus.q="";mus.page=1;musFetch();}));
+  const srcRow=chipRow(MUSIC_SRC.filter(s=>s[0]!=="jamendo"||key).map(s=>[s[0],s[1]]),mus.src,v=>{mus.src=v;mus.page=1;musFetch();});srcRow.classList.add("msrc");w.appendChild(srcRow);
+  if(mus.busy)w.appendChild(el("p","hint","Đang tìm nhạc từ "+musSources().length+" nguồn…"));else if(mus.err)w.appendChild(el("p","hint",mus.err));
+  const list=el("div","mlist");mus.items.forEach(it=>{const row=el("div","mrow"+(mus.playing===it.id?" on":"")+(opt.pick&&opt.pick.cur&&opt.pick.cur.id===it.id?" pick":""));
     const pb=el("button","mplay");pb.type="button";pb.setAttribute("aria-label",(mus.playing===it.id?"Dừng ":"Nghe thử ")+it.title);pb.innerHTML=mus.playing===it.id?'<svg class="i"><use href="#i-pause"/></svg>':'<svg class="i"><use href="#i-play"/></svg>';
     if(it.img)pb.style.backgroundImage="url('"+it.img+"')";pb.onclick=()=>musPreview(it);
-    const tx=el("div","mtx");tx.append(el("b",null,it.title),el("small",null,[it.artist,musFmt(it.dur),it.lic].filter(Boolean).join(" · ")));
-    const ab=el("button","tbtn","Thêm");ab.type="button";ab.onclick=()=>musAdd(it,ab);row.append(pb,tx,ab);list.appendChild(row);});
-  w.appendChild(list);
-  if(mus.items.length){const nr=el("div","btnrow");if(mus.page>1)nr.appendChild(tbtn("Trang trước",()=>{mus.page--;musFetch();}));nr.appendChild(tbtn("Thêm bài khác",()=>{mus.page++;musFetch();}));w.appendChild(nr);}
-  if(P.credits&&P.credits.length){const d=document.createElement("details");d.className="fold";d.appendChild(el("summary",null,"Ghi công nhạc ("+P.credits.length+")"));const ta=el("textarea","field");ta.readOnly=true;ta.rows=3;ta.value=P.credits.join("\n");
+    const tx=el("div","mtx");tx.append(el("b",null,it.title),el("small",null,[it.artist,musFmt(it.dur),it.lic,it.src].filter(Boolean).join(" · ")));
+    const ab=el("button","tbtn"+(opt.pick&&opt.pick.cur&&opt.pick.cur.id===it.id?" primary":""),opt.pick?(opt.pick.cur&&opt.pick.cur.id===it.id?"Đã chọn":"Chọn"):"Thêm");ab.type="button";
+    ab.onclick=()=>{if(opt.pick){opt.pick.set(it);renderLibIfAudio();}else musAdd(it,ab);};row.append(pb,tx,ab);list.appendChild(row);});
+  w.appendChild(list);if(mus.note)w.appendChild(el("p","hint",mus.note));
+  if(mus.items.length||mus.page>1){const nr=el("div","btnrow");if(mus.page>1)nr.appendChild(tbtn("Trang trước",()=>{mus.page--;musFetch();}));if(mus.items.length)nr.appendChild(tbtn("Thêm bài khác",()=>{mus.page++;musFetch();}));w.appendChild(nr);}
+  if(!opt.pick&&P.credits&&P.credits.length){const d=document.createElement("details");d.className="fold";d.appendChild(el("summary",null,"Ghi công nhạc ("+P.credits.length+")"));const ta=el("textarea","field");ta.readOnly=true;ta.rows=3;ta.value=P.credits.join("\n");
     d.append(ta,tbtn("Sao chép ghi công",()=>{try{navigator.clipboard.writeText(ta.value);toast("Đã sao chép, dán vào mô tả khi đăng");}catch(e){ta.select();}}));w.appendChild(d);}
-  const kd=document.createElement("details");kd.className="fold";kd.appendChild(el("summary",null,key?"Nguồn: Jamendo (đang bật)":"Muốn nhạc thịnh hành theo tuần?"));
-  const ki=document.createElement("input");ki.className="field";ki.placeholder="Dán Client ID Jamendo";ki.value=key;ki.setAttribute("aria-label","Jamendo Client ID");
-  const kr=el("div","btnrow");kr.append(tbtn(key?"Cập nhật":"Bật Jamendo",()=>{musSetKey(ki.value.trim());mus.page=1;musFetch();},"primary"));if(key)kr.appendChild(tbtn("Tắt",()=>{musSetKey("");mus.page=1;musFetch();}));
-  const hp=el("p","hint");hp.innerHTML='Tạo Client ID miễn phí tại <a href="https://devportal.jamendo.com" target="_blank" rel="noopener">devportal.jamendo.com</a> để có bảng bài hát thịnh hành theo tuần. Không có mã, app dùng kho nhạc Creative Commons của Openverse. App chỉ hiện bài cho phép dùng thương mại.';
-  kd.append(ki,kr,hp);w.appendChild(kd);
+  if(!opt.pick){const kd=document.createElement("details");kd.className="fold";kd.appendChild(el("summary",null,key?"Jamendo: đang bật (thịnh hành theo tuần)":"Thêm nguồn Jamendo (thịnh hành theo tuần)"));
+    const ki=document.createElement("input");ki.className="field";ki.placeholder="Dán Client ID Jamendo";ki.value=key;ki.setAttribute("aria-label","Jamendo Client ID");
+    const kr=el("div","btnrow");kr.append(tbtn(key?"Cập nhật":"Bật Jamendo",()=>{musSetKey(ki.value.trim());mus.page=1;musFetch();},"primary"));if(key)kr.appendChild(tbtn("Tắt",()=>{musSetKey("");if(mus.src==="jamendo")mus.src="all";mus.page=1;musFetch();}));
+    const hp=el("p","hint");hp.innerHTML='Nhạc lấy cùng lúc từ Openverse, Wikimedia Commons và Internet Archive, không cần đăng ký. Tạo Client ID miễn phí tại <a href="https://devportal.jamendo.com" target="_blank" rel="noopener">devportal.jamendo.com</a> để thêm bảng thịnh hành theo tuần của Jamendo. App chỉ hiện bài được dùng thương mại và được ghép vào video (không có giấy phép NC, ND).';
+    kd.append(ki,kr,hp);w.appendChild(kd);}
   if(!mus.items.length&&!mus.busy&&!mus.err)setTimeout(musFetch,0);
   return w;}
 

@@ -41,3 +41,8 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 - **Làm đẹp không còn nhoè viền**: mịn da giữ khối (chỉ làm phẳng vết thâm, lỗ chân lông), xoá mụn không lan ra đường hàm, son môi và trắng răng chỉ tô đúng môi, răng.
 - **Video – Sửa đồng bộ**: trong bố cục nhiều ô, bật "Sửa đồng bộ cả N ô" để preset, màu, hiệu ứng, hoạt ảnh, mask, tách nền áp cho mọi ô.
 - **Kho nhạc miễn phí**: mục Âm thanh có kho nhạc Creative Commons (Openverse, không cần đăng ký) chỉ gồm bài được dùng thương mại; dán Client ID Jamendo miễn phí để có bảng thịnh hành theo tuần. App tự lưu dòng ghi công tác giả để dán khi đăng.
+
+### Cập nhật 3/11
+
+- **Tạo nhanh làm lại**: chọn bao nhiêu ảnh/video cũng được, chọn nhiều lần để cộng dồn hoặc kéo thả; xem trước từng file, đổi thứ tự, bỏ file, sắp theo ngày chụp; chọn nhạc ngay từ kho nhạc miễn phí; tự khớp độ dài với bài nhạc và tự lặp nhạc khi video dài hơn; báo tiến độ và bỏ qua file lỗi.
+- **Kho nhạc nhiều nguồn**: Openverse, Wikimedia Commons, Internet Archive (không cần đăng ký) và Jamendo (Client ID miễn phí) tìm song song; chỉ hiện bài được dùng thương mại và được ghép vào video (loại NC, ND).
