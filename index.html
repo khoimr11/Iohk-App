@@ -165,6 +165,9 @@ body.no-insp .insp{transform:translateX(calc(100% + 28px));opacity:0;pointer-eve
 .fxcard[aria-pressed="true"]{color:var(--fg)}
 .fxcard[aria-pressed="true"] img{border-color:var(--accent,#f2a33a)}
 .fxpanel .chips{max-height:none}
+.fxtabs{margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.fxtabs::-webkit-scrollbar{display:none}
+.fxpanel .note{margin-bottom:14px}
 @media (max-width:760px){.fxgrid{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:64px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}}
 .pscroll{flex:1;min-height:0;overflow:auto;padding:2px 14px 18px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
 .fam{margin-top:8px}
@@ -2503,7 +2506,7 @@ function cloneCanvas(c){const m=mk(c.width,c.height);m.x.drawImage(c,0,0);return
 /* ---------- Phong cách AI (on-device restyle) & Hiệu ứng trend (Prequel / Instagram-style) ----------
    Restyle and pixel effects run on the GPU inside buildRet (cached like the bg stage), light overlays are drawn
    in composeTo with a seeded random generator so preview and export match. */
-const FX0={rs:"none",rsA:100,fx:"none",fxA:70,seed:7};
+const FX0={rs:"none",rsA:100,fx:"none",fxA:70,seed:7,enh:0,spot:"none",spotPos:"left",spotA:75,spotDark:45,sky:"none",skyA:100};
 state.fx2=Object.assign({},FX0);
 const RS_LIST=[
  ["none","Gốc",-1,"Ảnh không đổi phong cách."],
@@ -2608,8 +2611,11 @@ void main(){vec2 uv=v;float a=u_amt,mn=min(u_res.x,u_res.y);vec3 o;
  gl_FragColor=vec4(clamp(o,0.0,1.0),texture2D(u_I,uv).a);}`
 });
 
-function rsKey(){const F=state.fx2;return [F.rs,F.rs==="none"?0:F.rsA,FX_GPU[F.fx]!=null?F.fx:"",FX_GPU[F.fx]!=null?F.fxA+"/"+F.seed:""].join("|");}
+function rsKey(){const F=state.fx2;return [F.enh,F.spot==="none"?"":F.spot+F.spotPos+F.spotA+"/"+F.spotDark,F.sky==="none"?"":F.sky+F.skyA+"/"+F.seed,F.rs,F.rs==="none"?0:F.rsA,FX_GPU[F.fx]!=null?F.fx:"",FX_GPU[F.fx]!=null?F.fxA+"/"+F.seed:""].join("|");}
 function fxStage(cv){const F=state.fx2;let out=cv;
+  if(F.enh>0)out=enhCv(out,F.enh/100);
+  if(F.sky&&F.sky!=="none"&&F.skyA>0)out=skyCv(out,F);
+  if(F.spot&&F.spot!=="none"&&F.spotA>0)out=spotCv(out,F);
   if(RS_MODE[F.rs]!=null&&F.rsA>0)out=restyleCv(out,F.rs,F.rsA/100);
   if(FX_GPU[F.fx]!=null&&F.fxA>0)out=pfxCv(out,FX_GPU[F.fx],F.fxA/100,F.seed);
   return out;}
@@ -2738,17 +2744,152 @@ function fxGrid(kind,list,cur,on){const g=el("div","fxgrid");
     const im=document.createElement("img");im.alt="";im.decoding="async";const cached=fxThumbs.k===srcStamp+""&&fxThumbs.m[kind+":"+id];
     if(cached)im.src=cached;else fxThumbQ.push({img:im,kind,id});b.append(im,el("span",null,name));b.onclick=()=>on(id);g.appendChild(b);});
   fxQueue();return g;}
+let fxTab="style";
 function fxPanel(){fxThumbQ=[];const box=el("div","fxpanel"),F=state.fx2,redo=()=>{retDirty=true;schedule();};
+  const tabs=chipRow([["style","Phong cách AI"],["fx","Hiệu ứng"],["ai","Công cụ AI"],["trend","Màu Trend"]],fxTab,v=>{fxTab=v;renderToolUI();});tabs.classList.add("fxtabs");box.appendChild(tabs);
+  if(fxTab==="style"){
   const s1=sec("Phong cách AI");s1.appendChild(fxGrid("rs",RS_LIST,F.rs,v=>{F.rs=v;if(v!=="none"&&!F.rsA)F.rsA=100;redo();pushHistory();renderToolUI();}));
   if(F.rs!=="none"){let t;s1.appendChild(sld("Độ đậm phong cách",0,100,F.rsA,v=>{F.rsA=v;clearTimeout(t);t=setTimeout(redo,90);},()=>pushHistory()));}
-  s1.appendChild(hint((RS_LIST.find(r=>r[0]===F.rs)||RS_LIST[0])[3]+" Chạy ngay trên máy, không gửi ảnh đi đâu."));box.appendChild(s1);
+  s1.appendChild(hint((RS_LIST.find(r=>r[0]===F.rs)||RS_LIST[0])[3]+" Chạy ngay trên máy, không gửi ảnh đi đâu."));box.appendChild(s1);}
+  else if(fxTab==="fx"){
   const s2=sec("Hiệu ứng");s2.appendChild(fxGrid("fx",FX_LIST,F.fx,v=>{F.fx=v;retDirty=true;schedule();pushHistory();renderToolUI();}));
   if(F.fx!=="none"){let t;s2.appendChild(sld("Độ mạnh hiệu ứng",0,100,F.fxA,v=>{F.fxA=v;if(FX_GPU[F.fx]!=null){clearTimeout(t);t=setTimeout(redo,60);}else schedule();},()=>pushHistory()));
     const r=el("div","btnrow");r.append(btn("Ngẫu nhiên","",()=>{F.seed=1+Math.floor(Math.random()*997);retDirty=true;schedule();pushHistory();}));s2.appendChild(r);}
-  s2.appendChild(hint((FX_LIST.find(r=>r[0]===F.fx)||FX_LIST[0])[3]+(F.fx!=="none"?" Bấm Ngẫu nhiên để đổi vị trí và kiểu.":"")));box.appendChild(s2);
+  s2.appendChild(hint((FX_LIST.find(r=>r[0]===F.fx)||FX_LIST[0])[3]+(F.fx!=="none"?" Bấm Ngẫu nhiên để đổi vị trí và kiểu.":"")));box.appendChild(s2);}
+  else if(fxTab==="trend"){
   const s3=sec("Bộ màu Trend");const tr=PRESETS.filter(p=>p.fam==="trend");s3.appendChild(chipRow([["none","Gốc"]].concat(tr.map(p=>[p.id,p.name])),state.presetId,v=>{selectPreset(v);renderToolUI();}));
-  s3.appendChild(hint("Màu theo trend: Teal, Miami, Y2K, Cyberpunk, Fairycore, Dreamcore… Kết hợp với phong cách và hiệu ứng phía trên."));box.appendChild(s3);
+  s3.appendChild(hint("Màu theo trend: Teal, Miami, Y2K, Cyberpunk, Fairycore, Dreamcore… Kết hợp với phong cách và hiệu ứng phía trên."));box.appendChild(s3);}
+  else box.appendChild(fxAiPanel());
   return box;}
+function fxAiPanel(){const w=el("div"),F=state.fx2,redo=()=>{retDirty=true;schedule();},deb=(fn,ms)=>{let t;return v=>{fn(v);clearTimeout(t);t=setTimeout(redo,ms||80);};};
+  const ch=(k,v,after)=>{F[k]=v;redo();pushHistory();renderToolUI();if(after)after();};
+  const a=sec("Làm nét AI");a.appendChild(chipRow([[0,"Tắt"],[40,"Nhẹ"],[70,"Vừa"],[100,"Mạnh"]],[0,40,70,100].includes(F.enh)?F.enh:-1,v=>ch("enh",v)));
+  if(F.enh>0)a.appendChild(sld("Mức làm nét",0,100,F.enh,deb(v=>{F.enh=v;}),()=>pushHistory()));
+  a.appendChild(hint("Tự cân sáng, khử ám màu, tăng chi tiết và độ nét vừa đủ. Dùng cho ảnh tối, ảnh mờ, ảnh tải từ mạng xã hội về."));w.appendChild(a);
+  const b=sec("Đèn rọi AI");b.appendChild(chipRow([["none","Tắt"],["white","Trắng"],["warm","Ấm"],["pink","Hồng"],["violet","Tím"],["blue","Xanh"],["dual","Hai màu"]],F.spot,v=>ch("spot",v)));
+  if(F.spot!=="none"){if(F.spot!=="dual")b.appendChild(chipRow([["left","Bên trái"],["right","Bên phải"],["top","Trên đầu"],["front","Chính diện"]],F.spotPos,v=>ch("spotPos",v)));
+    b.appendChild(sld("Độ sáng đèn",0,100,F.spotA,deb(v=>{F.spotA=v;}),()=>pushHistory()));b.appendChild(sld("Tối nền",0,100,F.spotDark,deb(v=>{F.spotDark=v;}),()=>pushHistory()));}
+  b.appendChild(hint(aiBusy?"Đang tìm người trong ảnh…":"Rọi một ngọn đèn màu vào người trong ảnh, nền tối đi cho chủ thể nổi bật. Hai màu: hồng một bên, xanh một bên như đèn neon."));w.appendChild(b);
+  const c=sec("Thay trời AI");c.appendChild(chipRow([["none","Gốc"],["blue","Trời xanh"],["sunset","Hoàng hôn"],["night","Đêm sao"],["dream","Mộng mơ"]],F.sky,v=>ch("sky",v,()=>setTimeout(()=>{if(F.sky!=="none"&&!skyInfo.found)toast("Không thấy bầu trời trong ảnh này");},400))));
+  if(F.sky!=="none"){c.appendChild(sld("Độ đậm",0,100,F.skyA,deb(v=>{F.skyA=v;}),()=>pushHistory()));const r=el("div","btnrow");r.append(btn("Đổi mây","",()=>{F.seed=1+Math.floor(Math.random()*997);redo();pushHistory();}));c.appendChild(r);}
+  c.appendChild(hint("Tự tìm vùng trời và thay bằng trời mới, chỉnh màu cảnh cho hợp. Hợp ảnh chụp ngoài trời có trời trơn hoặc trời trắng."));w.appendChild(c);
+  const d=sec("Ảnh động 3D");const r3=el("div","btnrow"),b3=btn("Tạo ảnh động 3D","primary",()=>make3D(b3));r3.appendChild(b3);d.appendChild(r3);
+  d.appendChild(hint("Tách người khỏi nền rồi tạo video 4 giây: người tiến lại gần, nền lùi xa như ảnh 3D. Giữ toàn bộ màu, hiệu ứng đang chỉnh."));w.appendChild(d);
+  w.appendChild(hint("Ảnh đại diện AI và chụp lại bằng AI (tạo ảnh mới từ câu lệnh) cần máy chủ AI trả phí, sẽ làm ở giai đoạn sau."));
+  return w;}
+
+/* ---------- Công cụ AI kiểu Prequel: Làm nét AI, Đèn rọi (Spotlight), Thay trời, Ảnh động 3D ---------- */
+const SPOT_COLS={white:[1,0.96,0.9],warm:[1,0.74,0.46],pink:[1,0.52,0.72],violet:[0.72,0.46,1],blue:[0.42,0.78,1]};
+Object.assign(GFS,{
+ enh:`uniform sampler2D u_I,u_B;uniform vec2 u_szB,u_tx;uniform vec3 u_lo,u_hi,u_wb;uniform float u_amt,u_gam;
+vec3 lv(vec3 c){return pow(clamp((c-u_lo)/(u_hi-u_lo),0.0,1.0)*u_wb,vec3(u_gam));}
+void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;vec3 n=lv(c);vec3 b=lv(bicubic(u_B,v,u_szB).rgb);
+ n+=(lumi(n)-lumi(b))*0.32;
+ vec3 s=(texture2D(u_I,v+vec2(u_tx.x,0.0)).rgb+texture2D(u_I,v-vec2(u_tx.x,0.0)).rgb+texture2D(u_I,v+vec2(0.0,u_tx.y)).rgb+texture2D(u_I,v-vec2(0.0,u_tx.y)).rgb)*0.25;
+ vec3 hf=c-s;hf*=smoothstep(0.008,0.035,length(hf));n+=hf*1.3/max(u_hi.g-u_lo.g,0.5);
+ n=mix(vec3(lumi(n)),n,1.08);gl_FragColor=vec4(mix(c,clamp(n,0.0,1.0),u_amt),I4.a);}`,
+ spot:`uniform sampler2D u_I,u_F;uniform vec2 u_lp,u_lp2,u_asp;uniform vec3 u_col,u_col2;uniform float u_amt,u_r,u_dark,u_hasF,u_dual;
+vec3 shoulder(vec3 x){return mix(x,1.0-0.2*exp(-(x-0.8)/0.2),step(0.8,x));}
+void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;float f=u_hasF>0.5?texture2D(u_F,v).r:1.0;
+ vec2 d=(v-u_lp)*u_asp;float f1=exp(-dot(d,d)/(u_r*u_r)*1.3);vec2 d2=(v-u_lp2)*u_asp;float f2=u_dual*exp(-dot(d2,d2)/(u_r*u_r)*1.3);
+ float k=mix(0.3,1.0,f);vec3 L=u_col*f1*k+u_col2*f2*k;
+ vec3 o=c*(1.0+L*1.7*u_amt)+L*0.14*u_amt;float fall=max(f1,f2);o*=1.0-u_dark*u_amt*(1.0-fall)*(1.0-0.55*f);
+ gl_FragColor=vec4(clamp(shoulder(o),0.0,1.0),I4.a);}`,
+ sky:`uniform sampler2D u_I,u_S;uniform vec2 u_res;uniform float u_kind,u_amt,u_hz,u_seed;
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h21(i),h21(i+vec2(1.0,0.0)),f.x),mix(h21(i+vec2(0.0,1.0)),h21(i+vec2(1.0,1.0)),f.x),f.y);}
+float fbm(vec2 p){float a=0.5,s=0.0;for(int i=0;i<5;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=0.5;}return s;}
+void main(){vec4 I4=texture2D(u_I,v);vec3 c=I4.rgb;float s=texture2D(u_S,v).r;float asp=u_res.x/u_res.y;
+ float t=clamp(v.y/max(u_hz,0.15),0.0,1.0);vec2 q=vec2(v.x*asp,v.y)*3.0+u_seed;vec3 sky;float cl;
+ if(u_kind<0.5){sky=mix(vec3(0.16,0.4,0.84),vec3(0.66,0.83,0.98),pow(t,1.3));cl=smoothstep(0.5,0.78,fbm(q*vec2(0.6,1.5)));sky=mix(sky,vec3(1.0),cl*0.9);}
+ else if(u_kind<1.5){sky=t<0.55?mix(vec3(0.24,0.2,0.5),vec3(0.95,0.45,0.42),t/0.55):mix(vec3(0.95,0.45,0.42),vec3(1.0,0.76,0.42),(t-0.55)/0.45);
+  cl=smoothstep(0.5,0.8,fbm(q*vec2(0.5,2.0)));sky=mix(sky,mix(vec3(1.0,0.62,0.5),vec3(0.55,0.3,0.45),1.0-t),cl*0.8);sky+=vec3(1.0,0.8,0.5)*exp(-pow((v.x-0.62)*asp,2.0)*20.0-pow((t-1.0),2.0)*18.0)*0.6;}
+ else if(u_kind<2.5){sky=mix(vec3(0.015,0.025,0.09),vec3(0.1,0.13,0.32),pow(t,1.5));vec2 g=floor(v*u_res/2.0);float st=step(0.996,h21(g+u_seed));sky+=st*(0.5+0.5*h21(g*1.3))*vec3(0.95,0.95,1.0);
+  vec2 m=(v-vec2(0.75,0.2))*vec2(asp,1.0);float md=length(m);sky=mix(sky,vec3(1.0,0.97,0.88),smoothstep(0.052,0.048,md));sky+=vec3(0.5,0.55,0.8)*exp(-md*md*60.0)*0.35;}
+ else{sky=mix(vec3(0.74,0.68,0.96),vec3(1.0,0.82,0.88),pow(t,1.1));cl=smoothstep(0.45,0.75,fbm(q*vec2(0.5,1.2)));sky=mix(sky,vec3(1.0,0.96,0.98),cl*0.85);}
+ vec3 avg=u_kind<0.5?vec3(0.55,0.72,0.95):u_kind<1.5?vec3(1.0,0.62,0.45):u_kind<2.5?vec3(0.25,0.3,0.55):vec3(0.95,0.78,0.92);
+ vec3 fg=mix(c,c*avg/max(lumi(avg),0.1),0.16*u_amt);if(u_kind>1.5&&u_kind<2.5)fg*=1.0-0.35*u_amt;
+ float m2=s*u_amt;gl_FragColor=vec4(mix(mix(c,fg,1.0-s),sky,m2),I4.a);}`
+});
+function personMatteTex(I,W,H){if(!(aiData&&aiData.bg))return null;const T=bgTextures(),F=gT(W,H);gRun(GQ.jbu,F,[["u_I",I],["u_M",T.M],["u_G",T.G]],{u_szM:sz(T.M),u_sr:0.11});return F;}
+function enhCv(cv,amt){const W=cv.width,H=cv.height,S=128,s=S/Math.max(W,H),w=Math.max(4,Math.round(W*s)),h=Math.max(4,Math.round(H*s));
+  const m=mk(w,h);m.x.drawImage(cv,0,0,w,h);const d=m.x.getImageData(0,0,w,h).data,n=w*h,ch=[[],[],[]];let sm=[0,0,0];
+  for(let i=0;i<n;i++)for(let k=0;k<3;k++){const x=d[i*4+k]/255;ch[k].push(x);sm[k]+=x;}
+  const lo=[],hi=[];ch.forEach((a,k)=>{a.sort((p,q)=>p-q);lo[k]=Math.min(0.1,a[Math.floor(n*0.004)]);hi[k]=Math.max(0.82,a[Math.floor(n*0.996)]);});
+  const av=sm.map((x,k)=>((x/n)-lo[k])/(hi[k]-lo[k])),g=(av[0]+av[1]+av[2])/3,wb=av.map(a=>1+0.5*(Math.min(1.12,Math.max(0.88,g/Math.max(a,0.02)))-1));
+  const mean=Math.max(0.05,Math.min(0.9,g)),gam=mean<0.38?Math.max(0.72,Math.log(0.42)/Math.log(mean)):1;
+  const I=gUp(cv),B=gBlur(I,Math.max(2,Math.min(W,H)*0.02)),O=gT(W,H);
+  gRun(GQ.enh,O,[["u_I",I],["u_B",B]],{u_szB:sz(B),u_tx:[1/W,1/H],u_lo:lo,u_hi:hi,u_wb:wb,u_amt:amt,u_gam:gam});const c=gRead(O);[I,B,O].forEach(gDel);return c;}
+function spotCv(cv,F2){const W=cv.width,H=cv.height,fc=flashGeom().fc,pos=F2.spotPos,dual=F2.spot==="dual";
+  const off=pos==="left"?[-0.22,-0.12]:pos==="right"?[0.22,-0.12]:pos==="top"?[0,-0.26]:[0,-0.04];
+  const lp=dual?[fc[0]-0.26,fc[1]-0.08]:[fc[0]+off[0],fc[1]+off[1]],lp2=dual?[fc[0]+0.26,fc[1]-0.08]:lp;
+  const c1=dual?SPOT_COLS.pink:SPOT_COLS[F2.spot]||SPOT_COLS.white,c2=dual?SPOT_COLS.blue:c1,mn=Math.min(W,H);
+  const I=gUp(cv),F=personMatteTex(I,W,H),O=gT(W,H);
+  gRun(GQ.spot,O,[["u_I",I],["u_F",F||I]],{u_lp:lp,u_lp2:lp2,u_asp:[W/mn,H/mn],u_col:c1,u_col2:c2,u_amt:F2.spotA/100,u_r:dual?0.42:0.5,u_dark:F2.spotDark/100,u_hasF:F?1:0,u_dual:dual?1:0});
+  const c=gRead(O);[I,O].forEach(gDel);if(F)gDel(F);return c;}
+let skyInfo={found:true};
+function skyMaskCv(cv){const S=192,s=S/Math.max(cv.width,cv.height),w=Math.max(8,Math.round(cv.width*s)),h=Math.max(8,Math.round(cv.height*s));
+  const m=mk(w,h);m.x.drawImage(cv,0,0,w,h);const d=m.x.getImageData(0,0,w,h).data,n=w*h,R=new Float32Array(n),G=new Float32Array(n),B=new Float32Array(n),Lm=new Float32Array(n);
+  for(let i=0;i<n;i++){R[i]=d[i*4]/255;G[i]=d[i*4+1]/255;B[i]=d[i*4+2]/255;Lm[i]=0.3*R[i]+0.59*G[i]+0.11*B[i];}
+  const bgp=(x,y)=>{if(!(aiData&&aiData.bg))return 1;const ax=Math.min(aiData.w-1,Math.floor(x/w*aiData.w)),ay=Math.min(aiData.h-1,Math.floor(y/h*aiData.h));return aiData.bg[ay*aiData.w+ax];};
+  const ok=new Uint8Array(n);
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x,gr=Math.abs(Lm[i+1]-Lm[i-1])+Math.abs(Lm[i+w]-Lm[i-w]);
+    const blue=B[i]>=R[i]-0.03&&B[i]>0.3,bright=Lm[i]>0.3,white=Lm[i]>0.72&&Math.abs(R[i]-B[i])<0.12;
+    if(gr<0.09&&(blue&&bright||white)&&bgp(x,y)>0.5)ok[i]=1;}
+  for(let x=0;x<w;x++){ok[x]=ok[x+w];ok[(h-1)*w+x]=0;}for(let y=0;y<h;y++){ok[y*w]=ok[y*w+1];ok[y*w+w-1]=ok[y*w+w-2];}
+  const sky=new Uint8Array(n),q=[];for(let x=0;x<w;x++)for(let y=0;y<Math.max(2,h*0.06);y++){const i=y*w+x;if(ok[i]&&!sky[i]){sky[i]=1;q.push(i);}}
+  while(q.length){const i=q.pop(),x=i%w,y=(i/w)|0;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const X=x+a,Y=y+b;if(X<0||Y<0||X>=w||Y>=h)return;const j=Y*w+X;
+    if(sky[j]||!ok[j])return;if(Math.abs(Lm[j]-Lm[i])>0.08)return;sky[j]=1;q.push(j);});}
+  let cnt=0,hz=0;for(let y=0;y<h;y++){let r=0;for(let x=0;x<w;x++)r+=sky[y*w+x];cnt+=r;if(r>w*0.15)hz=(y+1)/h;}
+  if(cnt>=n*0.03){const seen=new Uint8Array(n),hzY=hz*h;for(let st=0;st<n;st++){if(sky[st]||seen[st])continue;const comp=[st],qq=[st];seen[st]=1;let bot=false,side=false,maxY=0,pp=0;
+    while(qq.length){const i=qq.pop(),x=i%w,y=(i/w)|0;if(y>=h-2)bot=true;if(x<=1||x>=w-2)side=true;if(y>maxY)maxY=y;if(bgp(x,y)<0.5)pp++;
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([a2,b2])=>{const X=x+a2,Y=y+b2;if(X<0||Y<0||X>=w||Y>=h)return;const j=Y*w+X;if(sky[j]||seen[j])return;seen[j]=1;comp.push(j);qq.push(j);});}
+    if(!bot&&pp<comp.length*0.2&&(!side||maxY<hzY*0.8))comp.forEach(i=>{sky[i]=1;});}
+    cnt=0;for(let i=0;i<n;i++)cnt+=sky[i];}
+  if(cnt<n*0.03)return null;
+  const o=mk(w,h),id=o.x.createImageData(w,h);for(let i=0;i<n;i++){const v=sky[i]?0:255;id.data[i*4]=v;id.data[i*4+1]=v;id.data[i*4+2]=v;id.data[i*4+3]=255;}o.x.putImageData(id,0,0);
+  return {mask:o.c,guide:m.c,hz:Math.max(0.15,hz)};}
+function skyCv(cv,F2){const r=skyMaskCv(cv);skyInfo={found:!!r};if(!r)return cv;const W=cv.width,H=cv.height;
+  const I=gUp(cv),M=gUp(r.mask),Gd=gUp(r.guide),S=gT(W,H);gRun(GQ.jbu,S,[["u_I",I],["u_M",M],["u_G",Gd]],{u_szM:[r.mask.width,r.mask.height],u_sr:0.09});
+  const O=gT(W,H),kind={blue:0,sunset:1,night:2,dream:3}[F2.sky]||0;gRun(GQ.sky,O,[["u_I",I],["u_S",S]],{u_res:[W,H],u_kind:kind,u_amt:F2.skyA/100,u_hz:r.hz,u_seed:(F2.seed%13)*1.7});
+  const c=gRead(O);[I,M,Gd,S,O].forEach(gDel);return c;}
+
+/* Ảnh động 3D: video ngắn có chiều sâu (người tiến gần, nền lùi xa) */
+async function fxSaveBlob(blob,name){const dl=await getDownloads();if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu "+name);return;}catch(err){if(err&&err.code==="declined"){toast("Đã huỷ lưu");return;}}}
+  const file=new File([blob],name,{type:blob.type});if(!desk&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return;}catch(e){if(e&&e.name==="AbortError")return;}}
+  const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);toast("Đã lưu "+name);}
+let busy3D=false;
+async function make3D(btnEl){
+  if(busy3D||!origPrev)return;if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast("Trình duyệt này chưa hỗ trợ quay video từ ảnh");return;}
+  busy3D=true;if(btnEl){btnEl.disabled=true;btnEl.textContent="Đang tạo video…";}
+  try{
+    if(!aiData&&!aiBusy&&!aiFailed){toast("Đang tìm người trong ảnh…");await analyzeAI(true);}
+    draw();const r=imgRect,img=mk(r.w,r.h);img.x.drawImage(view,r.x,r.y,r.w,r.h,0,0,r.w,r.h);
+    const sc=Math.min(1,1080/Math.max(r.w,r.h)),W=Math.round(r.w*sc/2)*2,H=Math.round(r.h*sc/2)*2;
+    let fg=null,bg=null;
+    if(aiData&&aiData.bg){const I=gUp(retPrev),F=personMatteTex(I,retPrev.width,retPrev.height),mc=gRead(F);gDel(I);gDel(F);
+      const mg=applyGeo(mc,state.geo).canvas,mm=mk(W,H);mm.x.drawImage(mg,0,0,W,H);const md=mm.x.getImageData(0,0,W,H);for(let i=0;i<md.data.length;i+=4){md.data[i+3]=md.data[i];}mm.x.putImageData(md,0,0);
+      fg=mk(W,H);fg.x.drawImage(img.c,0,0,W,H);fg.x.globalCompositeOperation="destination-in";fg.x.drawImage(mm.c,0,0);
+      const bl=gBlurCanvas((()=>{const t=mk(W,H);t.x.drawImage(img.c,0,0,W,H);return t.c;})(),Math.max(W,H)*0.03);
+      bg=mk(W,H);bg.x.drawImage(bl,0,0,W,H);const hole=mk(W,H);hole.x.drawImage(img.c,0,0,W,H);hole.x.globalCompositeOperation="destination-out";
+      hole.x.filter="none";for(const s of [1.04,1.0]){hole.x.save();hole.x.translate(W/2,H/2);hole.x.scale(s,s);hole.x.drawImage(mm.c,-W/2,-H/2);hole.x.restore();}bg.x.drawImage(hole.c,0,0);}
+    else{bg=mk(W,H);bg.x.drawImage(img.c,0,0,W,H);}
+    const out=mk(W,H),x=out.x,dur=4000,fps=30,stream=out.c.captureStream(fps);
+    const mime=["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9","video/webm"].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
+    const rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:8e6}:{}),chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+    const done=new Promise(res=>{rec.onstop=res;});
+    const frame=t=>{const e=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2,bs=1.04+0.07*e,fs=1.0+(fg?0.1:0)*e,dx=(e-0.5)*W*0.025;
+      x.clearRect(0,0,W,H);x.save();x.translate(W/2-dx*0.6,H/2);x.scale(bs,bs);x.drawImage(bg.c,-W/2,-H/2);x.restore();
+      if(fg){x.save();x.translate(W/2+dx,H/2+H*0.02*e);x.scale(fs*1.04,fs*1.04);x.drawImage(fg.c,-W/2,-H/2);x.restore();}};
+    frame(0);rec.start(200);const t0=performance.now();
+    await new Promise(res=>{const tick=()=>{const t=Math.min(1,(performance.now()-t0)/dur);frame(t<0.5?t*2:2-t*2);if(t<1)requestAnimationFrame(tick);else res();};requestAnimationFrame(tick);});
+    rec.stop();await done;stream.getTracks().forEach(t=>t.stop());
+    const type=rec.mimeType||mime||"video/webm",blob=new Blob(chunks,{type:type.split(";")[0]});
+    if(!blob.size)throw new Error("empty");window.__fx3dSize=blob.size;
+    await fxSaveBlob(blob,"iohk-3d-"+Date.now().toString().slice(-5)+(type.includes("mp4")?".mp4":".webm"));
+  }catch(err){toast("Không tạo được video 3D. Thử lại nhé.");if(window.console)console.error(err);}
+  finally{busy3D=false;if(btnEl){btnEl.disabled=false;btnEl.textContent="Tạo ảnh động 3D";}}
+}
 
 /* ---------- Tool UI ---------- */
 const TOOLS=[["flash","Flash"],["fx2","Hiệu ứng AI"],["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];
@@ -2912,7 +3053,7 @@ function setTool(t){
   if(desk&&t&&typeof dMain!=="undefined"&&dMain!=="tools"){dMain="tools";document.querySelectorAll("[data-dm]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.dm==="tools")));["presets","color","tools"].forEach(x=>$("dm-"+x).hidden=x!=="tools");}
   if(prev!==t&&$("mDrawer"))$("mDrawer").classList.remove("min");
   if(t==="flash"&&!state.ai.flash&&flashAutoStamp!==srcStamp){flashAutoStamp=srcStamp;state.ai.flash=80;retDirty=true;schedule();pushHistory();}
-  if((t==="beauty"||t==="ai"||t==="flash")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
+  if((t==="beauty"||t==="ai"||t==="flash"||t==="fx2")&&!aiData&&!aiBusy&&!aiFailed)analyzeAI(true).then(()=>{if(state.ai.level>0){setLevel(state.ai.level);retDirty=true;schedule();}});
   renderToolUI();schedule();
 }
 function setMTab(t){

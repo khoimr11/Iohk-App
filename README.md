@@ -54,3 +54,12 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 - **Hiệu ứng trend** (kiểu Prequel): Bling, Kim cương, Disco, Lăng kính, VHS, Glitch, 3D, Tim bokeh, Lóa film, Tia nắng, Lens flare, Witch light, Bụi film, Tuyết; có độ mạnh và nút Ngẫu nhiên. Ảnh xuất ra giống hệt bản xem trước.
 - **Bộ màu Trend** (16 màu): Teal, Miami, Y2K, Vintage burn, Retro 70s, Indie kid, Fairycore, Cyberpunk, Witch light, Disco, Dreamcore, VHS, Bling, Hoàng hôn, Matcha, Neo noir.
 - Phong cách, hiệu ứng và bộ màu kết hợp được với nhau, và có trong lịch sử hoàn tác.
+
+### Cập nhật 9/11 (tối) — Công cụ AI kiểu Prequel
+
+Trong “Hiệu ứng AI”, thẻ **Công cụ AI**:
+- **Làm nét AI**: tự cân sáng, khử ám màu, tăng chi tiết và độ nét (hợp ảnh tối, ảnh mờ, ảnh tải từ mạng xã hội).
+- **Đèn rọi AI** (giống Spotlight của Prequel): rọi đèn màu Trắng/Ấm/Hồng/Tím/Xanh hoặc Hai màu vào người trong ảnh, chọn hướng đèn, chỉnh độ sáng và độ tối nền.
+- **Thay trời AI**: tự tìm vùng trời, thay bằng Trời xanh, Hoàng hôn, Đêm sao hoặc Mộng mơ, chỉnh màu cảnh cho hợp; nút Đổi mây.
+- **Ảnh động 3D**: tách người khỏi nền, xuất video 4 giây có chiều sâu (MP4 hoặc WebM tuỳ trình duyệt).
+- Bảng Hiệu ứng AI chia 4 thẻ: Phong cách AI, Hiệu ứng, Công cụ AI, Màu Trend.
