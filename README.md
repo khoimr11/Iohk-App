@@ -46,3 +46,11 @@ Mở `index.html` hoặc bật GitHub Pages: **Settings → Pages → Deploy fro
 
 - **Tạo nhanh làm lại**: chọn bao nhiêu ảnh/video cũng được, chọn nhiều lần để cộng dồn hoặc kéo thả; xem trước từng file, đổi thứ tự, bỏ file, sắp theo ngày chụp; chọn nhạc ngay từ kho nhạc miễn phí; tự khớp độ dài với bài nhạc và tự lặp nhạc khi video dài hơn; báo tiến độ và bỏ qua file lỗi.
 - **Kho nhạc nhiều nguồn**: Openverse, Wikimedia Commons, Internet Archive (không cần đăng ký) và Jamendo (Client ID miễn phí) tìm song song; chỉ hiện bài được dùng thương mại và được ghép vào video (loại NC, ND).
+
+### Cập nhật 9/11 — Hiệu ứng AI (tham khảo Prequel và Instagram Restyle)
+
+- **Công cụ mới “Hiệu ứng AI”** trong chế độ Ảnh, chạy ngay trên máy, không gửi ảnh đi đâu.
+- **Phong cách AI** (giống các phong cách có sẵn của Instagram Restyle): Anime, Manga, Màu nước, Sơn dầu, Phác chì, 8-bit, Truyện tranh, Pop art, Neon, Mộng mơ; có thanh độ đậm.
+- **Hiệu ứng trend** (kiểu Prequel): Bling, Kim cương, Disco, Lăng kính, VHS, Glitch, 3D, Tim bokeh, Lóa film, Tia nắng, Lens flare, Witch light, Bụi film, Tuyết; có độ mạnh và nút Ngẫu nhiên. Ảnh xuất ra giống hệt bản xem trước.
+- **Bộ màu Trend** (16 màu): Teal, Miami, Y2K, Vintage burn, Retro 70s, Indie kid, Fairycore, Cyberpunk, Witch light, Disco, Dreamcore, VHS, Bling, Hoàng hôn, Matcha, Neo noir.
+- Phong cách, hiệu ứng và bộ màu kết hợp được với nhau, và có trong lịch sử hoàn tác.
