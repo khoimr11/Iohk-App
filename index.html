@@ -165,6 +165,9 @@ body.no-insp .insp{transform:translateX(calc(100% + 28px));opacity:0;pointer-eve
 .fxcard[aria-pressed="true"]{color:var(--fg)}
 .fxcard[aria-pressed="true"] img{border-color:var(--accent,#f2a33a)}
 .fxpanel .chips{max-height:none}
+.fxcta{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;padding:12px 14px;margin-bottom:12px;border-radius:12px;border:1px solid var(--accent);background:linear-gradient(120deg,rgba(233,180,92,.16),rgba(214,120,200,.12));color:var(--fg);cursor:pointer}
+.fxcta b{font-size:14px}.fxcta span{font-size:12px;color:var(--muted)}
+.tool.fxcta{flex-direction:row;width:auto;padding:0 12px;margin:0;color:var(--accent);font-weight:600;white-space:nowrap}
 .fxtabs{margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 .fxtabs::-webkit-scrollbar{display:none}
 .fxpanel .note{margin-bottom:14px}
@@ -1594,6 +1597,7 @@ function syncKey(k){const v=getV(k);(binds[k]||[]).forEach(b=>{if(document.activ
   if(k===mKey||k==="strength")syncBig();updateToolDots();}
 function buildDesktopGroups(){
   ["adjust","fx"].forEach(tab=>{const root=$("dt-"+tab);root.innerHTML="";
+    if(tab==="fx")root.appendChild(fxCta());
     GROUPS.filter(g=>g.tab===tab).forEach(g=>{const box=document.createElement("div");box.className="group";box.dataset.g=g.id;
       const h=document.createElement("div");h.className="ghead";const t=document.createElement("h4");t.textContent=g.title;
       const eye=document.createElement("button");eye.type="button";eye.className="eye";eye.setAttribute("aria-pressed","true");eye.setAttribute("aria-label","Tạm tắt nhóm "+g.title);eye.title="Tạm tắt nhóm để so sánh";
@@ -1632,6 +1636,7 @@ function syncDate(){const m=Math.round(state.params.date||0);dateBinds.forEach(b
 let bigInp=null,bigLabel=null,bigVal=null,mDateBox=null;
 function buildMobileTools(){
   const tools=$("mTools");tools.innerHTML="";
+  if(mTab==="fx")tools.appendChild(fxCta());
   const keys=GROUPS.filter(g=>g.tab===mTab).flatMap(g=>g.items.map(i=>i[0]));
   if(mTab==="fx")keys.push("date");
   if(!keys.includes(mKey))mKey=keys[0];
@@ -2890,6 +2895,33 @@ async function make3D(btnEl){
   }catch(err){toast("Không tạo được video 3D. Thử lại nhé.");if(window.console)console.error(err);}
   finally{busy3D=false;if(btnEl){btnEl.disabled=false;btnEl.textContent="Tạo ảnh động 3D";}}
 }
+
+function fxCta(){const b=document.createElement("button");b.type="button";b.className=desk?"fxcta":"tool fxcta";
+  b.innerHTML=desk?'<b>✦ Hiệu ứng AI</b><span>Phong cách AI, Bling, VHS, Đèn rọi, Thay trời, Ảnh động 3D…</span>':"✦ Hiệu ứng AI";
+  b.onclick=()=>{if(desk){const t=document.querySelector('[data-dm=tools]');if(t)t.click();}else{const t=document.querySelector('[data-mt=edit]');if(t)t.click();}setTool("fx2");};return b;}
+/* Trend đợt 2: các nhóm bộ lọc phổ biến trên app ảnh trend (công thức tự làm) */
+(function(){const T=(id,name,moods,desc,p)=>PRESETS.push(D(id,name,"trend",moods,desc,p));
+T("tr_polaroid","Polaroid","warm faded","Ảnh lấy liền: phai kem, vùng sáng ấm, bóng hơi xanh.",{exposure:4,contrast:-6,fade:24,temp:8,tint:-4,saturation:-10,shHue:180,shAmt:18,hiHue:45,hiAmt:16,vignette:16,grain:8});
+T("tr_90s","90s","warm grainy contrast","Ảnh film thập niên 90: đỏ vàng đậm, tương phản, hạt rõ, in ngày.",{contrast:20,temp:12,tint:4,saturation:14,hiHue:35,hiAmt:14,grain:26,grainSize:36,vignette:12,date:1});
+T("tr_35mm","Film 35mm","natural grainy","Film 35mm màu: tông tự nhiên, xanh lá hơi ngả vàng, hạt mịn.",{contrast:10,fade:8,temp:6,tint:-6,saturation:-4,shHue:170,shAmt:12,hiHue:48,hiAmt:12,grain:18,grainSize:28,halation:10});
+T("tr_blog","Blogger","pastel natural","Sáng thoáng kiểu blogger: trắng sạch, da hồng, bóng nhạt.",{exposure:10,contrast:-4,highlights:-16,shadows:14,temp:-2,tint:4,vibrance:10,hiHue:340,hiAmt:6});
+T("tr_lens","Dreamy lens","pastel atmo","Ống kính mơ màng: vùng sáng lan, viền hồng, mềm như sương.",{exposure:6,contrast:-10,highlights:-14,fade:12,tint:6,saturation:-6,hiHue:330,hiAmt:16,glow:38,bloom:34,halation:16,aberration:8});
+T("tr_lofi","Lo-fi","faded grainy","Lo-fi: màu bệt, phai, hạt to, thiếu nét như máy rẻ.",{contrast:-6,fade:30,saturation:-18,lofi:40,grain:30,grainSize:46,vignette:18});
+T("tr_grunge","Grunge","contrast faded mono","Grunge: gần đơn sắc, ám xanh rêu, bẩn và gắt.",{contrast:30,shadows:-14,fade:14,temp:-6,tint:-10,saturation:-46,shHue:120,shAmt:20,grain:34,grainSize:44,vignette:28});
+T("tr_sepia","Sepia","warm mono faded","Ảnh nâu cổ: đơn sắc nâu ấm, phai nhẹ.",{bw:100,contrast:8,fade:16,duo:60,shHue:30,shAmt:40,hiHue:42,hiAmt:30,grain:14,vignette:22});
+T("tr_golden","Golden","warm vivid","Ánh vàng óng: da vàng mật ong, vùng sáng cam vàng.",{exposure:4,contrast:10,temp:22,tint:4,vibrance:14,hiHue:38,hiAmt:30,glow:12});
+T("tr_ice","Ice","cool pastel","Băng giá: lạnh trong, trắng xanh, da sứ.",{exposure:6,contrast:6,highlights:-10,temp:-26,tint:2,saturation:-18,shHue:205,shAmt:24,hiHue:195,hiAmt:12});
+T("tr_cherry","Cherry","vivid warm","Cherry: đỏ anh đào nổi, môi má đỏ, tương phản nhẹ.",{contrast:12,tint:10,saturation:10,vibrance:18,hiHue:350,hiAmt:16,shHue:340,shAmt:12});
+T("tr_peach","Peach","pastel warm","Đào: hồng cam ngọt, sáng mềm, da mịn.",{exposure:6,contrast:-4,highlights:-10,temp:8,tint:8,saturation:-4,hiHue:20,hiAmt:20,glow:14});
+T("tr_lavender","Lavender","pastel cool","Oải hương: tím nhạt khắp ảnh, sáng và nhẹ.",{exposure:6,contrast:-6,fade:12,temp:-8,tint:16,saturation:-14,shHue:265,shAmt:24,hiHue:300,hiAmt:14});
+T("tr_moody","Moody","contrast cool","Moody: tối sâu, lạnh, ít màu, nhiều tâm trạng.",{exposure:-6,contrast:22,highlights:-14,shadows:-20,temp:-10,saturation:-24,shHue:210,shAmt:22,vignette:30,grain:10});
+T("tr_cine","Cinema","cool contrast","Điện ảnh: teal sâu ở bóng, da ấm, khung đen viền tối.",{contrast:18,shadows:-8,temp:2,saturation:-6,shHue:195,shAmt:36,hiHue:30,hiAmt:22,vignette:24,grain:8});
+T("tr_ccd","Digicam","cool vivid","Máy ảnh số nhỏ: sắc lạnh, tương phản, flash nhẹ, in ngày.",{exposure:4,contrast:20,temp:-14,saturation:8,flash:30,glow:10,grain:10,grainSize:20,date:1});
+T("tr_kodachrome","Slide film","vivid contrast","Phim dương bản: màu đặc, đỏ và xanh rất sâu, đen chắc.",{contrast:26,shadows:-10,saturation:22,vibrance:6,shHue:220,shAmt:14,hiHue:40,hiAmt:10});
+T("tr_summer","Summer","warm vivid","Mùa hè: nắng chói, nước xanh ngọc, da rám.",{exposure:6,contrast:12,temp:12,tint:-6,saturation:18,vibrance:10,shHue:185,shAmt:20,hiHue:42,hiAmt:16,bloom:10});
+T("tr_softpink","Soft pink","pastel","Hồng phấn: hồng nhẹ khắp ảnh, bóng mềm, da trắng.",{exposure:8,contrast:-8,highlights:-12,fade:10,tint:12,saturation:-8,hiHue:340,hiAmt:22,shHue:330,shAmt:14,glow:16});
+T("tr_forest","Forest","cool natural","Rừng: xanh lá đậm và mát, bóng xanh rêu.",{contrast:12,temp:-6,tint:-14,saturation:-4,shHue:150,shAmt:24,hiHue:70,hiAmt:10,vignette:16});
+})();
 
 /* ---------- Tool UI ---------- */
 const TOOLS=[["flash","Flash"],["fx2","Hiệu ứng AI"],["crop","Cắt & xoay"],["beauty","Làm đẹp"],["reshape","Nắn dáng"],["blur","Mosaic & mờ"],["draw","Vẽ"],["text","Chữ"],["sticker","Sticker"],["frame","Khung"],["ai","Nền AI"],["collage","Ghép ảnh"]];

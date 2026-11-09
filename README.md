@@ -63,3 +63,6 @@ Trong “Hiệu ứng AI”, thẻ **Công cụ AI**:
 - **Thay trời AI**: tự tìm vùng trời, thay bằng Trời xanh, Hoàng hôn, Đêm sao hoặc Mộng mơ, chỉnh màu cảnh cho hợp; nút Đổi mây.
 - **Ảnh động 3D**: tách người khỏi nền, xuất video 4 giây có chiều sâu (MP4 hoặc WebM tuỳ trình duyệt).
 - Bảng Hiệu ứng AI chia 4 thẻ: Phong cách AI, Hiệu ứng, Công cụ AI, Màu Trend.
+- Thêm 20 màu Trend: Polaroid, 90s, Film 35mm, Blogger, Dreamy lens, Lo-fi, Grunge, Sepia, Golden, Ice, Cherry, Peach, Lavender, Moody, Cinema, Digicam, Slide film, Summer, Soft pink, Forest (tổng 36).
+- Nút “✦ Hiệu ứng AI” ngay trong tab Hiệu ứng để dễ tìm.
+- App tự lấy bản mới mỗi lần mở (không dùng bản cũ trong bộ nhớ đệm trình duyệt).
