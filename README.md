@@ -66,3 +66,11 @@ Trong “Hiệu ứng AI”, thẻ **Công cụ AI**:
 - Thêm 20 màu Trend: Polaroid, 90s, Film 35mm, Blogger, Dreamy lens, Lo-fi, Grunge, Sepia, Golden, Ice, Cherry, Peach, Lavender, Moody, Cinema, Digicam, Slide film, Summer, Soft pink, Forest (tổng 36).
 - Nút “✦ Hiệu ứng AI” ngay trong tab Hiệu ứng để dễ tìm.
 - App tự lấy bản mới mỗi lần mở (không dùng bản cũ trong bộ nhớ đệm trình duyệt).
+
+### Cập nhật 9/11 — AI miễn phí chạy ngay trên máy
+
+- **Xoá vật thể** (công cụ mới): tô lên người qua đường, vật thừa, chữ… rồi bấm Xoá, AI tự vẽ lại nền phía sau. Dùng mô hình MI-GAN (giấy phép MIT).
+- **Phóng to nét AI x2 / x4** (Hiệu ứng AI → Công cụ AI): AI vẽ lại chi tiết khi phóng to, cứu ảnh mờ, ảnh nhỏ tải từ mạng xã hội. Dùng Real-ESRGAN (giấy phép BSD 3-Clause). Chạy bằng GPU, máy không có WebGL thì tự chuyển sang WASM.
+- Mô hình nằm trong thư mục `models/`, tải về trình duyệt ở lần dùng đầu (khoảng 28 MB cho Xoá vật thể, 2,5 MB cho Phóng to), sau đó lưu lại để dùng ngay. Ảnh không gửi đi đâu, không tốn phí.
+- Xoá và phóng to đều hoàn tác được.
+- “Làm nét AI” cũ đổi tên thành **Tự chỉnh AI** (cân sáng, khử ám màu, tăng chi tiết).
