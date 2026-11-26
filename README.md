@@ -74,3 +74,21 @@ Trong “Hiệu ứng AI”, thẻ **Công cụ AI**:
 - Mô hình nằm trong thư mục `models/`, tải về trình duyệt ở lần dùng đầu (khoảng 28 MB cho Xoá vật thể, 2,5 MB cho Phóng to), sau đó lưu lại để dùng ngay. Ảnh không gửi đi đâu, không tốn phí.
 - Xoá và phóng to đều hoàn tác được.
 - “Làm nét AI” cũ đổi tên thành **Tự chỉnh AI** (cân sáng, khử ám màu, tăng chi tiết).
+
+### Cập nhật 26/11 — Công cụ cho chuyến Hà Nội · Ninh Bình
+
+**Ảnh**
+- **LUT .cube**: nhập LUT từ Lightroom, Resolve hay bộ LUT tải về (Công thức → LUT màu). LUT chạy sau preset, có thanh độ mạnh, ảnh xuất giống hệt bản xem trước. LUT lưu trong trình duyệt và dùng chung với Video.
+- **Chép / dán chỉnh**: chép preset, mọi thông số và LUT của ảnh này rồi dán sang ảnh khác (Ctrl+Shift+C, Ctrl+Shift+V).
+- **Áp cho nhiều ảnh**: chọn cả loạt ảnh, app áp màu đang chỉnh, giữ độ phân giải gốc, in ngày theo ngày chụp của từng file. Máy tính tải về một file ZIP, điện thoại mở bảng chia sẻ để lưu thẳng vào Ảnh.
+- **Cỡ xuất Instagram**: 3:4 (1080×1440) hoặc 4:5 (1080×1350), cắt giữa, thu nhỏ kỹ và làm nét nhẹ.
+
+**Video Pro**
+- **Dò beat**: nhạc thêm vào được dò nhịp ngay trên máy, hiện vạch nhịp và số BPM trên track nhạc. Mép clip và đầu phát hít vào nhịp. Phím `M` đặt mốc tay, `B` / `Shift+B` nhảy tới nhịp sau / trước.
+- **Tạo nhanh → Cắt theo nhịp**: mỗi nhịp, 2 nhịp, 4 nhịp hoặc để app tự chọn, điểm cắt rơi đúng beat.
+- **LUT .cube** cho từng clip và cho lớp hiệu ứng.
+- **Khung điện ảnh**: hai thanh đen 2.39, 2.0 hoặc 1.85, có kiểu mở từ đen, khép vào, mở ra, khép rồi mở, hoặc tự đặt keyframe.
+- **Hiện lần lượt** cho bố cục nhiều ô: theo thứ tự, ngược lại, từ giữa ra, ngẫu nhiên; cách nhau theo giây hoặc theo nhịp nhạc; hiện dần, trượt lên hoặc phóng ra; tuỳ chọn ô mới sáng, ô trước tối dần. Thêm mẫu **Nền + khung nổi** (nền mờ tối, ba ô nổi xếp dọc).
+- **Chữ theo từng từ**: hiện dần, bật lên hoặc tô sáng kiểu karaoke; tự chia đều, sửa giờ từng từ, hoặc khớp theo nhịp. Mẫu **nhật ký** chữ thường, serif mảnh nghiêng. Thêm nút viết thường và hai font mảnh.
+- **Instagram**: mẫu xuất Reel 1080×1920, Carousel 3:4, Feed 4:5 (30 fps, H.264 + AAC, bitrate cao); nút **vùng an toàn** trên khung xem trước (vùng chữ Reels, khung lưới 3:4, khung feed 4:5, chỉ là ước lượng) và báo khi chữ lọt ra ngoài; **Ảnh bìa** chọn khung hình, thêm tiêu đề, lưu JPG 1080×1920 hoặc 1080×1440; xuất thêm **bản không nhạc** kèm file mốc cắt để ghép nhạc trong Instagram.
+- **Làm sạch tiếng** cho đoạn nhạc, lồng tiếng: lọc ồn và chuẩn hoá về khoảng −14 LUFS, tạo file mới nên vẫn hoàn tác được.
