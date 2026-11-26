@@ -92,3 +92,14 @@ Trong “Hiệu ứng AI”, thẻ **Công cụ AI**:
 - **Chữ theo từng từ**: hiện dần, bật lên hoặc tô sáng kiểu karaoke; tự chia đều, sửa giờ từng từ, hoặc khớp theo nhịp. Mẫu **nhật ký** chữ thường, serif mảnh nghiêng. Thêm nút viết thường và hai font mảnh.
 - **Instagram**: mẫu xuất Reel 1080×1920, Carousel 3:4, Feed 4:5 (30 fps, H.264 + AAC, bitrate cao); nút **vùng an toàn** trên khung xem trước (vùng chữ Reels, khung lưới 3:4, khung feed 4:5, chỉ là ước lượng) và báo khi chữ lọt ra ngoài; **Ảnh bìa** chọn khung hình, thêm tiêu đề, lưu JPG 1080×1920 hoặc 1080×1440; xuất thêm **bản không nhạc** kèm file mốc cắt để ghép nhạc trong Instagram.
 - **Làm sạch tiếng** cho đoạn nhạc, lồng tiếng: lọc ồn và chuẩn hoá về khoảng −14 LUFS, tạo file mới nên vẫn hoàn tác được.
+
+### Cập nhật 26/11 (tối) — Carousel liền mạch
+
+Trong chế độ Ảnh, công cụ mới **Carousel liền mạch**: một khổ dài trải qua 2–10 slide, ảnh đặt vắt qua mép slide nên lúc vuốt trên Instagram trông liền một dải.
+- Khổ 3:4 (1080×1440) hoặc 4:5 (1080×1350); nền trắng, kem, đen hoặc tự chọn màu, có tuỳ chọn vân giấy. Mép slide hiện bằng nét đứt có đánh số, phóng to thu nhỏ và cuộn ngang thoải mái.
+- Thêm nhiều ảnh một lúc hoặc kéo thả. Mỗi ảnh kéo, đổi cỡ (giữ tỉ lệ), kéo ảnh trong khung (chạm đúp), xoay nhẹ, viền trắng hoặc Polaroid, bóng đổ, đổi lớp, xoá. Hít vào mép slide, đường giữa, ảnh khác và lề 24px (giữ Alt để tắt).
+- Mẫu bố cục cho từng slide (1, 2 dọc, 2 ngang, 3, 4, 1 + 2) và mẫu **Vắt** đặt một ảnh lớn đè lên mép hai slide. Nút **Tự xếp** chia ảnh cho các slide, khoảng 2 slide có 1 ảnh vắt.
+- Chữ dùng các font sẵn có, thêm kiểu nhật ký serif mảnh nghiêng viết thường; chữ cũng vắt qua mép được.
+- Tuỳ chọn áp màu đang chỉnh (preset, LUT, thông số) cho mọi ảnh, chỉnh từ file gốc.
+- **Xem thử** trong khung điện thoại kiểu Instagram, vuốt từng slide, kèm ô lưới 3:4 của slide 1.
+- Xuất N ảnh JPG rộng đúng 1080, tên 01.jpg, 02.jpg…, vẽ từ ảnh gốc nên đường nối giữa hai slide khớp từng pixel. Máy tính tải về ZIP, điện thoại mở bảng chia sẻ. Dự án tự lưu trong trình duyệt.
