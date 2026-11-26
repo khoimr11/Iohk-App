@@ -385,6 +385,20 @@ details.fold summary::before{content:"";width:6px;height:6px;border-right:1.5px 
 details.fold[open] summary::before{transform:rotate(45deg)}
 details.fold>.tpane-in{margin-top:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* LUT, chép chỉnh, áp hàng loạt */
+.recipe .lutamt{margin-top:-4px}
+.mine button[aria-pressed="true"]{color:var(--accent)}
+.batch .bbox{width:min(720px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:20px;box-sizing:border-box}
+.batch h2{margin:0;font:600 24px/1.2 var(--font-display)}
+.batch p{margin:0;color:var(--muted);font-size:12.5px;text-align:left;max-width:none}
+.btray{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;max-height:46dvh;overflow:auto}
+.bthumb{position:relative;display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:10px;background:var(--well)}
+.bthumb img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;box-shadow:none;max-height:none}
+.bthumb span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bthumb button{position:absolute;top:10px;right:10px;font-size:11px;padding:2px 7px;border-radius:6px;background:rgba(10,10,11,.78);color:var(--fg)}
+.bthumb.ok{outline:1px solid rgba(233,180,92,.7)}
+.bthumb.err{outline:1px solid #ff8f7a}
+.batch .bmsg{color:var(--fg)}
 </style>
 </head>
 <body>
@@ -1187,7 +1201,8 @@ FAMS.push(["daily","Hằng ngày"]);
 
 /* ---------- WebGL engine ---------- */
 const glc = document.createElement("canvas");
-const gl = glc.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false});
+const GLOPT={preserveDrawingBuffer:true,alpha:false,antialias:false,premultipliedAlpha:false};
+const gl = glc.getContext("webgl2",GLOPT)||glc.getContext("webgl",GLOPT);
 const VS = "attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
 const HEAD = "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\nvarying vec2 v;float luma(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}\n";
 const FS_COLOR = HEAD+`
@@ -1279,7 +1294,7 @@ function program(fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VER
 let PR=null, maxTex=4096;
 function initGL(){
   if(!gl) throw new Error("no webgl");
-  PR={color:program(FS_COLOR),bright:program(FS_BRIGHT),blur:program(FS_BLUR),comp:program(FS_COMP)};
+  PR={color:program(FS_COLOR),bright:program(FS_BRIGHT),blur:program(FS_BLUR),comp:compProgram()};
   const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
@@ -1335,9 +1350,82 @@ function render(srcTex,W,H,e){
   gl.uniform1f(k.u.u_gsize,e.grainSize/100);gl.uniform1f(k.u.u_leak,e.leak/100);gl.uniform1f(k.u.u_aspect,W/H);
   gl.uniform1f(k.u.u_lofi,e.lofi/100);gl.uniform1f(k.u.u_chroma,e.chroma/100);
   gl.uniform1f(k.u.u_flash,fl/100);gl.uniform1f(k.u.u_glow,needGlow?gw/100:0);gl.uniform2f(k.u.u_fc,FLASH_C[0],FLASH_C[1]);
-  gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);
+  gl.uniform1f(k.u.u_seed,seed);gl.uniform2f(k.u.u_res,W,H);lutBind(k,e);
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 }
+
+/* ---------- LUT .cube: parse, store (IndexedDB, chung cho Ảnh và Video), áp ở cuối pipeline ----------
+   WebGL2: LUT là texture 3D (RGB16F, nội suy ba chiều trên GPU). WebGL1: LUT xếp ô thành texture 2D, nội suy tay theo kênh xanh dương. */
+const LUT3D=typeof WebGL2RenderingContext!=="undefined"&&gl instanceof WebGL2RenderingContext;
+let lutUse3D=LUT3D;
+const LUT_DECL3=`precision highp sampler3D;uniform sampler3D u_lut3;uniform float u_lutAmt;uniform vec3 u_lutMin,u_lutMax;
+vec3 lutApply(vec3 c){vec3 x=clamp((c-u_lutMin)/max(u_lutMax-u_lutMin,vec3(1e-5)),0.0,1.0);float N=float(textureSize(u_lut3,0).x);return texture2D(u_lut3,(x*(N-1.0)+0.5)/N).rgb;}
+`;
+const LUT_DECL2=`uniform sampler2D u_lut2;uniform float u_lutAmt,u_lutN,u_lutCols;uniform vec2 u_lutSz;uniform vec3 u_lutMin,u_lutMax;
+vec3 lutTap(vec2 rg,float b){float row=floor((b+0.5)/u_lutCols);vec2 tile=vec2(b-row*u_lutCols,row);return texture2D(u_lut2,(tile*u_lutN+rg+0.5)/u_lutSz).rgb;}
+vec3 lutApply(vec3 c){vec3 x=clamp((c-u_lutMin)/max(u_lutMax-u_lutMin,vec3(1e-5)),0.0,1.0);vec3 s=x*(u_lutN-1.0);float b0=floor(s.b);float b1=min(b0+1.0,u_lutN-1.0);return mix(lutTap(s.rg,b0),lutTap(s.rg,b1),s.b-b0);}
+`;
+function compSource(decl){return FS_COMP.replace("void main(){",decl+"void main(){").replace("  float r=length((v-0.5)*vec2(u_aspect,1.0))","  if(u_lutAmt>0.001)c=mix(c,lutApply(clamp(c,0.0,1.0)),u_lutAmt);\n  float r=length((v-0.5)*vec2(u_aspect,1.0))");}
+const VS300="#version 300 es\nin vec2 p;out vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
+function to300(fs){return "#version 300 es\n"+fs.replace("varying vec2 v;","in vec2 v;out vec4 o_fc;").replace(/texture2D\(/g,"texture(").replace(/gl_FragColor/g,"o_fc");}
+function program300(fs){const p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,VS300));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,to300(fs)));
+  gl.bindAttribLocation(p,0,"p");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));
+  const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}return {p,u};}
+function compProgram(){if(lutUse3D){try{return program300(compSource(LUT_DECL3));}catch(err){lutUse3D=false;if(window.console)console.warn("LUT 3D không dùng được, chuyển sang 2D",err);}}
+  return program(compSource(LUT_DECL2));}
+const LUTS=new Map();let lutDummyT=null,lutVer=0;const lutHooks=[];
+function lutDummy(){if(lutDummyT)return lutDummyT;const t=gl.createTexture();
+  if(lutUse3D){gl.bindTexture(gl.TEXTURE_3D,t);gl.texImage3D(gl.TEXTURE_3D,0,gl.RGBA8,1,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);}
+  else{gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);}
+  return lutDummyT=t;}
+function lutUpload(L){const N=L.n,d=L.data,t=gl.createTexture();gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  if(lutUse3D){gl.bindTexture(gl.TEXTURE_3D,t);gl.pixelStorei(gl.UNPACK_ALIGNMENT,1);gl.texImage3D(gl.TEXTURE_3D,0,gl.RGB16F,N,N,N,0,gl.RGB,gl.FLOAT,d);gl.pixelStorei(gl.UNPACK_ALIGNMENT,4);
+    [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T,gl.TEXTURE_WRAP_R].forEach(w=>gl.texParameteri(gl.TEXTURE_3D,w,gl.CLAMP_TO_EDGE));gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);}
+  else{const cols=Math.ceil(Math.sqrt(N)),rows=Math.ceil(N/cols),tw=N*cols,th=N*rows,px=new Uint8Array(tw*th*4);
+    for(let b=0;b<N;b++){const ox=(b%cols)*N,oy=Math.floor(b/cols)*N;for(let g=0;g<N;g++)for(let r=0;r<N;r++){const s=(r+g*N+b*N*N)*3,o=((oy+g)*tw+ox+r)*4;
+      px[o]=Math.round(Math.max(0,Math.min(1,d[s]))*255);px[o+1]=Math.round(Math.max(0,Math.min(1,d[s+1]))*255);px[o+2]=Math.round(Math.max(0,Math.min(1,d[s+2]))*255);px[o+3]=255;}}
+    gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,tw,th,0,gl.RGBA,gl.UNSIGNED_BYTE,px);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    L.cols=cols;L.tw=tw;L.th=th;}
+  L.tex=t;return t;}
+function lutGet(id){const L=id?LUTS.get(id):null;if(L&&!L.tex)lutUpload(L);return L||null;}
+function lutBind(k,e){const L=e&&e.lutId?lutGet(e.lutId):null,amt=L?Math.max(0,Math.min(1,(e.lutAmt==null?100:e.lutAmt)/100)):0;
+  gl.uniform1f(k.u.u_lutAmt,amt);gl.activeTexture(gl.TEXTURE2);
+  if(lutUse3D){gl.bindTexture(gl.TEXTURE_3D,amt?L.tex:lutDummy());gl.uniform1i(k.u.u_lut3,2);}
+  else{gl.bindTexture(gl.TEXTURE_2D,amt?L.tex:lutDummy());gl.uniform1i(k.u.u_lut2,2);gl.uniform1f(k.u.u_lutN,L?L.n:2);gl.uniform1f(k.u.u_lutCols,L?L.cols:1);gl.uniform2f(k.u.u_lutSz,L?L.tw:1,L?L.th:1);}
+  gl.uniform3fv(k.u.u_lutMin,L?L.dmin:[0,0,0]);gl.uniform3fv(k.u.u_lutMax,L?L.dmax:[1,1,1]);gl.activeTexture(gl.TEXTURE0);}
+/* .cube text → {name,n,data:Float32Array(rgb, r nhanh nhất),dmin,dmax}. Hỗ trợ LUT_3D_SIZE, LUT_1D_SIZE (đổi sang 3D), DOMAIN_MIN/MAX, LUT_3D_INPUT_RANGE. */
+function parseCube(text,fname){let title="",n3=0,n1=0,dmin=[0,0,0],dmax=[1,1,1];const vals=[];
+  const lines=String(text).split(/\r?\n/);
+  for(let raw of lines){const ln=raw.trim();if(!ln||ln[0]==="#")continue;const c=ln.charCodeAt(0);
+    if((c>=48&&c<=57)||c===45||c===46||c===43){const p=ln.split(/\s+/);if(p.length<3)continue;vals.push(+p[0],+p[1],+p[2]);continue;}
+    const p=ln.split(/\s+/),key=p[0].toUpperCase();
+    if(key==="TITLE")title=ln.slice(5).trim().replace(/^"|"$/g,"");else if(key==="LUT_3D_SIZE")n3=parseInt(p[1],10);else if(key==="LUT_1D_SIZE")n1=parseInt(p[1],10);
+    else if(key==="DOMAIN_MIN")dmin=[+p[1],+p[2],+p[3]];else if(key==="DOMAIN_MAX")dmax=[+p[1],+p[2],+p[3]];
+    else if(key==="LUT_3D_INPUT_RANGE"||key==="LUT_1D_INPUT_RANGE"){dmin=[+p[1],+p[1],+p[1]];dmax=[+p[2],+p[2],+p[2]];}}
+  if(dmin.some(x=>!isFinite(x))||dmax.some(x=>!isFinite(x)))throw new Error("Khoảng DOMAIN không hợp lệ");
+  for(let i=0;i<3;i++)if(!(dmax[i]>dmin[i]))throw new Error("DOMAIN_MAX phải lớn hơn DOMAIN_MIN");
+  let n,data;
+  if(n3){if(n3<2||n3>129)throw new Error("Kích thước LUT "+n3+" chưa hỗ trợ (2–129)");if(vals.length<n3*n3*n3*3)throw new Error("File thiếu dữ liệu: cần "+n3*n3*n3+" dòng màu");n=n3;data=new Float32Array(vals.slice(0,n*n*n*3));}
+  else if(n1){if(n1<2||n1>65536||vals.length<n1*3)throw new Error("LUT 1D thiếu dữ liệu");n=33;data=new Float32Array(n*n*n*3);
+    const f=(ch,x)=>{const s=x*(n1-1),i=Math.min(n1-2,Math.floor(s)),t=s-i;return vals[i*3+ch]*(1-t)+vals[(i+1)*3+ch]*t;};
+    for(let b=0;b<n;b++)for(let g=0;g<n;g++)for(let r=0;r<n;r++){const o=(r+g*n+b*n*n)*3;data[o]=f(0,r/(n-1));data[o+1]=f(1,g/(n-1));data[o+2]=f(2,b/(n-1));}}
+  else throw new Error("Không thấy LUT_3D_SIZE trong file");
+  for(let i=0;i<data.length;i++)if(!isFinite(data[i]))throw new Error("File có giá trị màu lỗi");
+  const name=(title||String(fname||"LUT").replace(/\.cube$/i,"")).slice(0,40);
+  return {name,n,data,dmin,dmax};}
+const lutStore=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{if(!window.indexedDB){rej(new Error("no idb"));return;}const r=indexedDB.open("iohk-luts",1);
+    r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains("luts"))d.createObjectStore("luts",{keyPath:"id"});};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));
+  const tx=(mode,fn)=>open().then(d=>new Promise((res,rej)=>{const t=d.transaction("luts",mode),s=t.objectStore("luts"),q=fn(s);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);}));
+  return {all:()=>tx("readonly",s=>s.getAll()),put:o=>tx("readwrite",s=>s.put(o)),del:id=>tx("readwrite",s=>s.delete(id))};})();
+function lutChanged(){lutVer++;lutHooks.forEach(f=>{try{f();}catch(e){}});}
+function lutList(){return [...LUTS.values()].sort((a,b)=>a.added-b.added);}
+const lutLoaded=lutStore.all().then(rows=>{(rows||[]).forEach(o=>{if(o&&o.id&&o.data&&!LUTS.has(o.id))LUTS.set(o.id,{id:o.id,name:o.name,n:o.n,data:o.data instanceof Float32Array?o.data:new Float32Array(o.data),dmin:o.dmin,dmax:o.dmax,added:o.added||0,tex:null});});lutChanged();}).catch(()=>{});
+async function lutImport(file){const txt=await file.text();const o=parseCube(txt,file.name);o.id="lut"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);o.added=Date.now();
+  LUTS.set(o.id,Object.assign({tex:null},o));try{await lutStore.put({id:o.id,name:o.name,n:o.n,data:o.data,dmin:o.dmin,dmax:o.dmax,added:o.added});}catch(e){}lutChanged();return LUTS.get(o.id);}
+async function lutRemove(id){const L=LUTS.get(id);if(L&&L.tex)gl.deleteTexture(L.tex);LUTS.delete(id);try{await lutStore.del(id);}catch(e){}lutChanged();}
+function lutPick(){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept=".cube,.CUBE,text/plain";i.style.cssText="position:fixed;left:-99px;opacity:0";document.body.appendChild(i);
+  i.onchange=()=>{const f=i.files&&i.files[0];i.remove();res(f||null);};i.click();});}
 
 /* ---------- App ---------- */
 const $=id=>document.getElementById(id);
@@ -1370,7 +1458,7 @@ function effective(st,useDis){const s=st.strength/100,e={};
   for(const k in NEUTRAL){const v=st.params[k]==null?NEUTRAL[k]:st.params[k];e[k]=NOSCALE.has(k)?v:NEUTRAL[k]+(v-NEUTRAL[k])*s;}
   if(useDis)disabled.forEach(g=>GMAP[g].forEach(k=>{e[k]=NEUTRAL[k];}));
   if(useDis&&disabled.has("split"))e.duo=0;
-  e.mix=(st.mix||Z9).map(x=>x*s);return e;}
+  e.mix=(st.mix||Z9).map(x=>x*s);e.lutId=st.lut&&st.lut.id||null;e.lutAmt=st.lut?st.lut.amt:100;return e;}
 
 /* ---------- Images ---------- */
 let fullSrc=null,prevSrc=null,thumbSrc=null,prevTex=null,thumbTex=null,isSample=true;
@@ -1454,7 +1542,7 @@ function drawStamp(ctx,w,h,mode){
     ctx.fillText(txt,w-fs*1.6,h-fs*1.1);ctx.shadowBlur=fs*0.15;ctx.fillText(txt,w-fs*1.6,h-fs*1.1);}
   ctx.restore();
 }
-function hoverState(){const p=findPreset(hoverId);return {strength:100,params:p.params,mix:p.mix};}
+function hoverState(){const p=findPreset(hoverId);return {strength:100,params:p.params,mix:p.mix,lut:state.lut};}
 function draw(){
   queued=false;if(!prevTex)return;
   const W=view.width,H=view.height;
@@ -2075,25 +2163,25 @@ async function exportImage(){
     composeTo(out.x,glc,W,H,fr,{date:e.date,overlays:true,preview:false,cutout:cut});
     draw();
     const png=!!cut&&fr.f==="none",mime=png?"image/png":"image/jpeg";
-    const blob=await new Promise(r=>out.c.toBlob(r,mime,0.96));if(!blob)throw new Error("encode");
+    const oc=igOut(out.c);const blob=await new Promise(r=>oc.toBlob(r,mime,0.96));if(!blob)throw new Error("encode");
     const name="iohk-"+norm(findPreset(state.presetId).name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Date.now().toString().slice(-5)+(png?".png":".jpg");
     const dl=await getDownloads();
-    if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+fr.OW+"×"+fr.OH);}catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}return;}
+    if(dl){try{await dl.save({filename:name,data:blob});toast("Đã lưu ảnh "+oc.width+"×"+oc.height);}catch(err){if(err&&err.code==="declined")toast("Đã huỷ lưu ảnh");else showOverlay(blob);}return;}
     const file=new File([blob],name,{type:mime});
     if(!desk&&navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file]});toast("Đã mở bảng chia sẻ. Chọn “Lưu hình ảnh”.");}catch(err){if(err&&err.name==="AbortError")toast("Đã huỷ");else showOverlay(blob);}return;}
     const a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);
-    if(/iPhone|iPad|iPod/.test(navigator.userAgent))showOverlay(blob);else toast("Đã lưu ảnh "+fr.OW+"×"+fr.OH);
+    if(/iPhone|iPad|iPod/.test(navigator.userAgent))showOverlay(blob);else toast("Đã lưu ảnh "+oc.width+"×"+oc.height);
   }catch(err){toast("Không xuất được ảnh. Thử lại với ảnh nhỏ hơn.");if(window.console)console.error(err);draw();}
   finally{saving=false;["tSave","mSave"].forEach(i=>{$(i).disabled=false;});}
 }
 
 /* ---------- History ---------- */
-function snap(){return JSON.stringify({presetId:state.presetId,strength:state.strength,params:state.params,mix:state.mix,geo:state.geo,opsLen:state.opsLen,overlays:state.overlays,frame:state.frame,ai:state.ai,fx2:state.fx2,srcV:state.srcV});}
+function snap(){return JSON.stringify({presetId:state.presetId,strength:state.strength,params:state.params,mix:state.mix,geo:state.geo,opsLen:state.opsLen,overlays:state.overlays,frame:state.frame,ai:state.ai,fx2:state.fx2,srcV:state.srcV,lut:state.lut});}
 function restore(i){
   const o=JSON.parse(history[i]),oo=state.opsLen,oa=JSON.stringify(state.ai),og=JSON.stringify(state.geo),ok=rsKey();
   state.presetId=o.presetId;state.strength=o.strength;state.params=o.params;state.mix=o.mix;
-  state.geo=o.geo||Object.assign({},GEO0);state.opsLen=o.opsLen||0;state.overlays=o.overlays||[];state.frame=o.frame||"none";state.ai=o.ai||Object.assign({},AI0);state.fx2=Object.assign({},FX0,o.fx2||{});
+  state.lut=o.lut||{id:null,amt:100};if(typeof lutUI==="function")lutUI();state.geo=o.geo||Object.assign({},GEO0);state.opsLen=o.opsLen||0;state.overlays=o.overlays||[];state.frame=o.frame||"none";state.ai=o.ai||Object.assign({},AI0);state.fx2=Object.assign({},FX0,o.fx2||{});
   {const sv=o.srcV||0;if(sv!==state.srcV&&SRCS[sv]){state.srcV=sv;swapSource(SRCS[sv]);}}
   if(state.opsLen!==oo||JSON.stringify(state.ai)!==oa||rsKey()!==ok)retDirty=true;if(JSON.stringify(state.geo)!==og){geoDirty=true;if(tool==="crop")cropDraft=state.geo.crop?Object.assign({},state.geo.crop):{x:0,y:0,w:1,h:1};}
   if(selId&&!state.overlays.some(o=>o.id===selId))selId=null;
@@ -3316,6 +3404,111 @@ function drawCollageUI(){
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cmodal&&!cmodal.hidden)cmodal.hidden=true;});
 (mq.addEventListener?mq.addEventListener("change",()=>renderToolUI()):mq.addListener(()=>renderToolUI()));
+
+
+/* ---------- LUT, chép / dán chỉnh, áp hàng loạt, cỡ xuất Instagram ---------- */
+if(!state.lut)state.lut={id:null,amt:100};
+const LOOK_KEY="iohk.copyLook",IGSZ_KEY="iohk.igSize";
+let igSize=store.get(IGSZ_KEY)||"orig";
+const IG_SIZES=[["orig","Giữ gốc",0,0],["p34","3:4 · 1080×1440",1080,1440],["p45","4:5 · 1080×1350",1080,1350]];
+function lookNow(){return {presetId:state.presetId,strength:state.strength,params:Object.assign({},state.params),mix:state.mix.slice(),lut:Object.assign({},state.lut)};}
+function applyLook(o){if(!o||!o.params)return false;state.presetId=o.presetId&&allPresets().some(p=>p.id===o.presetId)?o.presetId:state.presetId;state.strength=isFinite(o.strength)?o.strength:100;
+  state.params=Object.assign({},NEUTRAL,o.params);state.mix=Array.isArray(o.mix)&&o.mix.length===9?o.mix.slice():Z9.slice();
+  state.lut=o.lut&&o.lut.id&&LUTS.has(o.lut.id)?{id:o.lut.id,amt:isFinite(o.lut.amt)?o.lut.amt:100}:{id:null,amt:state.lut.amt};
+  document.querySelectorAll(".tile").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.id===state.presetId)));syncAll();pushHistory();schedule();lutUI();return true;}
+function copyLook(){store.set(LOOK_KEY,JSON.stringify(lookNow()));lookUI();toast("Đã chép chỉnh của ảnh này. Mở ảnh khác rồi bấm Dán chỉnh.");}
+function pasteLook(){let o=null;try{o=JSON.parse(store.get(LOOK_KEY)||"null");}catch(e){}if(!applyLook(o)){toast("Chưa chép chỉnh nào");return;}
+  toast(o.lut&&o.lut.id&&!LUTS.has(o.lut.id)?"Đã dán chỉnh. LUT gốc đã bị xoá nên bỏ qua.":"Đã dán chỉnh");}
+/* Ảnh xuất cho Instagram: cắt giữa đúng tỉ lệ, thu về rộng 1080 (thu nửa từng bước + nội suy chất lượng cao), làm nét nhẹ */
+function igOut(src){const s=IG_SIZES.find(x=>x[0]===igSize);if(!s||!s[2])return src;const TW=s[2],TH=s[3],r=TW/TH;
+  let sw=src.width,sh=src.height,sx=0,sy=0;if(sw/sh>r){const w=Math.round(sh*r);sx=Math.round((sw-w)/2);sw=w;}else{const h=Math.round(sw/r);sy=Math.round((sh-h)/2);sh=h;}
+  let cur=document.createElement("canvas");cur.width=sw;cur.height=sh;cur.getContext("2d").drawImage(src,sx,sy,sw,sh,0,0,sw,sh);
+  while(cur.width/2>=TW){const c=document.createElement("canvas");c.width=Math.round(cur.width/2);c.height=Math.round(cur.height/2);const x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(cur,0,0,c.width,c.height);cur=c;}
+  const out=document.createElement("canvas");out.width=TW;out.height=TH;const o=out.getContext("2d",{willReadFrequently:true});o.imageSmoothingQuality="high";o.drawImage(cur,0,0,TW,TH);
+  const bl=document.createElement("canvas");bl.width=TW;bl.height=TH;const b=bl.getContext("2d",{willReadFrequently:true});b.filter="blur(0.9px)";b.drawImage(out,0,0);
+  const A=o.getImageData(0,0,TW,TH),B=b.getImageData(0,0,TW,TH).data,d=A.data,k=0.45;
+  for(let i=0;i<d.length;i+=4){for(let c=0;c<3;c++){const v=d[i+c],df=v-B[i+c];if(df>2||df<-2)d[i+c]=v+k*df;}}o.putImageData(A,0,0);return out;}
+function lutUI(){const box=$("lutList");if(!box)return;box.innerHTML="";const L=lutList();
+  if(!L.length){box.appendChild(el("p",null,"Chưa có LUT nào. Bấm Nhập file .cube để thêm."));}
+  L.forEach(l=>{const r=el("div","mine"),n=el("span",null,l.name+" · "+l.n+"³"),on=state.lut.id===l.id;
+    const use=el("button",null,on?"Đang dùng":"Dùng");use.type="button";use.setAttribute("aria-pressed",String(on));
+    use.onclick=()=>{state.lut={id:on?null:l.id,amt:state.lut.amt||100};pushHistory();schedule();lutUI();};
+    const del=el("button",null,"Xoá");del.type="button";del.onclick=()=>{if(!del.classList.contains("warn")){del.classList.add("warn");del.textContent="Bấm lần nữa để xoá";setTimeout(()=>{del.classList.remove("warn");del.textContent="Xoá";},2600);return;}
+      if(state.lut.id===l.id)state.lut={id:null,amt:state.lut.amt};lutRemove(l.id).then(()=>schedule());};
+    r.append(n,use,del);box.appendChild(r);});
+  const rw=$("lutAmtRow");if(rw){rw.hidden=!state.lut.id;$("lutAmt").value=state.lut.amt;$("lutAmtV").textContent=Math.round(state.lut.amt)+"%";}}
+function lookUI(){const b=$("lookPaste");if(b)b.disabled=!store.get(LOOK_KEY);}
+(function buildRecipeExtras(){const rec=$("recipe");if(!rec)return;const first=rec.firstElementChild;
+  const add=(tag,cls,txt)=>{const e=el(tag,cls,txt);rec.insertBefore(e,first);return e;};
+  add("h3",null,"LUT màu (.cube)");add("p",null,"Nhập LUT từ Lightroom, Resolve hoặc bộ LUT tải về. LUT chạy sau preset và có trong ảnh xuất. LUT đã nhập dùng được cả bên Video.");
+  const ll=add("div","minelist");ll.id="lutList";
+  const ar=add("div","row lutamt");ar.id="lutAmtRow";ar.hidden=true;const al=el("label",null,"Độ mạnh LUT");al.htmlFor="lutAmt";const av=el("span","val num");av.id="lutAmtV";
+  const ai=document.createElement("input");ai.type="range";ai.min=0;ai.max=100;ai.step=1;ai.id="lutAmt";ai.value=100;ar.append(al,av,ai);
+  ai.addEventListener("input",()=>{state.lut.amt=+ai.value;av.textContent=ai.value+"%";schedule();});ai.addEventListener("change",()=>pushHistory());
+  const ib=add("div","inline"),lb=el("button","tbtn","Nhập file .cube");lb.type="button";lb.id="lutAdd";ib.appendChild(lb);
+  lb.onclick=async()=>{const f=await lutPick();if(!f)return;try{const L=await lutImport(f);state.lut={id:L.id,amt:100};pushHistory();schedule();lutUI();toast("Đã thêm LUT “"+L.name+"”");}catch(err){toast(err&&err.message?err.message:"File .cube không đọc được");}};
+  add("h3",null,"Chép chỉnh sang ảnh khác");add("p",null,"Chép preset, mọi thông số và LUT của ảnh này để dán vào ảnh khác. Phím tắt Ctrl+Shift+C và Ctrl+Shift+V.");
+  const cr=add("div","inline"),cb=el("button","tbtn","Sao chép chỉnh"),pb=el("button","tbtn","Dán chỉnh");cb.type=pb.type="button";cb.id="lookCopy";pb.id="lookPaste";cb.onclick=copyLook;pb.onclick=pasteLook;cr.append(cb,pb);
+  const br=add("div","inline"),bb=el("button","tbtn primary","Áp cho nhiều ảnh…");bb.type="button";bb.id="batchOpen";bb.onclick=openBatch;br.appendChild(bb);
+  add("h3",null,"Cỡ ảnh xuất");add("p",null,"Chọn 3:4 hoặc 4:5 để app cắt giữa, thu về rộng 1080 và làm nét nhẹ cho Instagram. Áp cho cả nút Lưu ảnh và xuất hàng loạt.");
+  const sr=add("div","inline igsz");sr.setAttribute("role","group");sr.setAttribute("aria-label","Cỡ ảnh xuất");
+  IG_SIZES.forEach(s=>{const b=el("button","tbtn",s[1]);b.type="button";b.dataset.ig=s[0];b.setAttribute("aria-pressed",String(igSize===s[0]));b.onclick=()=>{igSize=s[0];store.set(IGSZ_KEY,igSize);sr.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));};sr.appendChild(b);});
+  add("h3",null,"Công thức của tôi");
+  lutHooks.push(()=>{if(state.lut.id&&!LUTS.has(state.lut.id))state.lut={id:null,amt:state.lut.amt};lutUI();schedule();});lutUI();lookUI();
+  document.addEventListener("keydown",e=>{const tg=e.target;if(tg&&(tg.tagName==="INPUT"&&tg.type!=="range"||tg.tagName==="TEXTAREA"))return;
+    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="c"){e.preventDefault();copyLook();}else if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="v"){e.preventDefault();pasteLook();}},true);
+})();
+/* ZIP (không nén, ảnh JPG vốn đã nén) */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=CRC_T[(c^u8[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+async function makeZip(files){const parts=[],cen=[];let off=0;const enc=new TextEncoder(),d=new Date(),dt=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xFFFF,dd=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF;
+  for(const f of files){const data=new Uint8Array(await f.blob.arrayBuffer()),nm=enc.encode(f.name),crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,0,true);h.setUint16(10,dt,true);h.setUint16(12,dd,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nm.length,true);h.setUint16(28,0,true);
+    parts.push(h.buffer,nm,data);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(10,0,true);c.setUint16(12,dt,true);c.setUint16(14,dd,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    cen.push(c.buffer,nm);off+=30+nm.length+data.length;}
+  const csz=cen.reduce((a,b)=>a+(b.byteLength||b.length),0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,csz,true);e.setUint32(16,off,true);
+  return new Blob(parts.concat(cen,[e.buffer]),{type:"application/zip"});}
+/* Áp hàng loạt: màu (preset, thông số, LUT) + in ngày theo ngày của từng file; giữ độ phân giải gốc */
+const BT={files:[],busy:false,out:[]};
+async function decodeAny(f){try{if(window.createImageBitmap)return await createImageBitmap(f,{imageOrientation:"from-image"});}catch(e){}
+  return await new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im);};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("decode"));};im.src=u;});}
+async function batchRender(f,e){const bm=await decodeAny(f),w0=bm.width||bm.naturalWidth,h0=bm.height||bm.naturalHeight,k=Math.min(1,maxTex/Math.max(w0,h0)),W=Math.max(1,Math.round(w0*k)),H=Math.max(1,Math.round(h0*k));
+  const c=document.createElement("canvas");c.width=W;c.height=H;c.getContext("2d").drawImage(bm,0,0,W,H);if(bm.close)bm.close();
+  const tex=makeTex(0,0,c);render(tex,W,H,e);gl.deleteTexture(tex);const x=c.getContext("2d");x.drawImage(glc,0,0);
+  if(e.date>0.5){const sd=state.dateISO,st=state.timeStr,d=new Date(f.lastModified||Date.now());state.dateISO=d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());state.timeStr=pad2(d.getHours())+":"+pad2(d.getMinutes());try{drawStamp(x,W,H,e.date);}finally{state.dateISO=sd;state.timeStr=st;}}
+  const oc=igOut(c),blob=await new Promise(r=>oc.toBlob(r,"image/jpeg",0.95));if(!blob)throw new Error("encode");return {blob,w:oc.width,h:oc.height,scaled:k<1};}
+let bmodal=null;
+function openBatch(){if(!bmodal){bmodal=el("div","overlay batch");bmodal.id="batch";bmodal.hidden=true;bmodal.setAttribute("role","dialog");bmodal.setAttribute("aria-label","Áp cho nhiều ảnh");document.body.appendChild(bmodal);}
+  BT.files=[];BT.out=[];renderBatch();bmodal.hidden=false;if(!desk)closeSheet();}
+function renderBatch(msg){const m=bmodal;m.innerHTML="";const box=el("div","bbox glass");m.appendChild(box);
+  box.appendChild(el("h2",null,"Áp cho nhiều ảnh"));
+  box.appendChild(el("p",null,"Áp màu đang chỉnh (preset “"+findPreset(state.presetId).name+"”"+(state.lut.id&&LUTS.has(state.lut.id)?", LUT “"+LUTS.get(state.lut.id).name+"”":"")+", mọi thông số, in ngày) cho cả loạt ảnh. Giữ độ phân giải gốc. Cắt khung, làm đẹp, chữ và sticker không áp theo."));
+  const tray=el("div","btray");BT.files.forEach((f,i)=>{const t=el("div","bthumb");const im=document.createElement("img");im.alt="";im.src=f._u||(f._u=URL.createObjectURL(f));const n=el("span",null,f.name);
+    const st=BT.out[i];if(st)t.classList.add(st.err?"err":"ok");const x=el("button",null,"Bỏ");x.type="button";x.setAttribute("aria-label","Bỏ "+f.name);x.onclick=()=>{BT.files.splice(i,1);BT.out=[];renderBatch();};t.append(im,n);if(!BT.busy)t.appendChild(x);tray.appendChild(t);});
+  if(!BT.files.length)tray.appendChild(el("p",null,"Chưa chọn ảnh nào."));box.appendChild(tray);
+  const pick=el("button","tbtn",BT.files.length?"Thêm ảnh":"Chọn ảnh");pick.type="button";pick.disabled=BT.busy;pick.onclick=()=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.multiple=true;i.onchange=()=>{BT.files=BT.files.concat([...i.files]);BT.out=[];renderBatch();};i.click();};
+  const go=el("button","tbtn primary",BT.busy?"Đang xuất…":"Xuất "+BT.files.length+" ảnh");go.type="button";go.id="batchGo";go.disabled=BT.busy||!BT.files.length;go.onclick=runBatch;
+  const close=el("button","tbtn","Đóng");close.type="button";close.disabled=BT.busy;close.onclick=()=>{BT.files.forEach(f=>{if(f._u)URL.revokeObjectURL(f._u);});BT.files=[];m.hidden=true;};
+  const r=el("div","inline");r.append(pick,go,close);box.appendChild(r);
+  const s=IG_SIZES.find(x=>x[0]===igSize);box.appendChild(el("p","bmsg",msg||("Cỡ xuất: "+(s?s[1]:"Giữ gốc")+". "+(desk?"Trên máy tính, ảnh gom vào một file ZIP.":"Trên điện thoại, app mở bảng chia sẻ để lưu cả loạt vào Ảnh."))));}
+async function runBatch(){if(BT.busy||!BT.files.length)return;BT.busy=true;BT.out=[];const e=effective(state,true),done=[];let fail=0;
+  try{try{await document.fonts.ready;}catch(x){}
+    for(let i=0;i<BT.files.length;i++){renderBatch("Đang xử lý "+(i+1)+" / "+BT.files.length+"…");await new Promise(r=>setTimeout(r,20));const f=BT.files[i];
+      try{const r=await batchRender(f,e);const base=f.name.replace(/\.[^.]+$/,"").replace(/[\\/:*?"<>|]+/g,"-")||"anh";r.name=String(i+1).padStart(2,"0")+"_"+base+"_iohk.jpg";done.push(r);BT.out[i]={ok:true};}
+      catch(err){fail++;BT.out[i]={err:true};if(window.console)console.warn(err);}}
+    draw();
+    if(!done.length){renderBatch("Không xử lý được ảnh nào. Thử ảnh JPG hoặc PNG.");return;}
+    window.__batchOut=done;
+    const files=done.map(d=>new File([d.blob],d.name,{type:"image/jpeg"}));let shared=false;
+    if(!desk&&navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files});shared=true;}catch(err){if(err&&err.name==="AbortError")shared=true;}}
+    if(!shared){const zip=await makeZip(done);window.__batchZip=zip;const name="iohk-"+done.length+"-anh-"+Date.now().toString().slice(-5)+".zip";const dl=await getDownloads();
+      if(dl){try{await dl.save({filename:name,data:zip});}catch(err){}}else{const a=document.createElement("a"),u=URL.createObjectURL(zip);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);}}
+    BT.busy=false;renderBatch("Xong "+done.length+" ảnh"+(fail?", lỗi "+fail+" ảnh":"")+(done.some(d=>d.scaled)?". Ảnh lớn hơn giới hạn GPU ("+maxTex+"px) được thu nhỏ vừa giới hạn.":"."));}
+  finally{BT.busy=false;}}
+if(window.__TPDEBUG){Object.assign(window.__TPDEBUG,{lutImportText:(t,n)=>lutImport(new File([t],n||"test.cube")),lutState:()=>state.lut,setLut:(id,amt)=>{state.lut={id,amt:amt==null?100:amt};schedule();lutUI();},lutMode:()=>lutUse3D?"3d":"2d",
+  copyLook,pasteLook,lookNow,applyLook,openBatch,addBatchFiles:fs=>{BT.files=BT.files.concat(fs);renderBatch();},runBatch,batchOut:()=>window.__batchOut,batchZip:()=>window.__batchZip,setIg:v=>{igSize=v;},igOut,
+  renderAt:(W,H)=>{const e=effective(state,true);const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");const g=x.createLinearGradient(0,0,W,0);g.addColorStop(0,"#000");g.addColorStop(1,"#fff");x.fillStyle=g;x.fillRect(0,0,W,H);const t=makeTex(0,0,c);render(t,W,H,e);gl.deleteTexture(t);x.drawImage(glc,0,0);return x.getImageData(0,0,W,H).data;}});}
 
 /* ---------- Boot ---------- */
 try{
