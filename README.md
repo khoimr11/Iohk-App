@@ -103,3 +103,49 @@ Trong chế độ Ảnh, công cụ mới **Carousel liền mạch**: một kh�
 - Tuỳ chọn áp màu đang chỉnh (preset, LUT, thông số) cho mọi ảnh, chỉnh từ file gốc.
 - **Xem thử** trong khung điện thoại kiểu Instagram, vuốt từng slide, kèm ô lưới 3:4 của slide 1.
 - Xuất N ảnh JPG rộng đúng 1080, tên 01.jpg, 02.jpg…, vẽ từ ảnh gốc nên đường nối giữa hai slide khớp từng pixel. Máy tính tải về ZIP, điện thoại mở bảng chia sẻ. Dự án tự lưu trong trình duyệt.
+
+### Cập nhật 26/11 (khuya) — Ảnh: bộ mẫu, sticker giấy, thẻ công thức, ngược sáng
+
+**Carousel liền mạch**
+- **Bộ mẫu một chạm**: Sổ còng (hai trang giấy kẻ, gáy lò xo kim loại ở mép giữa hai slide), Scrapbook (polaroid nghiêng, băng keo, chú thích viết tay), Tạp chí (tiêu đề đỏ đứng đậm chồng chữ script, chú thích nhỏ ở góc), Thư tình (giấy kem, tiêu đề serif đỏ, tem), Photo dump file (ảnh nền tràn khung, ảnh nhỏ kèm tên 01.jpg…, bong bóng tin nhắn), Bậc thang (3 ảnh xếp chéo qua các slide, bóng nắng lá), Chữ lặp (nền đỏ gạch có chữ lặp), Thẻ công thức 9:16 (ảnh giữa khung trên nền chính nó làm mờ, nhãn hook, thẻ Máy ảnh / Ống kính / Film), 3 ô một câu (9:16 hoặc 3:4, ba ảnh xếp dọc, mỗi ô một chữ nhỏ nối thành câu). Ảnh đã thêm tự lấp vào ô theo thứ tự; ô trống chạm đúp để chọn ảnh.
+- **Sticker vẽ bằng nét** (phóng to vẫn nét, không dùng ảnh có bản quyền): băng keo nhiều màu mép xé, kẹp giấy, gáy lò xo, tem bưu điện (sửa được chữ), sao, lấp lánh, đá quý, trang giấy kẻ, thẻ công thức kính mờ.
+- **Kiểu chữ mới**: nhãn hook (chữ đen đậm trên nền trắng bo tròn), tin nhắn xanh / xám, chú thích viết tay, tên file, tiêu đề đỏ đứng đậm, chữ script. Thêm font Oswald và Patrick Hand (đều có tiếng Việt).
+- **Nền**: giấy kem, giấy kraft, denim, đỏ gạch; chữ lặp làm nền; **bóng nắng lá** phủ lên cả dải.
+- Khổ **9:16 (1080×1920)** và carousel 1 slide.
+- **Mockup**: xuất ảnh PNG 1080×1350 có điện thoại hiển thị slide 1 đang vuốt sang slide 2, để khoe carousel.
+
+**Ảnh**
+- **Thẻ công thức** (công cụ mới): chọn Máy ảnh (Compact film, Máy dùng một lần, Máy số CCD, Rangefinder, Half-frame — đổi tông, hạt, tối góc, in ngày), Ống kính 24 / 28 / 35 / 50 / 85mm (cắt góc nhìn theo tiêu cự, điện thoại tính là 26mm, kèm tối góc hoặc độ mềm), Film (bộ màu). Thêm thẻ công thức kính mờ và nhãn hook lên ảnh. Lưu ảnh **9:16 nền mờ** (ảnh giữa khung, phần trống lấp bằng chính ảnh làm mờ), cũng có trong Cỡ ảnh xuất.
+- **Sticker giấy** và **bóng nắng lá** trong công cụ Sticker; chữ có thêm kiểu Nhãn hook và Tin nhắn; khung mới Giấy kem, Giấy kraft, Denim, Đỏ gạch.
+- **Ngược sáng AI** (Hiệu ứng AI → Công cụ AI): quầng sáng sau đầu và vai, viền sáng theo mép người, màu Ấm / Trắng / Hồng, chỉnh độ mạnh và độ lan.
+- **Trước / Sau** (công cụ mới): ảnh ghép cạnh nhau, trên dưới 9:16 có chữ Trước / Sau, hoặc video 4 giây có đường gạt chạy qua lại (MP4 hoặc WebM tuỳ trình duyệt).
+- **Bộ màu Chuyến đi** (nhóm đầu trong thư viện preset): Khôi & Thư (ấm cam hồng đều cả ba vùng, vùng giữa ấm nhất, giảm bão hoà khoảng 20%, đen nâng lên khoảng 11/255, trắng nén về khoảng 230), Nước ngọc, Nắng phố, Okinawa, Alps moody. Mỗi màu là một LUT 33³ trong thư mục `luts/`, tự lưu vào danh sách LUT (dùng được cả bên Video) và mở được bằng Lightroom, Resolve.
+
+### Cập nhật 26/11 (khuya) — Video Pro: chữ sau người, chuyển cảnh dải, mẫu dựng sẵn, chuyển động máy
+
+**Người trong khung (AI tách người theo từng khung, có trong video xuất)**
+- **Chữ sau người**: bật trong bảng Chữ, chữ nằm giữa nền và người, người đi ngang sẽ che chữ. Mask người được tính theo từng khung và lưu đệm; nút **Chuẩn bị mask** (tab Nâng cao) tính trước cho cả clip để xem trước mượt hơn.
+- **Bóng trắng** (Hiệu ứng → Người): tô kín người bằng màu phẳng trong 1–12 khung ở mỗi nhịp nhạc, hoặc suốt cả lớp.
+- **Nhân bản người**: chụp người ở các thời điểm khác của clip thành bản sao đứng yên, cho hiện lần lượt theo nhịp; có kiểu bóng trắng rồi thành người thật.
+
+**Chữ động**
+- **Chữ trộn font**: mỗi từ một kiểu (serif mảnh nghiêng, chữ đứng đậm, chữ hoa dãn rộng, chữ viền), xếp chồng từng dòng, hiện theo nhịp hoặc chia đều; từ viết HOA được làm to và đổi màu.
+- Hoạt ảnh chữ mới: **Xáo chữ**, **Hiện từng ký tự** (giữ nguyên vị trí chữ), cùng Gõ chữ và Mờ sang rõ có sẵn.
+- **Chữ xếp dọc**: mỗi ký tự một hàng, hiện dần từ trên xuống.
+
+**Chuyển cảnh mới** (khớp nhịp, có trong video xuất): **Dải** (2–12 dải, ngang, chéo 45° hoặc dọc, so le, xen kẽ hai hướng, kiểu chuyển động), **Rèm dọc**, **Quét tối** (theo độ sáng của cảnh mới hoặc cảnh cũ), **Khung màu thu vào** (tuỳ chọn người hiện trước trên nền màu), **Dải dọc nở** (nhiều clip thành dải dọc rồi nở ra, hợp làm đoạn mở). Chọn độ dài chuyển cảnh theo ½, 1, 2, 4 nhịp.
+
+**Bố cục theo vùng**
+- **Dải mở dần**: thanh khung điện ảnh bắt đầu từ một vạch mảnh rồi cao dần, chữ luôn nằm trên thanh. Nút **Dải mở dần + tiêu đề** trong Hiệu ứng.
+- **Lưới trong dải**: chia dải 2.39 thành 2–4 ô dọc trên khung 9:16, các ô lần lượt đổi cảnh ở mỗi nhịp.
+
+**Mẫu dựng sẵn** (mục Mẫu)
+- **Lưu làm mẫu**: video và ảnh trong dự án thành ô trống, giữ nhịp cắt, chuyển cảnh, chữ, lớp hiệu ứng và màu.
+- **Dùng mẫu**: thả video, ảnh (và nhạc nếu muốn), app tự xếp vào từng ô theo thứ tự, lấy đoạn giữa cho vừa ô, video ngắn được làm chậm cho đủ.
+- 4 mẫu có sẵn: **Moving postcards**, **Một câu, năm nơi**, **Hà Nội đứng yên** (tự khoá khung cho shot cầm tay), **Nhật ký Thạch Trang**.
+
+**Máy quay và xuất**
+- **Chuyển động máy** (tab Máy quay của mỗi clip hoặc ảnh): tiến vào, lùi ra, zoom giật, zoom bật, dolly zoom, trượt ngang, trượt 2.5D, lia, ngước, lia quất (có tiếng vút khi xuất), nghiêng khung, xoay máy, đung đưa, cầm tay, rung theo nhịp, hé nét, chuyển nét, xoá phông giả, tilt shift, vệt anamorphic, loé sáng quét, dừng hình, tua ngược, zoom vô tận. Mỗi kiểu có tên tiếng Anh, chỉnh cường độ, thời lượng, kiểu chuyển động, chồng được lên keyframe.
+- **Gợi ý prompt AI**: ghép câu tiếng Anh gồm mô tả cảnh, tối đa hai chuyển động máy, tốc độ và ánh sáng để dán vào Google Flow, Kling hay Wan; có 5 combo gợi ý.
+- **Nhoè chuyển động** (trộn khung như màn trập chậm), **Khoá khung** (đo rung ngang dọc rồi bù lại, cắt mép nhẹ), hiệu ứng **Loé ống kính** động.
+- Xuất **Xoay ngang trong 9:16**: khung ngang 16:9 xoay 90° vào video dọc 1080×1920.
