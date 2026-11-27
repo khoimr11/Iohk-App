@@ -149,3 +149,80 @@ Trong chế độ Ảnh, công cụ mới **Carousel liền mạch**: một kh�
 - **Gợi ý prompt AI**: ghép câu tiếng Anh gồm mô tả cảnh, tối đa hai chuyển động máy, tốc độ và ánh sáng để dán vào Google Flow, Kling hay Wan; có 5 combo gợi ý.
 - **Nhoè chuyển động** (trộn khung như màn trập chậm), **Khoá khung** (đo rung ngang dọc rồi bù lại, cắt mép nhẹ), hiệu ứng **Loé ống kính** động.
 - Xuất **Xoay ngang trong 9:16**: khung ngang 16:9 xoay 90° vào video dọc 1080×1920.
+
+### Cập nhật 27/11 — Carousel & Ảnh: hệ tạp chí, lookbook
+
+Bộ mẫu cũ (sổ còng, scrapbook, băng keo, lấp lánh, denim, kraft) vẫn còn nhưng đã gom vào mục **Vui nhộn** (đóng sẵn). Mặc định giờ là hệ tạp chí: lề rộng, ít chữ, một điểm nhấn.
+
+**Phông tự host** (`fonts/`, OFL, đủ dấu tiếng Việt, khoảng 900 KB, chỉ tải phần cần dùng)
+- Cormorant Garamond (Light, Light nghiêng, Medium), EB Garamond (thường, nghiêng), Fraunces Light (thường, nghiêng), Noto Serif Display Light (thường, nghiêng), Playfair Display nghiêng, Be Vietnam Pro (300, 400, 500), Manrope (400, 500), Josefin Sans Light, Montserrat Light, IBM Plex Mono.
+- Mỗi phông có ba phần latin, latin-ext, vietnamese. Đã soát từng glyph tiếng Việt (ằ ẩ ặ ế ộ ữ ỵ đ Ơ Ư và đủ bảng chữ hoa, thường). Bodoni Moda bị loại vì thiếu dấu tiếng Việt.
+- Video Pro dùng chung bằng `<link rel="stylesheet" href="fonts/fonts.css">`. Giấy phép ở `fonts/LICENSES.txt`.
+
+**5 cặp chữ** (một chạm, đổi cả series)
+- *Tạp chí cổ điển*: tiêu đề Cormorant Garamond Light / nghiêng, nhãn Be Vietnam Pro chữ hoa giãn +300.
+- *Tối giản hiện đại*: Fraunces Light, nhãn Manrope chữ hoa giãn +320.
+- *Nhật ký Nhật/Hàn*: EB Garamond nghiêng, ngày tháng và số trang bằng Plex Mono viết thường, rất nhỏ.
+- *Lookbook*: Noto Serif Display Light chữ hoa giãn +200, nhãn Josefin Sans Light giãn +420.
+- *Điện ảnh*: Montserrat Light chữ hoa giãn +500 như title phim, tên và lời bằng Cormorant nghiêng.
+- Mỗi cặp quy định phông, độ đậm, giãn chữ, chữ hoa hay thường, giãn dòng và cỡ cho 9 vai trò: tên tạp chí, tiêu đề, nhãn chữ hoa, ngày và toạ độ, đoạn văn, trích dẫn, chú thích, số trang, số lớn. Chọn chữ rồi chạm một vai trò là xong. Có thêm giãn chữ, giãn dòng, căn trái/giữa/phải, CHỮ HOA và bề ngang tự xuống dòng.
+
+**16 mẫu tạp chí & lookbook** (lưới 12 cột, lề 88px ≈ 8%, đường kẻ 1px, số trang, N°, toạ độ, địa danh song ngữ; chữ mẫu là chuyến Hà Nội · Ninh Bình 18–22.11.2026 của Khôi & Thư, sửa được hết)
+- 4:5: Bìa tạp chí, Lookbook lưới (2 slide), Passe-partout gallery (3 slide), Contact sheet 35mm (rìa phim, lỗ răng cưa, số khung 11, 11A… vẽ bằng code, khung chọn màu rượu vang), Chương (2 slide), Trích dẫn, Hành trình tối giản (đường mảnh, toạ độ, tên địa danh hai thứ tiếng), Toàn khung + chú thích, Ảnh nhỏ giữa khoảng trắng.
+- 3:4: Trang đôi editorial (ảnh vắt qua mép sang trang chữ), Diptych và Triptych liền mạch, Photo dump tinh tế (lưới lệch, không băng keo), Trọn một số (7 slide ghép từ bìa, chương, trang đôi, trích dẫn, ảnh nhỏ).
+- 9:16: Bìa Reel (chữ nằm trong vùng 3:4 để lưới trang cá nhân không cắt mất), Khép lại (credits như cuối phim).
+- Ảnh tự vào ô hợp hướng dọc ngang. Chữ và lớp tối nằm trên ảnh **tự chọn mực**: đo độ sáng thật của ảnh bên dưới, chọn chữ kem trên lớp tối hoặc chữ mực trên lớp sáng, tự tăng độ đậm lớp tối khi ảnh có vùng quá sáng.
+
+**Nền & màu**
+- Chất liệu vẽ bằng code, rất nhẹ: giấy kem mịn, giấy cotton, vải lanh, vữa thạch cao, trắng gallery, đá xám, đen ấm, giấy ảnh bóng. Thêm thanh **Ánh sáng cửa sổ** (sáng ấm từ góc trên trái, bóng khung cửa mờ).
+- 6 bảng màu: Kem & mực, Trắng gallery, Rượu vang, Rêu, Đá xám, Đen ấm (#1C1A17, #F3EEE6, #6E1F1F, #3F4A3C…). Chữ phụ luôn đạt tương phản ≥ 4.5:1.
+- **Lấy màu từ ảnh**: chọn giấy, mực và một màu nhấn từ ảnh đang chọn, rồi tự chỉnh cho đủ tương phản.
+
+**Kiểm tra sang** (nút trên thanh Carousel): soát từng slide, khoanh đỏ chỗ cần sửa và hiện lề an toàn 6%. Báo khi có hơn 2 họ chữ, chữ ra ngoài lề, quá 2 sticker, chữ trắng tinh hoặc đen tuyền, tương phản thấp (đo trên ảnh thật bên dưới chữ), slide chật.
+
+**Chi tiết khác**
+- Mockup trung tính: nền vữa sáng, máy viền titan, bóng tiếp xúc mềm, giao diện xám không màu mè.
+- Thẻ công thức mặc định là bản mảnh: hai đường kẻ, nhãn chữ hoa nhỏ, giá trị serif nghiêng, không nền. Bản kính mờ vẫn chọn được.
+- **Dải chữ mảnh**: serif mảnh trên một dải màu trơn, thay cho nhãn hook bo tròn chữ đậm (nhãn hook cũ vẫn còn).
+- Công cụ Chữ bên Ảnh có mục **Kiểu chữ sang**: chọn cặp chữ rồi chạm Tên tạp chí, Tiêu đề, Nhãn chữ hoa, Chú thích, Trích dẫn hoặc Toạ độ & ngày. Sticker và emoji gom vào mục Vui nhộn; trên cùng là Thẻ công thức mảnh, Đường kẻ mảnh, Dải chữ mảnh.
+- Ảnh trong carousel có thêm viền Passe-partout (gờ cắt bìa) và Đường viền mảnh.
+
+### Cập nhật 27/11 — Video Pro 3: hậu kỳ cho phim 6–7 phút
+
+**Màu (tab Chấm màu của mỗi clip và lớp hiệu ứng)**
+- **Bánh xe màu** Lift / Gamma / Gain / Offset: kéo chấm để đẩy màu, thanh dưới để sáng tối, bấm đúp để đặt lại. **Tương phản có pivot** (giữ điểm giữa, không cháy trắng), bão hoà riêng.
+- **Đường cong**: Tổng, Đỏ, Xanh lá, Xanh dương, Hue → Sat, Hue → Hue, Sáng → Sat (đường cong mượt, không vọt quá điểm).
+- **Chọn vùng màu (HSL qualifier)** có sẵn Da người, Nước sâu, Lá cây, Trời; xoay màu, bão hoà, độ sáng riêng cho vùng chọn; nút Xem vùng chọn.
+- **Khớp màu với clip khác**: đo điểm đen, trung tính, trắng từng kênh của hai shot rồi tự đặt bánh xe; tuỳ chọn dùng chung preset, LUT, film của clip mẫu.
+- **Scope**: waveform, RGB parade, vectorscope có đường màu da, histogram có báo % đen chết / trắng cháy. **Trước / Sau** chia đôi khung xem trước, kéo được đường chia.
+- **Phim nhựa** cho từng clip: 35mm mịn, Kodak 2383, Portra 400, Eterna, 16mm; hạt, cỡ hạt, halation, gate weave.
+- **Chép / dán màu** (Ctrl+Shift+C / V), áp cho các clip đang chọn hoặc mọi clip. Xử lý trung gian 16-bit float khi GPU hỗ trợ (đỡ banding trời).
+
+**Dựng**
+- **Roll (N), Slip (Y), Slide (U)**, Chọn (V); phím `,` / `.` dịch 1 khung theo công cụ đang chọn.
+- **Chọn nhiều**: Shift / Ctrl + bấm, Ctrl+A chọn mọi clip chính; xoá, áp màu cho cả nhóm.
+- **Sync lock**: chữ, lớp phủ, lớp hiệu ứng, lồng tiếng bám theo clip chính khi dồn, cắt, đổi chỗ. Nhạc và lớp môi trường đứng yên. Shift+Delete xoá và dồn track.
+- **J-cut / L-cut** trong tab Âm thanh của clip: tiếng vào sớm hoặc ra muộn so với hình, có vạch xanh trên dòng thời gian.
+- **Marker có ghi chú** (Shift+M) và **chương**: nhãn chương trên thước thời gian, danh sách trong bảng Dự án, xuất file marker.
+
+**Chữ điện ảnh** (thư viện Chữ)
+- **Title card chương**: số lớn, tên chương nghiêng, đường kẻ mảnh, ngày và toạ độ; chèn nền đen ấm, nền giấy kem hoặc đè lên hình làm tối.
+- **Tên phim**, **lower-third địa danh** (tên, dòng phụ, ngày, toạ độ), **credits cuộn** như cuối phim (vai trò | tên, tiêu đề nhỏ), **phụ đề song ngữ**, **phụ đề điện ảnh** (chữ kem, bóng mềm, hiện 5 khung). Phụ đề tạo từ lời thoại / SRT dùng kiểu điện ảnh mặc định.
+- Dùng 5 cặp chữ chung với chế độ Ảnh (phông tự host trong `fonts/`): Tạp chí cổ điển, Tối giản hiện đại, Nhật ký Nhật/Hàn, Lookbook, Điện ảnh. Chữ hiện dần 12–18 khung, không nảy.
+
+**Âm thanh**
+- Crossfade ngắn ở mọi điểm cắt (chống tiếng “bụp”), chỉnh trong bảng Dự án.
+- **Ducking**: nhạc tự hạ khi có giọng nói (−6 đến −18 dB, nhìn trước 150 ms), tuỳ chọn hạ cả dưới thoại trong clip.
+- **EQ** (cắt trầm 80 / 120 / 200 Hz, rõ giọng 3 kHz, sáng tiếng 8 kHz) và **reverb** (phòng nhỏ, phòng lớn, hang đá) cho từng đoạn âm thanh và clip.
+- **Room tone** tự tìm đoạn yên nhất rồi lặp mượt suốt phim; **lớp môi trường** trải một đoạn tiếng thành nền dài cả phim.
+- **Âm thanh hiệu ứng tự tổng hợp** (không bản quyền): vút nhẹ, màn trập, máy chiếu phim, gió, mặt nước, phố xa, lật trang.
+- **Đồng hồ loudness** khi phát, **đo độ to cả phim** (BS.1770) và **chuẩn hoá khi xuất** −14 LUFS (Instagram, YouTube) hoặc −16 LUFS, giới hạn đỉnh −1 dBFS.
+
+**Hiệu năng & file iPhone**
+- **Proxy**: video 1080p trở lên, video quay dọc có xoay hoặc HEVC được tạo bản 960 px H.264 trong nền ngay khi nhập; xem trước trên proxy, xuất từ file gốc. Proxy lưu lại trong trình duyệt. Xem trước “Nét nhất” dùng file gốc.
+- Đọc đúng hướng xoay của video iPhone (trước đây có thể hiện nằm ngang).
+- Bộ giải mã ở xa đầu phát được giải phóng: timeline dài nhiều clip 4K không còn làm sập tab. Dòng thời gian chỉ vẽ dải hình quanh vùng đang xem.
+- Trình duyệt không giải mã được HEVC thì app báo rõ cách khắc phục thay vì nhận clip đen.
+
+**Giao phim** (hộp Xuất video)
+- Mẫu **Phim 16:9 · 4K**, **Phim 16:9 · 1080p**, **YouTube 16:9 · 2K**, **Reel 9:16**; **khung 2.39** (thanh đen cả khi xem trước); **chương YouTube (.txt)**; **poster JPG** (đặt khung poster trong bảng Dự án).
