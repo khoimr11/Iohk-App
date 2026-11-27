@@ -226,3 +226,47 @@ Bộ mẫu cũ (sổ còng, scrapbook, băng keo, lấp lánh, denim, kraft) v�
 
 **Giao phim** (hộp Xuất video)
 - Mẫu **Phim 16:9 · 4K**, **Phim 16:9 · 1080p**, **YouTube 16:9 · 2K**, **Reel 9:16**; **khung 2.39** (thanh đen cả khi xem trước); **chương YouTube (.txt)**; **poster JPG** (đặt khung poster trong bảng Dự án).
+
+### Cập nhật 27/11 (2) — Kỹ thuật “Edit Không Khó”, làm theo kiểu sang
+
+Bộ hiệu ứng dùng chung nằm trong `ekk.js` (cả Ảnh và Video Pro), chạy trên máy, không gửi ảnh hay video đi đâu.
+
+**Khung dọc ↔ ngang** (Video Pro, clip → tab **Cảnh**)
+- **Nền mờ cùng clip**: nền là chính clip đó, phóng nhẹ, làm mờ, tối và giảm bão hoà một chút.
+- **Mở rộng nền**: soi gương mép ảnh ra hai bên (hoặc trên dưới), càng ra xa càng mờ và tối, mép nối không lộ.
+- **Bám chủ thể**: app dò người (AI tách người, chưa có AI thì dò vùng da) 5 lần mỗi giây, làm mượt quỹ đạo rồi cắt khung đi theo. Chọn người ở giữa, hơi cao hoặc một phần ba trên, phóng thêm tới 140%.
+- Chọn nhiều clip để áp cùng lúc, hoặc bấm **Áp cho mọi clip khác khung**. Phim 16:9 dùng footage iPhone quay dọc thì dùng cái này.
+
+**Trời** (Ảnh: Hiệu ứng AI → **Trời · Màu**; Video: tab Cảnh)
+- Tự tìm vùng trời, kể cả trời trắng đục, sau vách núi, tán cây, dây điện. Mép trời tinh chỉnh ở độ phân giải đầy đủ nên cành lá, tóc bay vẫn giữ.
+- **Làm đậm trời**: lấy lại vân mây trên trời trắng, nén vùng sáng, lọc chuyển sắc như kính ND. **Ấm chạng vạng**: tím xám ở trên, ấm dần xuống chân trời.
+- **Mây mềm**, **Trời hoàng hôn**: thay trời bằng mây hoặc dải màu chạng vạng tự vẽ, có sương ở chân trời, cảnh phía dưới được chỉnh màu cho khớp. Có độ đậm, làm mềm mép, khớp màu cảnh, nút Đổi mây.
+- Trong video, mép trời được làm mượt giữa các khung lân cận nên không nháy.
+
+**Màu**
+- **Giữ một màu**: chọn màu có sẵn hoặc **chấm màu** ngay trên ảnh / khung xem trước. Phần còn lại về đen trắng; chỉnh được độ rộng và độ mềm.
+- **Đơn sắc**: một màu mực trên nền giấy (Giấy kem, Sepia nhạt, Xanh rêu, Chàm, Đỏ rượu, Bạc).
+- **Phản chiếu mặt nước** (chọn đường mặt nước, gợn sóng, độ tối; trong video sóng chuyển động) và **gương** dọc / ngang / bốn góc.
+
+**Chuyển cảnh và mở đầu** (Video Pro, khớp nhịp được, có cả khi xuất)
+- **Mực tàu loang**, **Sương mờ**, **Giọt mưa loang**, **Lật trang** (mặt sau giấy kem, bóng mềm), **Tròn mở lớp** (các vòng đồng tâm có đường kẻ kem mảnh), **Xé giấy** (khung cũ đứng hình, mép giấy kem).
+- Hiện vào cho clip: Mực tàu loang, Sương mờ, Tròn mở lớp, **Chia 3 phần**. Chữ cũng hiện được bằng mực loang.
+- **Sổ ảnh lật trang**: đặt lật trang cho các clip đang chọn, như lật lookbook.
+- **Cuộn phim 35mm**: ảnh và clip nằm trong dải phim có lỗ răng, mã viền, số khung chữ IBM Plex Mono, cuộn ngang hoặc dọc rồi phóng vào một khung cho tràn màn hình. Hợp làm đoạn mở đầu hoặc mở chương.
+
+**Kết phim** (thư viện Hiệu ứng → Mở đầu & kết phim)
+- **Đóng màn tròn** hoặc **Đóng rèm** về đen ấm.
+- **Nhạc dừng đột ngột**: cắt nhạc tại đầu phát, giữ khung 3 giây, lót room tone.
+- **Kết phim**: clip cuối tắt dần về đen, thêm đoạn đen ấm với tên phim, nhạc kéo dài và ngân đuôi. Credits cuộn vẫn ở thư viện Chữ.
+- **Vệt sáng nhẹ**: một vệt sáng mảnh lướt qua trời.
+
+**Phụ đề** (thư viện Phụ đề)
+- **Phụ đề tự động**: nhận giọng nói tiếng Việt bằng Whisper (tiny hoặc base) chạy trong trình duyệt. Lần đầu tải mô hình khoảng 80–150 MB, sau đó trình duyệt giữ lại. Không tải được thì app báo rõ, vẫn dán lời hoặc nhập SRT được.
+- Câu dài tự chia thành phụ đề tối đa 2 dòng × 42 ký tự.
+- **Sửa lệch phụ đề**: dời ±1 / ±5 khung; **Khớp với giọng nói** (app dò đoạn có tiếng, tự tìm độ lệch trong ±3 giây và co giãn nhỏ); **Kéo giãn** để dòng cuối rơi đúng đầu phát; **Tách dòng dài**.
+
+**Đêm và làm nét** (tab Cảnh)
+- **Đêm**: khử nhiễu theo thời gian, trộn các khung liên tiếp ở vùng đứng yên, bỏ qua vùng chuyển động nên người không bị nhoè. **Làm nét**: chỉ tăng ở chi tiết thật, hạt không bị nổi lên.
+- Ảnh trong video có nút **Làm nét ảnh bằng AI (x2)**, dùng cùng mô hình Real-ESRGAN của chế độ Ảnh.
+
+**Thêm**: **Viền sáng** quanh người và **Tách nền 3 lớp** (trời đi chậm, cảnh đi vừa, người tiến gần), cả hai cần AI tách người.
