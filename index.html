@@ -480,6 +480,15 @@ details.edfun>.tp-sec{margin-bottom:14px}
 .p4sw{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.4);display:inline-block;flex:none}
 body.p4pick #stage,body.p4pick #view{cursor:crosshair}
 
+/* P5: khung động, cinemagraph */
+.cpv .igstrip canvas.p5live{flex:0 0 100%;width:100%;height:auto;scroll-snap-align:center;display:block}
+.p5cine{display:flex;align-items:center;justify-content:center}
+.p5cbox{display:flex;gap:20px;align-items:flex-start;max-width:min(1100px,96vw);max-height:92vh;overflow:auto;background:#1a1917;border-radius:14px;padding:18px}
+.p5ccv{max-width:min(680px,62vw);max-height:80vh;width:auto;height:auto;border-radius:6px;cursor:crosshair;touch-action:none;background:#000}
+.p5cside{width:280px;display:flex;flex-direction:column;gap:10px;color:#ECE5D9}
+.p5cside h3{font:500 17px "Be Vietnam Pro",system-ui,sans-serif;margin:0}
+@media (max-width:760px){.p5cbox{flex-direction:column;padding:12px}.p5ccv{max-width:92vw;max-height:52vh}.p5cside{width:100%}}
+
 </style>
 </head>
 <body>
@@ -3639,11 +3648,11 @@ function drawCarScene(x,o){const W=cW(),H=cH();x.save();x.fillStyle=CAR.bg;x.fil
   if(CAR.rep)drawRep(x,W,H,CAR.rep);
   x.imageSmoothingEnabled=true;x.imageSmoothingQuality="high";
   for(const it of CAR.items){if(o.x0!=null){const e=cExtent(it);if(it.x+e<o.x0||it.x-e>o.x1)continue;}
-    x.save();x.translate(it.x,it.y);if(it.rot)x.rotate(it.rot*Math.PI/180);
+    x.save();x.translate(it.x,it.y);if(it.rot)x.rotate(it.rot*Math.PI/180);if(it.blend)x.globalCompositeOperation=it.blend;if(it.anim)p5Anim(x,it);if(it.op!=null&&it.type==="img")x.globalAlpha*=it.op;
     if(it.type==="stk"){if(!(o.noScrim&&it.kind==="scrim"))drawStk(x,it,it.w,it.h,o.sc);x.restore();continue;}
     if(it.type==="text"){const L=cMeasure(x,it),lh=it.size*(it.lh||1.18);if(o.noText){x.restore();continue;}carTextBg(x,it,L,lh,o.sc);x.font=cTextFont(it);x.fillStyle=p2TextInk(it.style,it.color||"#1d1d1f");if(it.op!=null)x.globalAlpha=it.op;
       if(it.style==="soft"){x.shadowColor="rgba(0,0,0,.5)";x.shadowBlur=it.size*0.35*o.sc;x.shadowOffsetY=it.size*0.05*o.sc;}
-      edLines(x,it,L);x.restore();continue;}
+      if(!(it.fillSrc&&p5FillText(x,it,L,o)))edLines(x,it,L);x.restore();continue;}
     const sid=it.follow?(cItem(it.follow)||{}).src:it.src,s=sid?cSrc(sid):null,img=sid?o.getImg(sid):null,w=it.w,h=it.h;
     if(it.blur){if(img)drawBlurCover(x,img,w,h);else{x.fillStyle="#3a3936";x.fillRect(-w/2,-h/2,w,h);}x.restore();continue;}
     const g=cGeom(it,s);
@@ -3651,7 +3660,7 @@ function drawCarScene(x,o){const W=cW(),H=cH();x.save();x.fillStyle=CAR.bg;x.fil
     if(it.border==="white"||it.border==="polaroid"){x.fillStyle="#fbfaf7";x.fillRect(-w/2,-h/2,w,h);}
     else if(it.border==="bevel"){const bw=Math.max(5,Math.min(w,h)*0.009);x.fillStyle="#FBF9F4";x.fillRect(-w/2-bw,-h/2-bw,w+2*bw,h+2*bw);x.fillStyle="rgba(60,50,40,.10)";x.fillRect(-w/2-bw,h/2,w+2*bw,bw);x.fillRect(w/2,-h/2-bw,bw,h+2*bw);}
     const L=-w/2+g.b,T=-h/2+g.b;
-    if(img){const iw=img.width,ih=img.height;x.drawImage(img,g.u0*iw,g.v0*ih,g.fw*iw,g.fh*ih,L,T,g.pw,g.ph);}
+    if(it.cut&&p5DrawCut(x,it,o,g.pw,g.ph)){}else if(it.cut&&img&&o.thumb){}else if(img){const iw=img.width,ih=img.height;x.drawImage(img,g.u0*iw,g.v0*ih,g.fw*iw,g.fh*ih,L,T,g.pw,g.ph);}
     else{x.fillStyle="#d8d4cc";x.fillRect(L,T,g.pw,g.ph);if(o.ui&&!sid&&g.pw>140&&g.ph>80){const z=Math.max(26,Math.min(g.pw,g.ph)*0.08);x.fillStyle="#5d584f";x.textAlign="center";x.textBaseline="middle";x.font="600 "+z+'px "Be Vietnam Pro",system-ui,sans-serif';x.fillText("+ Thêm ảnh",L+g.pw/2,T+g.ph/2);}}
     if(it.border==="bevel"||it.border==="hair"){x.strokeStyle=it.border==="hair"?edRgba(it.lc||"#1C1A17",0.55):"rgba(40,32,24,.22)";x.lineWidth=Math.max(1/o.sc,1);x.strokeRect(L,T,g.pw,g.ph);}
     x.restore();}
@@ -3681,7 +3690,7 @@ function buildCar(){
     else if(CAR.pan&&CAR.sel){const it=cItem(CAR.sel);if(it&&it.type==="img"){e.preventDefault();it.zoom=Math.max(1,Math.min(4,(it.zoom||1)*(e.deltaY<0?1.06:1/1.06)));carPaint();carCommitSoon();}}},{passive:false});
   let dz=null;cm.addEventListener("dragover",e=>{if(![...(e.dataTransfer?e.dataTransfer.types:[])].includes("Files"))return;e.preventDefault();if(!dz){dz=el("div","cdrop","Thả ảnh để thêm vào carousel");cws.appendChild(dz);}});
   cm.addEventListener("dragleave",e=>{if(dz&&!cm.contains(e.relatedTarget)){dz.remove();dz=null;}});
-  cm.addEventListener("drop",e=>{e.preventDefault();if(dz){dz.remove();dz=null;}const fs=[...(e.dataTransfer?e.dataTransfer.files:[])].filter(f=>/^image\//.test(f.type));if(fs.length)carAddFiles(fs);});
+  cm.addEventListener("drop",e=>{e.preventDefault();if(dz){dz.remove();dz=null;}const fs=[...(e.dataTransfer?e.dataTransfer.files:[])].filter(f=>/^(image|video)\//.test(f.type));if(fs.length)carAddFiles(fs);});
   document.addEventListener("keydown",e=>{if(!cm||cm.hidden)return;const tg=e.target;if(tg&&(tg.tagName==="INPUT"&&tg.type!=="range"||tg.tagName==="TEXTAREA"))return;e.stopPropagation();
     if(e.key==="Escape"){const pv=cm.querySelector(".cpv");if(pv){pv.remove();return;}if(CAR.pan){CAR.pan=false;carSide();carPaint();return;}if(CAR.sel){CAR.sel=null;carSide();carPaint();return;}closeCarousel();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.stopPropagation();carUndo(e.shiftKey?1:-1);return;}
@@ -3776,11 +3785,11 @@ const carDB=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{if(!wi
   const tx=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction("p",mode),st=t.objectStore("p"),q=fn(st);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);}));
   return {get:k=>tx("readonly",s=>s.get(k)),put:(k,v)=>tx("readwrite",s=>s.put(v,k)),del:k=>tx("readwrite",s=>s.delete(k))};})();
 function carSave(){clearTimeout(carSaveT);carSaveT=setTimeout(carSaveNow,700);}
-function carSaveNow(){clearTimeout(carSaveT);carSaveT=null;const o=JSON.parse(carSnapState());o.v=1;o.look=CAR.look;o.srcs=CAR.srcs.map(s=>({id:s.id,name:s.name,blob:s.blob,w:s.w,h:s.h}));
+function carSaveNow(){clearTimeout(carSaveT);carSaveT=null;const o=JSON.parse(carSnapState());o.v=1;o.look=CAR.look;o.srcs=CAR.srcs.map(s=>({id:s.id,name:s.name,blob:s.blob,w:s.w,h:s.h,v:s.v||null}));o.lang=CAR.lang;o.vi2=CAR.vi2;o.motionDur=CAR.motionDur||0;
   return carDB.put("last",o).catch(()=>{});}
-async function carLoad(){let o=null;try{o=await carDB.get("last");}catch(e){}
+async function carLoad(){let o=null;try{o=await carDB.get("last");}catch(e){}if(o){CAR.lang=o.lang||"en";CAR.vi2=!!o.vi2;CAR.motionDur=o.motionDur||0;}
   if(o&&o.v===1&&!CAR.srcs.length){Object.assign(CAR,{n:o.n||4,ratio:o.ratio||"34",bg:o.bg||"#ffffff",grain:!!o.grain,tex:o.tex||"",rep:o.rep||null,leaf:o.leaf||0,look:!!o.look,pair:o.pair||"classic",pal:o.pal||"cream",palc:o.palc||null,light:o.light||0,tpl:o.tpl||"",items:o.items||[]});
-    const srcs=[];for(const s of o.srcs||[]){try{srcs.push(await carMakeSrc(s.blob,s.name,s.id));}catch(e){}}CAR.srcs=srcs;CAR.items=CAR.items.filter(i=>i.type!=="img"||!i.src||cSrc(i.src));
+    const srcs=[];for(const s of o.srcs||[]){try{srcs.push(await carMakeSrc(s.blob,s.name,s.id,s.v));}catch(e){}}CAR.srcs=srcs;CAR.items=CAR.items.filter(i=>i.type!=="img"||!i.src||cSrc(i.src));
     if(CAR.srcs.length||CAR.items.length)toast("Đã mở lại carousel đang làm");}
   carHist=[];carHi=-1;carCommit();}
 /* ---- ảnh nguồn ---- */
@@ -3909,7 +3918,7 @@ async function carPreview(){await carFontsReady();const g=id=>{const s=cSrc(id);
 function carFontLoad(it){const f=CFONTS[it.font]||CFONTS.diary;try{return document.fonts.load(f[0]+" 40px "+f[1],String(it.text||"")+ED_VN).catch(()=>{});}catch(e){return Promise.resolve();}}
 async function carFontsReady(){await Promise.all(CAR.items.filter(i=>i.type==="text").map(carFontLoad).concat([edLoadFace("plex"),edLoadFace("cg300i"),edLoadFace("bvp500")]));try{await document.fonts.ready;}catch(e){}}
 async function carRender(){await carFontsReady();const H=cH(),e=CAR.look?effective(state,true):null,need=new Map();
-  CAR.items.forEach(it=>{if(it.type!=="img")return;const s=cSrc(it.src);if(!s)return;const g=cGeom(it,s);need.set(s.id,Math.max(need.get(s.id)||0,s.w*g.s0));});
+  CAR.items.forEach(it=>{if(it.type!=="img")return;const s=cSrc(it.src);if(!s||s.kind==="video")return;const g=cGeom(it,s);need.set(s.id,Math.max(need.get(s.id)||0,s.w*g.s0));});
   const prep=new Map();let scaledDown=false;
   for(const [id,nw] of need){const s=cSrc(id),bm=await decodeAny(s.blob);let cur=bm,w=bm.width||bm.naturalWidth,h=bm.height||bm.naturalHeight;
     if(e){const k=Math.min(1,maxTex/Math.max(w,h)),W=Math.max(1,Math.round(w*k)),Hh=Math.max(1,Math.round(h*k));if(k<1)scaledDown=true;
@@ -3918,8 +3927,8 @@ async function carRender(){await carFontsReady();const H=cH(),e=CAR.look?effecti
     prep.set(id,cur);}
   if(e)draw();
   const out=[];for(let k=0;k<CAR.n;k++){let c=document.createElement("canvas");c.width=SW;c.height=H;let x=null;try{x=c.getContext("2d",{colorSpace:"srgb"});}catch(er){}if(!x)x=c.getContext("2d");
-    x.setTransform(1,0,0,1,-k*SW,0);drawCarScene(x,{sc:1,getImg:id=>prep.get(id),x0:k*SW,x1:(k+1)*SW});out.push(c);}
-  prep.forEach(v=>{if(v.close)v.close();});return {canvases:out,scaledDown};}
+    x.setTransform(1,0,0,1,-k*SW,0);drawCarScene(x,{sc:1,getImg:id=>prep.get(id)||p5StillImg(id),x0:k*SW,x1:(k+1)*SW});out.push(c);}
+  return {canvases:out,scaledDown,prep};}
 async function carExport(){if(CAR.busy)return;if(!CAR.items.length){toast("Carousel còn trống");return;}CAR.busy=true;carPaint();toast("Đang xuất "+CAR.n+" ảnh…");
   try{const r=await carRender(),files=[];
     for(let k=0;k<r.canvases.length;k++){const b=await new Promise(res=>r.canvases[k].toBlob(res,"image/jpeg",0.92));if(!b)throw new Error("encode");files.push({name:String(k+1).padStart(2,"0")+".jpg",blob:b,w:SW,h:cH()});}
@@ -4594,7 +4603,7 @@ function edStkSide(it){const c=sec("Màu");c.appendChild(edColorRow(it,it.color,
 
 /* ---- ảnh: một chạm kiểu chữ sang cho công cụ Chữ ---- */
 let edPhPair="classic";
-function edPhotoStyle(role){const P=ED_PAIRS.find(p=>p.id===edPhPair)||ED_PAIRS[0],s=P.r[role],sel=selItem(),txt={title:"Tràng An",kicker:"Chương hai · Ninh Bình",caption:"Tam Cốc, chiều 20.11",quote:"Ở đây, đến tiếng mái chèo cũng nói khẽ.",meta:"20.2506° N  105.9045° E",display:"Ninh Bình"}[role];
+function edPhotoStyle(role){const P=ED_PAIRS.find(p=>p.id===edPhPair)||ED_PAIRS[0],s=P.r[role],sel=selItem(),txt=(CAR.lang!=="vi"?{title:"Water & Stone",kicker:"Chapter Two · Ninh Binh",caption:"Tam Coc, the last morning",quote:"Even the oars speak softly here.",meta:"20.2506° N  105.9045° E",display:"Ninh Binh"}:{title:"Tràng An",kicker:"Chương hai · Ninh Bình",caption:"Tam Cốc, chiều 20.11",quote:"Ở đây, đến tiếng mái chèo cũng nói khẽ.",meta:"20.2506° N  105.9045° E",display:"Ninh Bình"})[role];
   const sz={display:0.11,title:0.08,kicker:0.026,caption:0.034,quote:0.05,meta:0.024}[role]*s[4];
   let o=sel&&sel.kind==="text"?sel:null;if(!o){o={id:"o"+Date.now(),kind:"text",text:txt,x:0.5,y:role==="kicker"||role==="meta"?0.88:0.5,rot:0,color:"#F3EEE6"};state.overlays.push(o);selId=o.id;}
   Object.assign(o,{font:s[0],ls:s[1],upper:s[2]==="u",lower:s[2]==="l",lh:s[3],size:sz,style:role==="caption"||role==="meta"||role==="kicker"?"plain":"soft",role});
@@ -4679,6 +4688,291 @@ function p4Panel(){const w=el("div"),F=p4F(),redo=()=>{retDirty=true;schedule();
     if(mine){[...box.children].forEach(c=>{if(c!==tabs)c.remove();});box.appendChild(p4Panel());}}catch(err){console.warn(err);}return box;};}
 if(window.__TPDEBUG)window.__TPDEBUG.p4={P4P,F:p4F,stage:p4Stage,setHue:p4SetHue,panel:()=>{fxTab="p4";setTool("fx2");renderToolUI();},load:f=>loadFile(f),src:()=>fullSrc,prev:()=>origPrev,redo:()=>{retDirty=true;schedule();},
   final:()=>{const ret=buildRet(fullSrc,null);return ret;}};
+
+/* ---------- P5 (27/11 chiều): chữ kiểu Apple + tiếng Anh, khung động (video trong khung), cinemagraph, hoà trộn, chữ chứa ảnh, lặp có bước, poster động ---------- */
+/* phông: Inter Display / Inter Text (opsz 32 / 14), Newsreader Display (opsz 72) — OFL, tự host trong fonts/, đủ dấu tiếng Việt cho dòng phụ */
+const P5F={idsp600:["600",'"Inter Display",system-ui,sans-serif',"Inter Display đậm vừa"],idsp500:["500",'"Inter Display",system-ui,sans-serif',"Inter Display"],idsp300:["300",'"Inter Display",system-ui,sans-serif',"Inter Display mảnh"],
+  itx400:["400",'"Inter Text",system-ui,sans-serif',"Inter"],itx500:["500",'"Inter Text",system-ui,sans-serif',"Inter vừa"],itx600:["600",'"Inter Text",system-ui,sans-serif',"Inter đậm vừa"],
+  nwd300:["300",'"Newsreader Display",Georgia,serif',"Newsreader"],nwd300i:["italic 300",'"Newsreader Display",Georgia,serif',"Newsreader nghiêng"],nwd400:["400",'"Newsreader Display",Georgia,serif',"Newsreader thường"]};
+Object.assign(EDF,P5F);Object.assign(CFONTS,P5F);Object.assign(FONTS,P5F);
+ED_PAIRS.push(
+ {id:"apple",name:"Apple · Sans",pal:"gallery",d:"Inter Display cho tiêu đề (giãn âm −1,5 đến −2%, như trang sản phẩm của Apple), Inter cho chữ nhỏ, chữ hoa nhỏ giãn dương.",
+  r:{display:["idsp600",-.022,"",1.0,.86],title:["idsp500",-.018,"",1.08,.9],kicker:["itx600",.08,"u",1.45,.78],meta:["itx500",.01,"",1.45,.86],body:["itx400",-.004,"",1.5,.9],quote:["idsp500",-.016,"",1.16,.92],caption:["itx400",0,"",1.4,.9],folio:["itx500",.02,"",1.4,.86],numeral:["idsp600",-.045,"",.9,.92]}},
+ {id:"appled",name:"Apple · Editorial",pal:"cream",d:"Newsreader Display mảnh cho tiêu đề kiểu New York, Inter chữ hoa nhỏ giãn dương cho nhãn, ngày, số trang.",
+  r:{display:["nwd300",-.018,"",1.0,.96],title:["nwd300",-.014,"",1.06,1.02],kicker:["itx600",.12,"u",1.45,.78],meta:["itx500",.06,"u",1.45,.76],body:["itx400",-.004,"",1.55,.9],quote:["nwd300i",-.01,"",1.16,1.04],caption:["itx400",0,"",1.4,.9],folio:["itx500",.06,"u",1.4,.78],numeral:["nwd300",-.03,"",.9,1]}});
+/* ---- ngôn ngữ chữ trên post: tiếng Anh (mặc định), tuỳ chọn một dòng phụ tiếng Việt ---- */
+const P5_EN={"N°01":"N°01","Tạp chí của Khôi & Thư":"A journal by Khôi & Thư","Thu 2026":"Autumn 2026","Ninh Bình":"Ninh Binh","18 — 22.11.2026":"18—22.11.2026","Hà Nội · Ninh Bình":"Hanoi · Ninh Binh",
+ "Hành trình":"The Journey","Năm ngày giữa\nphố và núi":"Five Days,\nOne Autumn","Tràng An, bảy giờ sáng\nHang Múa, gần 500 bậc đá\nHoa Lư, chiều muộn":"Trang An, seven in the morning\nMua Cave, five hundred stone steps\nHoa Lu, late afternoon",
+ "Chương hai — Tràng An":"Chapter Two — Trang An","Nước đi chậm,\nngười cũng chậm":"Slow water,\nslow days","Hết.":"Fin.",
+ "Thuyền rời bến lúc bảy giờ. Chị lái đò chèo bằng chân, nước trong tới mức nhìn thấy rong dưới đáy. Hai đứa không nói gì suốt ba hang đầu tiên, chỉ nghe tiếng mái chèo.":"The boat left the pier at seven. Our rower steered with her feet, and the water was clear enough to see the weeds below. Through the first three caves we didn’t say a word. Only the oars.",
+ "Ảnh: bến Tràng An, 19.11":"Photograph: Trang An pier, 20.11","Lookbook — Thu 2026":"Lookbook — Autumn 2026","Khôi — áo thun trắng,\nbến Tràng An":"Khôi — white tee,\nTrang An pier","Thư — áo len xám,\ntrên đường về Hà Nội":"Thư — grey knit,\non the road back to Hanoi",
+ "Áo len, khăn lụa\nvà một chuyến đi":"Wool, silk\nand five slow days","Đường lên Hang Múa, 17:00":"The climb to Mua Cave, 17:00","Khăn lụa, Hoa Lư":"Silk scarf, Hoa Lu","Tràng An, buổi sớm":"Trang An, early",
+ "Tam Cốc, 19.11.2026":"Tam Coc, the last morning","Tam Coc — Ninh Binh":"Tam Cốc · Ninh Bình","Hoa Lư, chiều muộn":"Hoa Lu, late afternoon","Hoa Lu ancient capital":"Cố đô Hoa Lư","Hà Nội, sáu giờ sáng":"Hanoi, six in the morning","Hanoi — Old Quarter":"Phố cổ Hà Nội",
+ "Tờ in thử":"Contact Sheet","cuộn 03 — ninh bình":"roll 03 — ninh binh","ảnh chọn: 12, 17":"selects: 12, 17","9 / 36 kiểu":"9 / 36 frames",
+ "Chương hai":"Chapter Two","Tràng An":"Trang An","Nước, đá và những con đò":"Water, stone and the little boats","Bến Tràng An, 7:05":"Trang An pier, 7:05",
+ "Ở Tam Cốc, đến tiếng\nmái chèo cũng nói khẽ.":"In Tam Coc, even the oars\nspeak softly.","Thư — trên đò ở Tam Cốc, 20.11":"Thư, on a boat in Tam Coc",
+ "Hà Nội":"Hanoi","Hanoi":"Hà Nội","Trang An":"Tràng An","Tam Cốc":"Tam Coc","Tam Coc":"Tam Cốc","Hang Múa":"Mua Cave","Mua Cave":"Hang Múa","Hoa Lư":"Hoa Lu","Hoa Lu":"Hoa Lư",
+ "năm ngày · 18—22.11.2026":"five days · 18—22.11.2026","rồi về lại Hà Nội, 22.11":"then back to Hanoi, 22.11",
+ "Hang Múa, 17:20. Nắng xuống\nsau dãy núi phía tây.":"Mua Cave, 17:20. The light\nslips behind the western ridge.","Hà Nội · Ninh Bình, tháng 11":"Hanoi · Ninh Binh, November","Hà Nội, sáng 18.11.2026":"Hanoi, the night of 18.11.2026",
+ "Một chuyến đi của":"A journey by","Nhân vật chính":"Starring","Ninh Bình, chậm":"Ninh Binh, slowly","Quay tại":"Filmed in","Hà Nội · Tràng An · Tam Cốc\nHang Múa · Hoa Lư":"Hanoi · Trang An · Tam Coc\nMua Cave · Hoa Lu",
+ "Tam Cốc từ đỉnh Hang Múa":"Tam Coc from the top of Mua Cave","Thời gian":"Dates","Toàn cảnh":"The wide view","Tràng An, nhìn từ đò":"Trang An, from the boat","Tập 01":"Volume 01",
+ "Phía tây, dòng Ngô Đồng":"West, along the Ngo Dong","Cánh đồng đã gặt xong":"The fields, already harvested","Đường về bến Tam Cốc":"The way back to Tam Coc pier","những thứ lặt vặt — tháng 11":"small things — november",
+ "Âm thanh":"Sound","Mái chèo, gió trên đỉnh núi":"Oars, and wind on the summit","Đạo diễn":"Directed by","04 — phố Hàng Gai":"04 — Hang Gai street","Khôi & Thư — 18.11.2026":"Khôi & Thư — 18.11.2026"};
+/* cặp chữ tiếng Anh cho từng mẫu: tiêu đề editorial dùng Newsreader, lưới/lookbook dùng Inter */
+const P5_TPAIR={cover:"appled",spread:"appled",lookbook:"apple",passe:"appled",contact:"apple",chapter:"appled",quote:"appled",route:"apple",diptych:"apple",triptych:"apple",fullcap:"apple",small:"appled",dump:"apple",reel:"apple",credits:"appled",issue:"appled",poster:"apple",posterv:"apple"};
+Object.assign(CAR,{lang:"en",vi2:false});
+function p5Lang(){return CAR.lang==="vi"?"vi":"en";}
+function p5TplPairs(){ED_TPL.forEach(T=>{if(T.pairVi==null)T.pairVi=T.pair;T.pair=p5Lang()==="en"&&P5_TPAIR[T.id]?P5_TPAIR[T.id]:T.pairVi;});edThumbC.clear();}
+{const _eT=eT;eT=function(text,x,y,role,o){const it=_eT(text,x,y,role,o);if(p5Lang()==="en"&&typeof text==="string"&&P5_EN[text]!=null&&P5_EN[text]!==text){it.vi=text;it.text=P5_EN[text];if(role==="body"||role==="quote"||role==="caption")it.text=it.text.replace(/ (\S+)$/,"\u00A0$1");}return it;};}
+/* dòng phụ tiếng Việt: một dòng nhỏ dưới (hoặc trên) tiêu đề lớn nhất của mỗi slide */
+function p5HasVN(s){return /[ăâđêôơưàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵ]/i.test(s||"");}
+function p5ViSync(){CAR.items=CAR.items.filter(i=>!i.viOf);if(!CAR.vi2||p5Lang()!=="en")return;const rank={display:0,title:1,numeral:3,quote:2};const best={};
+  CAR.items.forEach(it=>{if(it.type!=="text"||!it.vi||!(it.role in rank)||!p5HasVN(it.vi))return;const k=Math.floor((it.x+(it._ox||0))/SW);if(!best[k]||rank[it.role]<rank[best[k].role])best[k]=it;});
+  Object.values(best).forEach(p=>{const t=_p5eT(p.vi.replace(/\n/g," "),p.x,p.y,"meta",{align:p.align,ink:p.ink==="light"?"light":"muted",auto:p.auto,viOf:p.id});CAR.items.push(t);});}
+function _p5eT(text,x,y,role,o){return Object.assign({id:cid(),type:"text",text,font:"itx500",size:ED_RB[role],base:ED_RB[role],role,ink:"ink",color:"#1C1A17",lower:false,align:"left",va:"top",x,y,rot:0},o||{});}
+function p5PlaceVi(){const x=edCtx(),H=cH();CAR.items.forEach(it=>{if(!it.viOf)return;const p=cItem(it.viOf);if(!p){it._dead=1;return;}cMeasure(x,p);cMeasure(x,it);it.align=p.align;it.x=p.x;const g=Math.max(10,p.size*0.22);
+    const top=p.y+(p.va==="top"?0:p.va==="bottom"?-p._h:-p._h/2),bot=top+p._h;if(p.va==="bottom"){it.va="bottom";it.y=top-g;}else{it.va="top";it.y=bot+g;if(it.y+it.size*1.5>H-EM){it.va="bottom";it.y=top-g;}}cMeasure(x,it);});
+  CAR.items=CAR.items.filter(i=>!i._dead);}
+function p5FitMargins(){if(p5Lang()!=="en")return;const x=edCtx(),Mg=SW*0.06;CAR.items.forEach(it=>{if(it.type!=="text"||it.role==="body"||it.maxw||it.style)return;cMeasure(x,it);const cx=it.x+(it._ox||0),k=Math.max(0,Math.min(CAR.n-1,Math.floor(cx/SW))),l=k*SW+Mg,r=(k+1)*SW-Mg;
+  const L=cx-it._w/2,R=cx+it._w/2;let avail=it._w;if(it.align==="left")avail=r-it.x;else if(it.align==="right")avail=it.x-l;else avail=2*Math.min(it.x-l,r-it.x);if(L<l-1||R>r+1){if(avail>40&&avail<it._w){it.size=Math.max(10,Math.floor(it.size*avail/it._w*0.995));cMeasure(x,it);}}});}
+{const _r=edRestyle;edRestyle=function(){_r();p5FitMargins();edFlow();p5PlaceVi();};}
+{const _a=edApply;edApply=async function(id,opt){p5TplPairs();const r=await _a(id,opt);if(r&&CAR.vi2){p5ViSync();edRestyle();edAutoInk();carCommit();carSide();carPaint();}return r;};}
+p5TplPairs();
+function p5SetLang(l){CAR.lang=l;p5TplPairs();CAR.items.forEach(it=>{if(it.type!=="text")return;if(l==="vi"&&it.vi){it.en=it.text;it.text=it.vi;delete it.vi;}else if(l==="en"&&it.en){it.vi=it.text;it.text=it.en;delete it.en;}});p5ViSync();edRestyle();edAutoInk();carCommit();carSide();carPaint();edFontsReady().then(()=>{edRestyle();carPaint();});}
+function p5SetVi2(on){CAR.vi2=!!on;p5ViSync();edRestyle();edAutoInk();carCommit();carSide();carPaint();edFontsReady().then(()=>{edRestyle();carPaint();});}
+
+/* ---- Kiểm tra sang cho tiếng Anh: chữ mồ côi, dòng quá dài/ngắn, chữ hoa thiếu giãn ---- */
+{const _lux=edLuxCheck;edLuxCheck=async function(){let out=await _lux();const x=edCtx();if(CAR.tpl==="poster"||CAR.tpl==="posterv")out=out.filter(o=>!(o.kind==="crowded"||o.kind==="contrast"&&(cItem(o.id)||{}).role==="display"));if(p5Lang()!=="en")return out;
+  CAR.items.forEach(it=>{if(it.type!=="text"||it.viOf)return;const L=cMeasure(x,it),k=Math.max(0,Math.min(CAR.n-1,Math.floor((it.x+(it._ox||0))/SW))),nm="“"+String(it.text).replace(/\n/g," ").slice(0,24)+"”";
+    if(L.length>1&&(it.role==="body"||it.role==="quote"||it.role==="caption"||it.role==="title")){const last=L[L.length-1].trim();if(last&&!/\s/.test(last)&&last.length<10&&L[L.length-2].trim().split(/\s+/).length>1)out.push({slide:k,kind:"widow",id:it.id,msg:"Slide "+(k+1)+": "+nm+" có chữ mồ côi “"+last+"” ở dòng cuối. Ngắt dòng sớm hơn hoặc nới khung."});}
+    if(it.role==="body"&&it.maxw){const cs=L.slice(0,-1).map(l=>l.length),av=cs.reduce((a,b)=>a+b,0)/Math.max(1,cs.length);if(cs.length&&(av>75||av<35))out.push({slide:k,kind:"measure",id:it.id,msg:"Slide "+(k+1)+": đoạn văn "+nm+" dài "+Math.min(...cs)+"–"+Math.max(...cs)+" ký tự/dòng. Tiếng Anh đọc dễ nhất 45–75 (cột tạp chí hẹp tối thiểu 35)."});}
+    const shown=edCase(it,it.text);if(/[A-Z]{4}/.test(shown)&&shown===shown.toUpperCase()&&it.size<90&&(it.ls||0)<0.05)out.push({slide:k,kind:"caps",id:it.id,msg:"Slide "+(k+1)+": chữ hoa "+nm+" cần giãn ít nhất +5% (đang "+Math.round((it.ls||0)*100)+"%)."});});
+  CAR.luxRes=out;return out;};}
+
+/* ---- Bộ nhận diện (house style): phông, bảng màu, LUT, lề — dùng chung với Video Pro qua localStorage ---- */
+const P5_HOUSE="iohk.house";
+function p5HouseGet(){try{return JSON.parse(localStorage.getItem(P5_HOUSE)||"null");}catch(e){return null;}}
+function p5HouseSave(){const pal=edPal(),o={v:1,pair:CAR.pair,pal:CAR.pal==="photo"?"photo":CAR.pal,palc:CAR.pal==="photo"?CAR.palc:null,colors:{bg:pal.bg,ink:pal.ink,muted:pal.muted,accent:pal.accent,light:pal.light},
+  preset:state.presetId,lut:state.lut&&state.lut.id||null,margin:EM,lang:p5Lang(),vi2:!!CAR.vi2,tex:CAR.tex||"",saved:Date.now()};try{localStorage.setItem(P5_HOUSE,JSON.stringify(o));}catch(e){}toast("Đã lưu bộ nhận diện: "+edPair().name+", "+(pal.name||"bảng màu")+". Video Pro dùng chung.");return o;}
+function p5HouseLoad(){const o=p5HouseGet();if(!o){toast("Chưa lưu bộ nhận diện nào");return null;}CAR.pair=o.pair||CAR.pair;if(o.pal==="photo"&&o.palc){CAR.palc=o.palc;CAR.pal="photo";}else if(o.pal)CAR.pal=o.pal;const p=edPal();CAR.bg=p.bg;CAR.tex=o.tex||p.tex||CAR.tex;
+  if(o.lang)CAR.lang=o.lang;CAR.vi2=!!o.vi2;p5TplPairs();if(o.preset&&findPreset(o.preset)&&typeof applyPreset==="function"&&o.preset!==state.presetId){try{applyPreset(o.preset);}catch(e){}}
+  p5ViSync();edRestyle();edAutoInk();carCommit();carSide();carPaint();edFontsReady().then(()=>{edRestyle();carPaint();});toast("Đã áp bộ nhận diện");return o;}
+
+/* =================== Khung động: video trong khung ảnh =================== */
+const P5V={fps:30,on:false,raf:0,last:0,looks:[["","Theo màu chung"],["none","Gốc"]].concat(TRIP.map(t=>[t[0],t[1]]))};
+function p5IsVid(f){return !!f&&(/^video\//.test(f.type||"")||/\.(mp4|mov|m4v|webm)$/i.test(f.name||""));}
+function p5NewVid(s){const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";v.crossOrigin="anonymous";v.src=s._url;return v;}
+function p5Ready(v){return new Promise(r=>{if(v.readyState>=2){r();return;}const f=()=>{v.removeEventListener("loadeddata",f);r();};v.addEventListener("loadeddata",f);setTimeout(r,8000);});}
+function p5Seek(v,t){return new Promise(r=>{t=Math.max(0,Math.min((v.duration||t+1)-0.02,t));if(Math.abs(v.currentTime-t)<0.0005&&v.readyState>=2){r();return;}let done=false;const fin=()=>{if(done)return;done=true;v.removeEventListener("seeked",fin);r();};v.addEventListener("seeked",fin);setTimeout(fin,4000);v.currentTime=t;});}
+function p5VDefaults(dur){return {in:0,out:Math.min(dur,6),loop:true,mute:true,speed:1,look:"",xf:0.5,cine:null};}
+async function p5MakeVidSrc(blob,name,id,vp){const s={id:id||cid(),name:name||"video",blob,kind:"video",thumb:null,lthumb:null};s._url=URL.createObjectURL(blob);
+  const v=p5NewVid(s);await p5Ready(v);if(!(v.videoWidth>0))throw new Error("video");s.w=v.videoWidth;s.h=v.videoHeight;s.dur=v.duration||0;s.v=Object.assign(p5VDefaults(s.dur),vp||{});
+  if(s.v.out>s.dur)s.v.out=s.dur;await p5Seek(v,s.v.in+0.01);const k=Math.min(1,(desk?1100:800)/Math.max(s.w,s.h));s.thumb=mk(s.w*k,s.h*k).c;s.thumb.getContext("2d").drawImage(v,0,0,s.thumb.width,s.thumb.height);
+  s.poster=mk(s.thumb.width,s.thumb.height).c;s.poster.getContext("2d").drawImage(s.thumb,0,0);s._v=v;v.loop=false;if(s.v.cine&&s.v.cine.mask)p5CineRestore(s);return s;}
+{const _ms=carMakeSrc;carMakeSrc=async function(blob,name,id,vp){if(p5IsVid({type:blob&&blob.type,name}))return p5MakeVidSrc(blob,name,id,vp);return _ms(blob,name,id);};}
+{const _af=carAddFiles;carAddFiles=async function(files){const r=await _af(files);if(r&&r.some(s=>s.kind==="video")){p5LiveKick();toast("Đã thêm "+r.length+" tệp, có "+r.filter(s=>s.kind==="video").length+" video chạy trong khung");}return r;};}
+/* thời gian nguồn của một video tại thời điểm t của carousel (vòng lặp, tốc độ, hoà vòng lặp) */
+function p5Span(s){const v=s.v,sp=v.speed||1,raw=Math.max(0.2,(v.out-v.in)/sp),xf=v.xf>0?Math.min(v.xf,raw*0.4):0;return {D:Math.max(0.2,raw-xf),xf,sp};}
+function p5Dur(){let D=0;p5VidSrcsUsed().forEach(s=>{D=Math.max(D,p5Span(s).D);});if(p5HasAnim())D=Math.max(D,CAR.motionDur||6);return Math.max(3,Math.min(15,D||3));}
+function p5SrcTimes(s,t){const {D,xf,sp}=p5Span(s),lt=((t%D)+D)%D,a=s.v.in+lt*sp;if(xf>0&&lt<xf)return [s.v.in+(D+lt)*sp,a,lt/xf];return [a,null,0];}
+function p5VidSrcsUsed(){const ids=new Set();CAR.items.forEach(it=>{const sid=it.type==="img"?(it.follow?(cItem(it.follow)||{}).src:it.src):it.fillSrc;const s=sid&&cSrc(sid);if(s&&s.kind==="video")ids.add(s);});return [...ids];}
+function p5HasAnim(){return CAR.items.some(i=>i.anim);}
+function p5ItemSrc(it){const sid=it.type==="img"?(it.follow?(cItem(it.follow)||{}).src:it.src):it.fillSrc;return sid?cSrc(sid):null;}
+function p5SlideIsLive(k){return CAR.items.some(it=>{const s=p5ItemSrc(it);if(!(s&&s.kind==="video")&&!it.anim)return false;const e=cExtent(it);return it.x+e>k*SW&&it.x-e<(k+1)*SW&&p5Overlap(it,k);});}
+function p5Overlap(it,k){const w=it.type==="text"?(it._w||200):it.w,h=it.type==="text"?(it._h||80):it.h,r=(it.rot||0)*Math.PI/180,hw=(Math.abs(w*Math.cos(r))+Math.abs(h*Math.sin(r)))/2,cx=it.x+(it.type==="text"?(it._ox||0):0);return cx+hw>k*SW+0.5&&cx-hw<(k+1)*SW-0.5;}
+function p5LiveSlides(){const L=[];for(let k=0;k<CAR.n;k++)if(p5SlideIsLive(k))L.push(k);return L;}
+/* màu riêng của video */
+function p5LookE(s){const lk=s.v&&s.v.look;if(!lk)return CAR.look?effective(state,true):null;if(lk==="none")return null;const p=findPreset(lk);if(!p)return null;
+  if(p.lut&&!LUTS.has(p.lut)&&p.lutFile)p2LoadBuiltin(p.lutFile);return effective({strength:100,params:Object.assign({},p.params),mix:(p.mix||Z9).slice(),lut:p.lut?{id:p.lut,amt:100}:null},false);}
+function p5Grade(c,e){if(!e)return c;const tex=makeTex(0,0,c);render(tex,c.width,c.height,e);gl.deleteTexture(tex);const x=c.getContext("2d");x.drawImage(glc,0,0,c.width,c.height);P5V.glDirty=true;return c;}
+/* vẽ một khung của video s tại thời điểm t vào canvas đích (đã đúng tỉ lệ nguồn) */
+async function p5FrameInto(s,t,dst,els){const x=dst.getContext("2d"),W=dst.width,H=dst.height,[ta,tb,a]=p5SrcTimes(s,t);
+  await p5Seek(els[0],ta);x.globalAlpha=1;x.drawImage(els[0],0,0,W,H);
+  if(tb!=null){await p5Seek(els[1],tb);x.globalAlpha=a;x.drawImage(els[1],0,0,W,H);x.globalAlpha=1;}
+  p5CineApply(s,x,W,H,els[2]);}
+/* cinemagraph: vùng ngoài mask đứng yên ở một khung */
+function p5CineApply(s,x,W,H){const c=s.v.cine;if(!c||!c.on||!s._cm)return;let st=s._still&&s._still.width===W&&s._still.height===H?s._still:null;if(!st)return;
+  const tmp=p5Tmp(W,H),tx=tmp.getContext("2d");tx.globalCompositeOperation="copy";tx.drawImage(x.canvas,0,0);tx.globalCompositeOperation="destination-in";tx.filter="blur("+Math.max(1,Math.round(Math.min(W,H)*(c.feather||2)/100))+"px)";tx.drawImage(s._cm,0,0,W,H);tx.filter="none";tx.globalCompositeOperation="source-over";
+  x.globalCompositeOperation="copy";x.drawImage(st,0,0,W,H);x.globalCompositeOperation="source-over";x.drawImage(tmp,0,0);}
+let p5TmpC=null;function p5Tmp(W,H){if(!p5TmpC)p5TmpC=document.createElement("canvas");if(p5TmpC.width!==W)p5TmpC.width=W;if(p5TmpC.height!==H)p5TmpC.height=H;return p5TmpC;}
+async function p5MakeStill(s,W,H,el){const c=s.v.cine;if(!c||!c.on)return;const v=el||s._v;await p5Seek(v,c.t!=null?c.t:s.v.in);const st=mk(W,H).c;st.getContext("2d").drawImage(v,0,0,W,H);s._still=st;}
+function p5CineRestore(s){const c=s.v.cine;if(!c||!c.mask)return;const im=new Image();im.onload=()=>{const m=mk(im.width,im.height);m.x.drawImage(im,0,0);s._cm=m.c;};im.src=c.mask;}
+
+/* ---- xem trực tiếp trong khổ: video chạy trong khung (khoảng 15 hình/giây) ---- */
+function p5LiveKick(){if(P5V.raf)return;P5V.t0=performance.now();P5V.raf=requestAnimationFrame(p5LiveTick);}
+let p5LiveBusy=false;
+async function p5LiveTick(now){P5V.raf=0;const open=cm&&!cm.hidden,vids=open?p5VidSrcsUsed():[];if(!open||!vids.length&&!p5HasAnim()||CAR.busy){if(P5V.glDirty&&!CAR.busy){P5V.glDirty=false;try{draw();}catch(e){}}if(open&&!CAR.busy)setTimeout(p5LiveKick,600);return;}
+  if(now-P5V.last<66||p5LiveBusy){P5V.raf=requestAnimationFrame(p5LiveTick);return;}P5V.last=now;p5LiveBusy=true;
+  try{const t=(now-P5V.t0)/1000;P5V.t=t;for(const s of vids){const v=s._v;if(!v)continue;const sp0=p5Span(s),end=s.v.in+(sp0.D+sp0.xf)*sp0.sp;
+      if(v.paused){v.playbackRate=s.v.speed||1;if(v.currentTime<s.v.in-0.05||v.currentTime>end)v.currentTime=s.v.in;try{await v.play();}catch(e){}}else if(v.currentTime>=end-0.02||v.currentTime<s.v.in-0.3){v.currentTime=s.v.in;}
+      if(Math.abs(v.playbackRate-(s.v.speed||1))>0.01)v.playbackRate=s.v.speed||1;if(v.readyState<2)continue;
+      const W=s.thumb.width,H=s.thumb.height,x=s.thumb.getContext("2d");x.drawImage(v,0,0,W,H);
+      if(s.v.cine&&s.v.cine.on&&s._cm){if(!s._still||s._still.width!==W)await p5MakeStill(s,W,H,s._v2||(s._v2=p5NewVid(s)));p5CineApply(s,x,W,H);}
+      const e=p5LookE(s);if(e){if(!s.lthumb||s.lthumb.width!==W){s.lthumb=mk(W,H).c;}const lx=s.lthumb.getContext("2d");lx.drawImage(s.thumb,0,0);p5Grade(s.lthumb,e);s._lk=1;}else if(s._lk){s.lthumb=null;s._lk=0;}}
+    if(p5HasAnim())P5A.t=t;carPaintNow();p5PvTick();}catch(e){}
+  p5LiveBusy=false;P5V.raf=requestAnimationFrame(p5LiveTick);}
+/* màu chung bật: lthumb của video lấy từ khung hiện tại (đã làm ở trên), không để carSyncLook ghi đè bằng ảnh tĩnh */
+{const _sl=carSyncLook;carSyncLook=function(force){_sl(force);p5LiveKick();};}
+{const _oc=openCarousel;openCarousel=function(){_oc();p5LiveKick();};}
+{const _cc=closeCarousel;closeCarousel=function(){_cc();CAR.srcs.forEach(s=>{if(s._v)s._v.pause();});if(P5V.glDirty){P5V.glDirty=false;try{draw();}catch(e){}}};}
+
+/* ---- xem thử kiểu Instagram: slide có video chạy trong khung điện thoại ---- */
+let p5Pv=null;
+{const _pv=carPreview;carPreview=async function(){const r=await _pv();const pv=cm.querySelector(".cpv:last-of-type"),strip=pv&&pv.querySelector(".igstrip");p5Pv=null;if(!strip)return r;
+  const live=p5LiveSlides();if(!live.length)return r;const imgs=[...strip.querySelectorAll("img")],cv=[];
+  live.forEach(k=>{const im=imgs[k];if(!im)return;const c=document.createElement("canvas");c.width=Math.round(SW*0.62);c.height=Math.round(cH()*0.62);c.className="p5live";c.setAttribute("aria-label","Slide "+(k+1)+" (video)");im.replaceWith(c);cv.push([k,c]);});
+  p5Pv={pv,cv};p5PvTick();p5LiveKick();return Object.assign({},r,{live:live.length});};}
+function p5PvTick(){if(!p5Pv)return;if(!p5Pv.pv.isConnected){p5Pv=null;return;}const g=id=>{const s=cSrc(id);return s&&((s.lthumb)||s.thumb);};
+  p5Pv.cv.forEach(([k,c])=>{const sl=carSlice(k,0.62,g);c.getContext("2d").drawImage(sl,0,0,c.width,c.height);});}
+
+/* ---- xuất: slide có video ra MP4 (H.264, AAC nếu có tiếng), slide tĩnh ra JPG, đánh số theo thứ tự ---- */
+const P5_MUX="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js";
+function p5Script(u){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=u;s.onload=res;s.onerror=()=>rej(new Error("load "+u));document.head.appendChild(s);});}
+async function p5Codec(W,H,fps){if(!("VideoEncoder" in window))return null;for(const codec of ["avc1.640028","avc1.4d0028","avc1.640033","avc1.42003e"]){const cfg={codec,width:W,height:H,bitrate:W*H>1.8e6?9e6:7e6,framerate:fps,avc:{format:"avc"}};try{const r=await VideoEncoder.isConfigSupported(cfg);if(r&&r.supported)return r.config||cfg;}catch(e){}}return null;}
+async function p5ACodec(){if(!("AudioEncoder" in window))return null;const cfg={codec:"mp4a.40.2",sampleRate:48000,numberOfChannels:2,bitrate:160000};try{const r=await AudioEncoder.isConfigSupported(cfg);if(r&&r.supported)return cfg;}catch(e){}return null;}
+/* tiếng: chỉ khi slide có đúng một video bật tiếng; lặp giống hình (kể cả hoà vòng lặp) */
+async function p5Audio(s,D){try{const ab=await s.blob.arrayBuffer(),ac=new OfflineAudioContext(2,48000,48000),buf=await ac.decodeAudioData(ab),sr=48000,n=Math.round(D*sr),L=new Float32Array(n),R=new Float32Array(n),sp=s.v.speed||1;
+  const src0=buf.getChannelData(0),src1=buf.numberOfChannels>1?buf.getChannelData(1):src0,br=buf.sampleRate,smp=(ch,t)=>{const i=Math.floor(t*br);return i>=0&&i<ch.length?ch[i]:0;};
+  for(let i=0;i<n;i++){const [ta,tb,a]=p5SrcTimes(s,i/sr);let l=smp(src0,ta),r=smp(src1,ta);if(tb!=null){l=l*(1-a)+smp(src0,tb)*a;r=r*(1-a)+smp(src1,tb)*a;}L[i]=l;R[i]=r;}
+  if(sp!==1)return null;return {L,R,n};}catch(e){return null;}}
+async function p5EncodeLive(slides,D,prog){const H=cH(),fps=P5V.fps,cfg=await p5Codec(SW,H,fps);if(!cfg)throw new Error("Trình duyệt chưa mã hoá được H.264");if(!window.Mp4Muxer)await p5Script(P5_MUX);
+  const vids=p5VidSrcsUsed(),acfg=await p5ACodec(),enc=[],need=new Map();
+  CAR.items.forEach(it=>{const s=p5ItemSrc(it);if(!s||s.kind!=="video")return;const g=it.type==="img"?cGeom(it,s):{s0:Math.max(it._w||it.size*4,1)/s.w*1.2};need.set(s.id,Math.max(need.get(s.id)||0,Math.min(s.w,Math.ceil(s.w*g.s0*1.02))));});
+  const fr=new Map();for(const s of vids){const W=Math.max(16,need.get(s.id)||s.w),Hh=Math.round(W*s.h/s.w),els=[p5NewVid(s),p5NewVid(s)];await Promise.all(els.map(p5Ready));if(s.v.cine&&s.v.cine.on&&s._cm)await p5MakeStill(s,W,Hh,els[0]);fr.set(s.id,{c:mk(W,Hh).c,els,e:p5LookE(s)});}
+  for(const k of slides){const aud=[];CAR.items.forEach(it=>{const s=p5ItemSrc(it);if(s&&s.kind==="video"&&!s.v.mute&&p5Overlap(it,k)&&!aud.includes(s))aud.push(s);});
+    const target=new Mp4Muxer.ArrayBufferTarget(),A=acfg&&aud.length===1?await p5Audio(aud[0],D):null;
+    const mux=new Mp4Muxer.Muxer({target,video:{codec:"avc",width:SW,height:H,frameRate:fps},audio:A?{codec:"aac",numberOfChannels:2,sampleRate:48000}:undefined,fastStart:"in-memory",firstTimestampBehavior:"offset"});
+    const o={k,target,mux,A,err:null,n:0};o.ve=new VideoEncoder({output:(ch,meta)=>{o.n++;mux.addVideoChunk(ch,meta);},error:e=>{o.err=e;}});o.ve.configure(cfg);enc.push(o);}
+  const N=Math.round(D*fps),cv=mk(SW,H).c,cx=cv.getContext("2d",{alpha:false});
+  for(let f=0;f<N;f++){const t=f/fps;for(const s of vids){const F=fr.get(s.id);await p5FrameInto(s,t,F.c,F.els);if(F.e)p5Grade(F.c,F.e);}P5A.t=t;
+    for(const o of enc){if(o.err)throw o.err;cx.setTransform(1,0,0,1,-o.k*SW,0);drawCarScene(cx,{sc:1,getImg:id=>{const F=fr.get(id);return F?F.c:p5Prep.get(id);},x0:o.k*SW,x1:(o.k+1)*SW});cx.setTransform(1,0,0,1,0,0);
+      const vf=new VideoFrame(cv,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});o.ve.encode(vf,{keyFrame:f%fps===0});vf.close();while(o.ve.encodeQueueSize>4)await new Promise(r=>setTimeout(r,3));}
+    if(f%6===0){prog&&prog(f/N);await new Promise(r=>setTimeout(r,0));}}
+  const out=[];for(const o of enc){await o.ve.flush();o.ve.close();if(o.err)throw o.err;
+    if(o.A){let aerr=null;const ae=new AudioEncoder({output:(ch,meta)=>o.mux.addAudioChunk(ch,meta),error:e=>{aerr=e;}});ae.configure(acfg);const CH=1024,{L,R,n}=o.A;
+      for(let i=0;i<n;i+=CH){const m=Math.min(CH,n-i),b=new Float32Array(m*2);b.set(L.subarray(i,i+m),0);b.set(R.subarray(i,i+m),m);const ad=new AudioData({format:"f32-planar",sampleRate:48000,numberOfFrames:m,numberOfChannels:2,timestamp:Math.round(i*1e6/48000),data:b});ae.encode(ad);ad.close();}
+      await ae.flush();ae.close();if(aerr&&window.console)console.warn(aerr);}
+    o.mux.finalize();out.push({k:o.k,blob:new Blob([o.target.buffer],{type:"video/mp4"}),frames:o.n,audio:!!o.A});}
+  fr.forEach(F=>F.els.forEach(v=>{v.removeAttribute("src");v.load();}));if(P5V.glDirty){P5V.glDirty=false;try{draw();}catch(e){}}return out;}
+let p5Prep=new Map();
+/* carRender bỏ qua video (đã vá trong mã gốc) — slide tĩnh dùng ảnh gốc, video dùng khung đầu */
+async function p5Export(){if(CAR.busy)return;const live=p5LiveSlides();if(!live.length)return p5ExportStatic();if(!CAR.items.length){toast("Carousel còn trống");return;}
+  CAR.busy=true;carPaint();const D=p5Dur(),H=cH();toast("Đang xuất "+CAR.n+" slide: "+live.length+" video "+D.toFixed(1)+"s, "+(CAR.n-live.length)+" ảnh…");const t0=performance.now();
+  try{const r=await carRender(),files=[];p5Prep=r.prep||new Map();
+    const vids=await p5EncodeLive(live,D,p=>{if(cexp)cexp.textContent="Đang xuất "+Math.round(p*100)+"%";});
+    for(let k=0;k<CAR.n;k++){const nm=String(k+1).padStart(2,"0"),lv=vids.find(o=>o.k===k);
+      if(lv)files.push({name:nm+".mp4",blob:lv.blob,w:SW,h:H,dur:D,frames:lv.frames,audio:lv.audio,type:"video/mp4"});
+      else{const b=await new Promise(res=>r.canvases[k].toBlob(res,"image/jpeg",0.92));if(!b)throw new Error("encode");files.push({name:nm+".jpg",blob:b,w:SW,h:H,type:"image/jpeg"});}}
+    window.__carOut=files;if(window.__TPDEBUG)window.__carCanvases=r.canvases;
+    const fl=files.map(f=>new File([f.blob],f.name,{type:f.type}));let shared=false;
+    if(!desk&&navigator.canShare&&navigator.canShare({files:fl})){try{await navigator.share({files:fl});shared=true;}catch(err){if(err&&err.name==="AbortError")shared=true;}}
+    if(!shared){const zip=await makeZip(files);window.__carZip=zip;const name="carousel-"+CAR.n+"-slide-"+Date.now().toString().slice(-5)+".zip",dl=await getDownloads();
+      if(dl){try{await dl.save({filename:name,data:zip});}catch(err){}}else{const a=document.createElement("a"),u=URL.createObjectURL(zip);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);}}
+    toast("Xong "+files.length+" slide ("+live.length+" MP4 "+D.toFixed(1)+"s, "+(files.length-live.length)+" JPG) trong "+Math.round((performance.now()-t0)/1000)+" giây");return files;}
+  catch(err){if(window.console)console.warn(err);toast("Xuất video chưa được: "+(err&&err.message||"lỗi")+". Thử video ngắn hơn hoặc Chrome / Edge mới.");return null;}
+  finally{CAR.busy=false;p5Prep=new Map();carPaint();p5LiveKick();}}
+const p5ExportStatic=carExport;carExport=p5Export;
+
+/* ---- bảng bên: điều khiển video trong khung ---- */
+function p5VidSide(it,s){const v=s.v,box=sec("Khung động · video");const fmt=x=>(x/10).toFixed(1)+"s",D=Math.max(1,Math.round(s.dur*10));
+  box.appendChild(sld("Bắt đầu",0,D,Math.round(v.in*10),x=>{v.in=Math.min(x/10,v.out-0.3);},()=>{p5VChanged(s);},fmt));
+  box.appendChild(sld("Kết thúc",0,D,Math.round(v.out*10),x=>{v.out=Math.max(x/10,v.in+0.3);},()=>{p5VChanged(s);},fmt));
+  box.appendChild(chipRow([[0.5,"0.5x"],[0.75,"0.75x"],[1,"1x"],[1.5,"1.5x"],[2,"2x"]],v.speed||1,x=>{v.speed=x;p5VChanged(s);}));
+  const r=el("div","btnrow"),mu=btn(v.mute?"Đang tắt tiếng":"Giữ tiếng gốc","",()=>{v.mute=!v.mute;p5VChanged(s);});mu.setAttribute("aria-pressed",String(!v.mute));
+  const xf=btn("Hoà vòng lặp","",()=>{v.xf=v.xf>0?0:0.5;p5VChanged(s);});xf.setAttribute("aria-pressed",String(v.xf>0));
+  const cn=btn(v.cine&&v.cine.on?"Sửa cinemagraph":"Cinemagraph","",()=>p5CineOpen(s));cn.setAttribute("aria-pressed",String(!!(v.cine&&v.cine.on)));r.append(mu,xf,cn);box.appendChild(r);
+  const lk=sec("Màu riêng của video");lk.appendChild(chipRow(P5V.looks,v.look||"",x=>{v.look=x;s.lthumb=null;p5VChanged(s);}));box.appendChild(lk);
+  const sp=p5Span(s);box.appendChild(hint("Vòng lặp "+sp.D.toFixed(1)+"s"+(sp.xf?", hoà "+sp.xf.toFixed(1)+"s ở chỗ nối nên không thấy vết cắt":"")+". Slide có video xuất MP4 "+SW+"×"+cH()+", dài 3–15 giây, mọi slide video cùng độ dài để ảnh vắt qua mép vẫn khớp."));
+  return box;}
+function p5VChanged(s){if(s.v.out>s.dur)s.v.out=s.dur;s._still=null;carCommit();carSide();carPaint();p5LiveKick();carSaveNow();}
+{const _cs=carSide;carSide=function(){_cs();if(!cside)return;const it=CAR.sel&&cItem(CAR.sel);
+  try{if(it&&it.type==="img"){const s=p5ItemSrc(it);const first=cside.querySelector(".tp-sec");
+      if(s&&s.kind==="video"){const b=p5VidSide(it,s);first&&first.nextSibling?cside.insertBefore(b,first.nextSibling):cside.appendChild(b);}
+      cside.appendChild(p5BlendSec(it));const sr=p5StepSec(it);cside.appendChild(sr);}
+    else if(it&&it.type==="text"){cside.appendChild(p5FillSec(it));cside.appendChild(p5BlendSec(it));cside.appendChild(p5StepSec(it));}
+    else if(it&&it.type==="stk"){cside.appendChild(p5BlendSec(it));cside.appendChild(p5StepSec(it));}
+    p5LangSec();
+    cside.querySelectorAll('input[type=file]').forEach(fi=>{if(fi.accept==="image/*")fi.accept="image/*,video/*";});}catch(e){if(window.console)console.warn(e);}};}
+function p5LangSec(){const s=sec("Chữ trên post");s.classList.add("p5lang");s.appendChild(chipRow([["en","Tiếng Anh"],["vi","Tiếng Việt"]],p5Lang(),v=>p5SetLang(v)));
+  const b=btn("Dòng phụ tiếng Việt","",()=>p5SetVi2(!CAR.vi2));b.setAttribute("aria-pressed",String(!!CAR.vi2));b.disabled=p5Lang()!=="en";const r=el("div","btnrow");r.appendChild(b);
+  const h=el("div","btnrow");h.append(btn("Lưu bộ nhận diện","",p5HouseSave),btn("Áp bộ nhận diện","",p5HouseLoad));s.append(r,h,hint("Mẫu mới viết tiếng Anh, chữ kiểu Apple (Inter Display, Newsreader). Dòng phụ thêm tên tiếng Việt có dấu, cỡ nhỏ dưới tiêu đề. Bộ nhận diện lưu cặp chữ, bảng màu, preset và lề để Video Pro dùng lại."));
+  const top=cside.querySelector(".edtpl");const host=top?top.closest(".tp-sec"):null;if(host&&host.parentNode)host.parentNode.insertBefore(s,host.nextSibling);else cside.appendChild(s);}
+
+/* ---- Cinemagraph: vẽ vùng chuyển động, phần còn lại đứng yên ở một khung ---- */
+function p5CineOpen(s){if(!s||s.kind!=="video")return;const v=s.v;v.cine=v.cine||{on:true,t:v.in,feather:2,mask:null};v.cine.on=true;
+  const MW=Math.round(Math.min(640,s.w)),MH=Math.round(MW*s.h/s.w);if(!s._cm||s._cm.width!==MW){const m=mk(MW,MH);if(s._cm)m.x.drawImage(s._cm,0,0,MW,MH);s._cm=m.c;}
+  const pv=el("div","cpv p5cine");pv.setAttribute("role","dialog");pv.setAttribute("aria-label","Cinemagraph");const box=el("div","p5cbox");const cv=document.createElement("canvas");cv.width=MW;cv.height=MH;cv.className="p5ccv";cv.setAttribute("aria-label","Vẽ vùng chuyển động");
+  const side=el("div","p5cside");side.appendChild(el("h3",null,"Cinemagraph"));side.appendChild(hint("Tô lên chỗ muốn chuyển động (nước, tóc, khói, đèn lồng). Phần còn lại đứng yên ở khung bạn chọn."));
+  let br=8,erase=false;const still=mk(MW,MH).c;
+  const paint=()=>{const x=cv.getContext("2d");x.globalCompositeOperation="source-over";x.drawImage(still,0,0);x.globalAlpha=0.5;const t=mk(MW,MH);t.x.drawImage(s._cm,0,0);t.x.globalCompositeOperation="source-in";t.x.fillStyle="#e9b45c";t.x.fillRect(0,0,MW,MH);x.drawImage(t.c,0,0);x.globalAlpha=1;};
+  const grab=async()=>{const vv=s._v2||(s._v2=p5NewVid(s));await p5Ready(vv);await p5Seek(vv,v.cine.t);still.getContext("2d").drawImage(vv,0,0,MW,MH);s._still=null;paint();};
+  side.appendChild(sld("Khung đứng yên",Math.round(v.in*10),Math.round(v.out*10),Math.round(v.cine.t*10),x=>{v.cine.t=x/10;},()=>grab(),x=>(x/10).toFixed(1)+"s"));
+  side.appendChild(sld("Cỡ cọ",2,30,br,x=>{br=x;},null,x=>x+"%"));side.appendChild(sld("Mép mềm",0,8,v.cine.feather,x=>{v.cine.feather=x;},null,x=>x+"%"));
+  const r=el("div","btnrow"),eb=btn("Tẩy","",()=>{erase=!erase;eb.setAttribute("aria-pressed",String(erase));});eb.setAttribute("aria-pressed","false");
+  r.append(eb,btn("Xoá hết","",()=>{s._cm.getContext("2d").clearRect(0,0,MW,MH);paint();}),btn("Tắt cinemagraph","",()=>{v.cine.on=false;done();}));side.appendChild(r);
+  const done=()=>{v.cine.mask=s._cm.toDataURL("image/png");s._still=null;pv.remove();p5VChanged(s);};const r2=el("div","btnrow");r2.appendChild(btn("Xong","primary",done));side.appendChild(r2);
+  let down=false;const dot=e=>{const b=cv.getBoundingClientRect(),px=(e.clientX-b.left)/b.width*MW,py=(e.clientY-b.top)/b.height*MH,x=s._cm.getContext("2d"),rr=br/100*Math.min(MW,MH);x.globalCompositeOperation=erase?"destination-out":"source-over";x.fillStyle="#fff";x.beginPath();x.arc(px,py,rr,0,7);x.fill();x.globalCompositeOperation="source-over";paint();};
+  cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);dot(e);});cv.addEventListener("pointermove",e=>{if(down)dot(e);});cv.addEventListener("pointerup",()=>{down=false;});cv.style.touchAction="none";
+  box.append(cv,side);pv.appendChild(box);cm.appendChild(pv);grab();return {paint:(fx,fy,fr)=>{const x=s._cm.getContext("2d");x.fillStyle="#fff";x.beginPath();x.arc(fx*MW,fy*MH,fr*Math.min(MW,MH),0,7);x.fill();paint();},rect:(a,b,c,d)=>{const x=s._cm.getContext("2d");x.fillStyle="#fff";x.fillRect(a*MW,b*MH,c*MW,d*MH);paint();},done};}
+/* tạo nhanh cinemagraph từ một video: carousel 1 slide, video tràn khung, mở bảng vẽ */
+function p5CineQuick(s){s=s||CAR.srcs.find(x=>x.kind==="video"&&CAR.pick.has(x.id))||CAR.srcs.find(x=>x.kind==="video");if(!s){toast("Thêm một video trước");return null;}
+  CAR.n=1;CAR.slide=0;const H=cH(),it=carImgItem(s.id,SW/2,H/2,SW,H);CAR.items=[it];CAR.sel=it.id;carFit(true);carCommit();carSide();carPaint();return p5CineOpen(s);}
+
+/* =================== Hoà trộn lớp, chữ chứa ảnh/video, lặp có bước =================== */
+const P5_BLENDS=[["","Thường"],["multiply","Multiply"],["screen","Screen"],["overlay","Overlay"],["soft-light","Soft light"],["hard-light","Hard light"],["darken","Darken"],["lighten","Lighten"],["color-burn","Color burn"],["color-dodge","Color dodge"],["difference","Difference"],["color","Color"],["luminosity","Luminosity"],["hue","Hue"],["saturation","Saturation"]];
+function p5BlendSec(it){const s=sec("Hoà trộn lớp");s.appendChild(chipRow(P5_BLENDS,it.blend||"",v=>{it.blend=v||undefined;carCommit();carSide();carPaint();}));s.appendChild(sld("Độ mờ lớp",5,100,Math.round((it.op==null?1:it.op)*100),v=>{it.op=v/100;carPaint();},()=>carCommit(),v=>v+"%"));
+  s.appendChild(hint("Multiply bỏ nền trắng của nét vẽ, chữ ký; Screen bỏ nền đen của khói, mây, ánh sáng."));return s;}
+function p5FillSec(it){const s=sec("Chữ chứa ảnh / video");const opts=[["","Màu trơn"]].concat(CAR.srcs.map(x=>[x.id,(x.kind==="video"?"Video ":"Ảnh ")+x.name.slice(0,14)]));
+  s.appendChild(chipRow(opts,it.fillSrc||"",v=>{it.fillSrc=v||undefined;carCommit();carSide();carPaint();p5LiveKick();}));s.appendChild(hint("Chữ tiêu đề lớn mang ảnh hoặc video bên trong, hợp bìa. Dùng chữ đậm, cỡ thật to."));return s;}
+function p5StepSec(it){const s=sec("Lặp có bước");let n=4,dx=0,dy=Math.round((it.type==="text"?(it._h||it.size):it.h)*1.05),fade=true;
+  s.appendChild(sld("Số bản",2,12,n,v=>{n=v;}));s.appendChild(sld("Bước ngang",-600,600,dx,v=>{dx=v;},null,v=>v+"px"));s.appendChild(sld("Bước dọc",-600,600,dy,v=>{dy=v;},null,v=>v+"px"));
+  const r=el("div","btnrow");r.appendChild(btn("Lặp","",()=>p5StepRepeat(it,n,dx,dy,fade)));s.appendChild(r);return s;}
+function p5StepRepeat(it,n,dx,dy,fade){const i0=CAR.items.indexOf(it),add=[];for(let k=1;k<n;k++){const c=JSON.parse(JSON.stringify(carClean(it)));c.id=cid();c.x=it.x+dx*k;c.y=it.y+dy*k;if(fade)c.op=Math.max(0.12,(it.op==null?1:it.op)*(1-k/(n+0.5)));c.stepOf=it.id;add.push(c);}
+  CAR.items.splice(i0+1,0,...add);edRestyle();carCommit();carSide();carPaint();return add.length;}
+/* vẽ chữ chứa ảnh: vẽ chữ làm mặt nạ rồi đổ ảnh (hoặc khung video hiện tại) vào, phủ cover theo khung chữ */
+function p5FillText(x,it,L,o){const s=cSrc(it.fillSrc),img=s&&o.getImg(s.id);if(!img)return false;const w=Math.max(4,it._w),h=Math.max(4,it._h),sc=o.sc||1,ox=it._ox||0,oy=it._oy||0;
+  const W=Math.max(2,Math.ceil(w*sc)),H=Math.max(2,Math.ceil(h*sc)),t=mk(W,H);t.x.setTransform(sc,0,0,sc,W/2-ox*sc,H/2-oy*sc);t.x.font=cTextFont(it);t.x.fillStyle="#000";edLines(t.x,it,L);
+  t.x.setTransform(1,0,0,1,0,0);t.x.globalCompositeOperation="source-in";const iw=img.width,ih=img.height,k=Math.max(W/iw,H/ih);t.x.drawImage(img,(W-iw*k)/2,(H-ih*k)/2,iw*k,ih*k);
+  x.drawImage(t.c,ox-w/2,oy-h/2,w,h);return true;}
+
+/* =================== Poster động (Swiss): người tách nền + khối hình học + chữ khổng lồ sau người =================== */
+const P5A={t:0};
+/* chuyển động rất chậm theo thời gian xuất (giây), áp trong drawCarScene */
+function p5Anim(x,it){const a=it.anim,t=P5A.t||0,D=CAR.motionDur||6,u=(t%D)/D,s=Math.sin(u*Math.PI*2);
+  if(a.k==="drift")x.translate((a.dx||0)*s,(a.dy||0)*s);else if(a.k==="rise"){const e=Math.min(1,t/1.2),f=1-Math.pow(1-e,3);x.translate(0,(1-f)*(a.d||60));x.globalAlpha*=f;}
+  else if(a.k==="breathe"){const k=1+(a.s||0.025)*(0.5-0.5*Math.cos(u*Math.PI*2));x.scale(k,k);}else if(a.k==="rot"){x.rotate((a.r||6)*Math.PI/180*s);}}
+/* tách người cho ảnh trong khung: dùng AI tách người sẵn có của app nếu đã tải, không có thì giữ nguyên ảnh */
+const p5CutC=new Map();
+async function p5Cutout(sid){const c0=p5CutC.get(sid);if(c0&&typeof c0!=="string")return c0;const s=cSrc(sid);if(!s)return null;let res=null;
+  try{if(typeof window.__p5Seg==="function")res=await window.__p5Seg(s.thumb);else if(typeof aiPersonMask==="function")res=await aiPersonMask(s.thumb);}catch(e){}
+  if(!res){try{res=await p5SegLocal(s.thumb);}catch(e){res=null;}}
+  if(!res){p5CutC.set(sid,"none");return null;}const c=mk(s.thumb.width,s.thumb.height);c.x.drawImage(s.thumb,0,0);c.x.globalCompositeOperation="destination-in";c.x.drawImage(res,0,0,c.c.width,c.c.height);p5CutC.set(sid,c.c);return c.c;}
+async function p5SegLocal(img){if(typeof ensureAI!=="function")return null;const a=await ensureAI();if(!a||!a.seg)return null;let out=null;
+  a.seg.segment(img,r=>{const cmk=r.confidenceMasks;if(!cmk||!cmk.length)return;const w=cmk[0].width,h=cmk[0].height,bg=cmk[0].getAsFloat32Array(),m=mk(w,h),d=m.x.createImageData(w,h);for(let i=0;i<w*h;i++){d.data[i*4+3]=Math.round(Math.max(0,Math.min(1,(1-bg[i]-0.35)/0.3))*255);}m.x.putImageData(d,0,0);out=m.c;});return out;}
+function p5PosterBuild(H,X,v){const I=[],W=SW,pal=edPal();const circ=eK("dot",X+W*0.645,H*0.47,W*0.54,W*0.54,{ink:"accent",op:.42,anim:{k:"breathe",s:.03}});
+  const big=eT(v?"NINH\nBINH":"Ninh\nBinh",X+EM-8,H*0.17,"display",{base:v?330:300,align:"left",ls:-.04,anim:{k:"drift",dx:14,dy:0},maxw:0});
+  const slot=eS(X+W*0.3,0,W*0.7,H,{cut:1});slot.anim={k:"drift",dx:-8,dy:-4};
+  I.push(circ,big,slot);
+  I.push(eT("N°03",X+EM,EM,"folio"),eT("Hanoi — Ninh Binh",X+W-EM,EM,"meta",{align:"right"}),eH(X+EM,H-EM-44,X+W-EM,{op:.5}),eT("Five Days, One Autumn",X+EM,H-EM,"caption",{va:"bottom",base:34,anim:{k:"rise",d:24}}),eT("18—22.11.2026",X+W-EM,H-EM,"meta",{va:"bottom",align:"right",ink:"muted"}));return I;}
+ED_TPL.push({id:"poster",name:"Poster động 4:5",ratio:"45",n:1,pair:"apple",pal:"cream",build(H,X){return p5PosterBuild(H,X,false);}},
+  {id:"posterv",name:"Bìa Reel poster 9:16",ratio:"916",n:1,pair:"apple",pal:"stone",build(H,X){const I=p5PosterBuild(H,X,true);I.forEach(i=>{if(i.role==="display"){i.y=H*0.2;i.base=360;}});return I;}});
+P5_TPAIR.poster="apple";P5_TPAIR.posterv="apple";p5TplPairs();
+/* ô có cut: vẽ người đã tách nền thay vì cả ảnh (nếu chưa tách được thì vẽ ảnh mờ nhẹ phía sau chữ) */
+function p5DrawCut(x,it,o,w,h){const sid=it.src,s=sid&&cSrc(sid);if(!s)return false;const cut=p5CutC.get(sid);if(!cut){if(!p5CutC.has(sid)){p5CutC.set(sid,"pending");p5Cutout(sid).then(c=>{p5CutC.set(sid,c||"none");carPaint();});}
+    const img=o.getImg(sid);if(!img||o.thumb)return true;const dot=CAR.items.find(i=>i.type==="stk"&&i.kind==="dot"&&Math.abs(i.x-it.x)<SW);const cx=dot?dot.x-it.x:w*0.12,cy=dot?dot.y-it.y:-h*0.07,R=dot?dot.w/2:w*0.28;
+    x.save();x.beginPath();x.arc(cx,cy,R,0,7);x.clip();const k=Math.max(2*R/img.width,2*R/img.height);x.drawImage(img,cx-img.width*k/2,cy-img.height*k/2,img.width*k,img.height*k);x.restore();return true;}
+  if(typeof cut==="string")return true;
+  const g=cGeom(it,s),iw=cut.width,ih=cut.height;x.drawImage(cut,g.u0*iw,g.v0*ih,g.fw*iw,g.fh*ih,-w/2,-h/2,w,h);return true;}
+{const _ap=edApply;edApply=async function(id,opt){const r=await _ap(id,opt);if(id==="poster"||id==="posterv"){CAR.motionDur=6;const sl=CAR.items.find(i=>i.cut&&i.src);if(sl){p5CutC.delete(sl.src);await p5Cutout(sl.src);carPaint();}p5LiveKick();}return r;};}
+
+/* ---- mẫu chữ tiếng Anh cho “Thêm chữ” ---- */
+{const _ar=edAddRole;edAddRole=function(role){const it=_ar(role);if(p5Lang()==="en"&&it){const EN={display:"Ninh Binh",title:"Water & Stone",kicker:"Chapter Two",meta:"20.11.2026",body:"The boat left the pier at seven. The water was clear enough to see the weeds below.",quote:"Even the oars speak softly here.",caption:"Tam Coc, the last morning",folio:"07",numeral:"03"};
+  if(EN[role]){it.vi=it.text;it.text=EN[role];edRestyle();carPaint();}}return it;};}
+if(window.__TPDEBUG)window.__TPDEBUG.p5={P5V,P5A,P5_EN,lang:p5SetLang,vi2:p5SetVi2,span:p5Span,dur:p5Dur,live:p5LiveSlides,cine:p5CineOpen,cineQuick:p5CineQuick,exp:p5Export,step:p5StepRepeat,cut:p5Cutout,cutC:p5CutC,
+  house:{save:p5HouseSave,load:p5HouseLoad,get:p5HouseGet},srcTimes:p5SrcTimes,vids:p5VidSrcsUsed,pvTick:p5PvTick};
+function p5StillImg(id){const s=cSrc(id);if(!s)return null;return s.kind==="video"?(s.lthumb||s.poster||s.thumb):(CAR.look&&s.lthumb)||s.thumb;}
+if(window.__TPDEBUG&&window.__TPDEBUG.car){Object.assign(window.__TPDEBUG.car,{preview:carPreview,exp:carExport,addFiles:carAddFiles,open:openCarousel,close:closeCarousel});Object.assign(window.__TPDEBUG.ed,{apply:edApply,lux:edLuxCheck,restyle:edRestyle});}
+
 
 /* ---------- Boot ---------- */
 try{

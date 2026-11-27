@@ -461,6 +461,7 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 /* bản 27/11 — Cảnh */
 body.p4pick #pv{cursor:crosshair}
 
+
 </style>
 </head>
 <body>
@@ -3751,7 +3752,7 @@ const ED_DEF={title:()=>({k:"title",title:"Khôi & Thư",sub:"Hà Nội · Ninh 
   sub2:()=>({k:"sub2",vi:"Mình đi chậm thôi",en:"let's take it slow",col:"cream",f:5})};
 function edPanel(it){const e=it.ed,box=el("div","sec");box.style.gap="14px";const inp=(l,k,ph,ta)=>{const s=sec(l);const i=document.createElement(ta?"textarea":"input");i.className="field";if(ta)i.rows=9;i.value=e[k]||"";if(ph)i.placeholder=ph;i.setAttribute("aria-label",l);
     i.oninput=()=>{e[k]=i.value;it.text=edLabel(e);requestDraw();};i.onchange=()=>commit();s.appendChild(i);box.appendChild(s);};
-  if(e.k==="chapter"){inp("Số chương","num","02");inp("Tên chương","name","Ninh Bình — nước & đá");inp("Ngày","date","19.11.2026");inp("Toạ độ","coord","20°15′N 105°54′E");
+  if(e.k==="chapter"){inp("Số chương","num","02");inp("Tên chương","name","Ninh Binh — Water & Stone");inp("Ngày","date","20.11.2026");inp("Toạ độ","coord","20°15′N 105°54′E");
     box.appendChild(sld("Làm tối hình phía sau",0,1,.01,e.dim||0,v=>Math.round(v*100)+"%",v=>{e.dim=v;requestDraw();},()=>commit()));}
   else if(e.k==="lower"){inp("Địa danh","place","Tràng An");inp("Dòng phụ (song ngữ, tên vùng)","sub","Ninh Bình");inp("Ngày","date","19.11.2026");inp("Toạ độ","coord","20°15′N 105°54′E");
     const s=sec("Căn");s.appendChild(segRow([["left","Trái dưới"],["right","Phải dưới"]],e.al||"left",v=>{e.al=v;commit();}));box.appendChild(s);}
@@ -3787,12 +3788,12 @@ async function makeChapter(o){const t0=o.t!=null?o.t:T,dur=o.dur||4.5;let start=
 function openChapterDlg(mk){pause();const d=$("expDlg");d.innerHTML="";d.appendChild(el("h3",null,"Title card chương"));const n=String(chapters().filter(c=>!mk||c!==mk).length+1).padStart(2,"0");
   const f={num:n,name:mk&&mk.name&&!/^Chương \d+$/.test(mk.name)?mk.name:"",date:"",coord:"",bg:"black",dur:4.5};
   const row=(l,k,ph)=>{const s=sec(l);const i=document.createElement("input");i.className="field";i.value=f[k];i.placeholder=ph;i.setAttribute("aria-label",l);i.oninput=()=>{f[k]=i.value;};s.appendChild(i);d.appendChild(s);};
-  row("Số chương","num","02");row("Tên chương","name","Ninh Bình — nước & đá");row("Ngày","date","19.11.2026");row("Toạ độ (tuỳ chọn)","coord","20°15′N 105°54′E");
+  row("Số chương","num","02");row("Tên chương","name","Ninh Binh — Water & Stone");row("Ngày","date","20.11.2026");row("Toạ độ (tuỳ chọn)","coord","20°15′N 105°54′E");
   const sP=sec("Cặp chữ");sP.appendChild(chipRow(Object.keys(PAIRS3).map(k=>[k,PAIRS3[k].n]),P.edPair||"classic",v=>{P.edPair=v;}));d.appendChild(sP);
   const s=sec("Nền");s.appendChild(chipRow([["black","Nền đen ấm (chèn vào)"],["paper","Nền giấy kem (chèn vào)"],["over","Đè lên hình, làm tối"]],f.bg,v=>{f.bg=v;}));d.appendChild(s);
   d.appendChild(sld("Thời lượng",2.5,8,.1,f.dur,v=>v.toFixed(1)+"s",v=>{f.dur=v;}));
   d.appendChild(el("p","hint","Số lớn serif mảnh, tên chương nghiêng, đường kẻ mảnh, ngày và toạ độ chữ mono. Mỗi dòng hiện dần 15 khung, lệch nhau vài khung. Chương được đánh dấu trên thước thời gian và xuất được thành mốc chương YouTube."));
-  const r=el("div","btnrow");r.append(tbtn("Huỷ",()=>{$("expBox").hidden=true;}),tbtn("Tạo chương",async()=>{$("expBox").hidden=true;await makeChapter(Object.assign({},f,{t:mk?mk.t:T,marker:mk,name:f.name||"Chương "+f.num}));toast("Đã tạo chương "+f.num);},"primary"));d.appendChild(r);$("expBox").hidden=false;}
+  const r=el("div","btnrow");r.append(tbtn("Huỷ",()=>{$("expBox").hidden=true;}),tbtn("Tạo chương",async()=>{$("expBox").hidden=true;await makeChapter(Object.assign({},f,{t:mk?mk.t:T,marker:mk,name:f.name||"Chapter "+f.num}));toast("Đã tạo chương "+f.num);},"primary"));d.appendChild(r);$("expBox").hidden=false;}
 /* thư viện Chữ: nhóm chữ điện ảnh */
 {const _lp=libPanel;libPanel=function(k){const box=_lp(k);if(k==="text")try{const s=sec("Chữ điện ảnh");const g=el("div","grid2");
       const card=(lab,sub,css,fn)=>{const c=el("button","card edc");c.type="button";const p=el("div","tt");p.style.cssText=css;p.textContent=lab;c.append(p,el("span",null,sub));c.onclick=fn;g.appendChild(c);};
@@ -4128,7 +4129,7 @@ async function hardStop(){layout();const t=T;let n=0;P.tracks.forEach(tr=>{if(tr
   commit();toast(n?"Nhạc dừng tại "+fmtTC(t)+", giữ khung 3 giây với room tone":"Không có nhạc tại đầu phát; đã giữ khung với room tone");}
 async function filmEnding(){layout();if(!P.main.length)return toast("Chưa có clip nào");const last=P.main[P.main.length-1];last.fadeOut=Math.max(last.fadeOut||0,1.5);
   const c=await solidClip(EDCOL.ink,false,5);if(c){P.main.push(c);layout();}const s=c?c._start:total;
-  const ed=ED_DEF.title();ed.title=(P.name&&!/^Dự án/.test(P.name))?P.name:"Năm ngày, một mùa thu";ed.sub="Khôi & Thư";ed.meta="Hà Nội · Ninh Bình · 11.2026";ed.f=18;addEd(ed,{start:s+.6,dur:3.8});
+  const ed=ED_DEF.title();ed.title=(P.name&&!/^Dự án/.test(P.name))?P.name:"Five Days, One Autumn";ed.sub="Khôi & Thư";ed.meta="Hanoi · Ninh Binh · 18—22.11.2026";ed.f=18;addEd(ed,{start:s+.6,dur:3.8});
   layout();P.tracks.forEach(tr=>{if(tr.type!=="audio")return;tr.items.forEach(a=>{if(!isMusicItem(a))return;const m=media.get(a.mid);const want=total-a.start;if(want>0){a.out=Math.min(m?m.dur:a.out,a.in+want);a.fadeOut=Math.min(3.5,(a.out-a.in)*.4);}});});
   commit();seek(Math.max(0,s-1));toast("Đã thêm kết phim: tắt dần về đen, tên phim, nhạc ngân đuôi");}
 /* vệt sáng / sao băng rất nhẹ (lớp hiệu ứng) */
@@ -4232,6 +4233,30 @@ window.__P4={P4,EKK:window.EKK,rfAnalyze,rfPathAt,p4Proc,skyFor,addFilmStrip,p4S
   setSeg:s=>{SEG=s;PMK.cache.clear();PMK.bytes=0;requestDraw();},pmCompute};
 async function p4RenderAt(t,W,H){layout();const c=document.createElement("canvas");c.width=W;c.height=H;const was=exporting;exporting=true;try{T=t;await frameReady(t);drawFrame(c.getContext("2d"),W,H,t,false);}finally{exporting=was;}return c;}
 window.__P4.renderAt=p4RenderAt;
+
+/* ---------- P5 (27/11 chiều): chữ kiểu Apple (Inter Display, Newsreader) và chữ tiếng Anh cho mọi mẫu điện ảnh ---------- */
+const IDSP='"Inter Display",system-ui,sans-serif',ITX='"Inter Text",system-ui,sans-serif',NWD='"Newsreader Display",Georgia,serif';
+Object.assign(EDF3,{idsp600:["600",IDSP],idsp500:["500",IDSP],idsp300:["300",IDSP],itx400:["400",ITX],itx500:["500",ITX],itx600:["600",ITX],nwd300:["300",NWD],nwd300i:["italic 300",NWD],nwd400:["400",NWD]});
+Object.assign(PAIRS3,{apple:{n:"Apple · Sans",display:["idsp600",-.02,""],numeral:["idsp600",-.04,""],title:["idsp500",-.015,""],kicker:["itx600",.1,"u"],meta:["itx500",.02,""],body:["itx400",0,""],quote:["idsp500",-.012,""],name:["idsp500",-.015,""]},
+  appled:{n:"Apple · Editorial",display:["nwd300",-.015,""],numeral:["nwd300",-.03,""],title:["nwd300i",-.005,""],kicker:["itx600",.14,"u"],meta:["itx500",.08,"u"],body:["itx400",0,""],quote:["nwd300i",-.005,""],name:["nwd300",-.012,""]}});
+Object.assign(TFONTS,{nwd:['300',NWD,"Newsreader"],idsp:['600',IDSP,"Inter Display"],itx:['400',ITX,"Inter Text"]});
+function p5House(){try{return JSON.parse(localStorage.getItem("iohk.house")||"null");}catch(e){return null;}}
+function p5DefPair(){const h=p5House();return h&&PAIRS3[h.pair]?h.pair:"appled";}
+pairOf=function(e){return PAIRS3[e.pair||P.edPair||p5DefPair()]||PAIRS3.appled;};
+(()=>{if(!document.fonts||!document.fonts.load)return;Promise.all(['600 40px "Inter Display"','500 40px "Inter Display"','300 40px "Inter Display"','400 20px "Inter Text"','500 20px "Inter Text"','600 20px "Inter Text"','300 40px "Newsreader Display"','italic 300 40px "Newsreader Display"','400 40px "Newsreader Display"'].map(f=>document.fonts.load(f,"Ninh Bình ĐƯỜNG ơ 0").catch(()=>{}))).then(()=>{try{requestDraw();}catch(e){}});})();
+/* chữ mặc định tiếng Anh (khách yêu cầu 27/11); tên riêng có dấu giữ ở dòng phụ */
+ED_DEF.title=()=>({k:"title",title:"Five Days, One Autumn",sub:"Khôi & Thư",meta:"Hanoi · Ninh Binh · 18—22.11.2026",col:"cream",f:15});
+ED_DEF.lower=()=>({k:"lower",place:"Trang An",sub:"Tràng An · Ninh Bình",date:"20.11.2026",coord:"20°15′N 105°54′E",al:"left",col:"cream",f:15});
+ED_DEF.credits=()=>({k:"credits",col:"cream",f:12,body:"Khôi & Thư\n#Hanoi · Ninh Binh · November 2026\n\nFilmed by | Khôi, Thư\nEdit & colour | Khôi\nMusic | Title — Artist (licence)\nLocations | Hoan Kiem · Old Quarter · Trang An · Mua Cave · Tam Coc\n\n#With thanks to\nLong · Ruby\n\n#Thank you\nfor staying to the end"});
+ED_DEF.sub2=()=>({k:"sub2",vi:"Mình đi chậm thôi",en:"let’s take it slow",col:"cream",f:5});
+/* 4 mẫu dựng sẵn: chữ tiếng Anh, phông Newsreader / Inter Display */
+const P5_VEN={"có những nơi":"some places","chỉ cần đến":"you only need","một lần":"to visit once","là nhớ":"to remember","rất lâu":"for a long time","NINH BÌNH":"NINH BINH","Hà Nội đứng yên":"Hanoi, standing still","hà nội · 11.2026":"hanoi · 11.2026",
+  "một ngày rất chậm ở ninh bình":"a very slow day in ninh binh","26. tháng mười một, 2026":"20 november, 2026","moving postcards":"moving postcards","from":"from"};
+const P5_VFONT={corm:"nwd",cormL:"nwd",bebas:"idsp",inter:"idsp"};
+TPL_BUILTIN.forEach(t=>{const mk0=t.make;t.make=function(){const r=mk0.call(this);(r.proj.tracks||[]).forEach(tr=>tr.items.forEach(i=>{if(i.type!=="text")return;if(P5_VEN[i.text]!=null){i.vi=i.text;i.text=P5_VEN[i.text];}if(P5_VFONT[i.font]){i.font=P5_VFONT[i.font];if(i.font==="idsp"&&i.ls>1)i.ls=1.2;}
+    if(i.text==="NINH BINH"){i.color="#E8DCC8";}}));return r;};});
+if(window.__V3)Object.assign(window.__V3,{P5_VEN});
+
 
 /* ---------- wiring ---------- */
 function syncProjSel(){$("selRatio").value=P.ratio;$("selBg").value=P.bg;}
