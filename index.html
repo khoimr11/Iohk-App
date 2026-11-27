@@ -476,6 +476,10 @@ details.edfun>.tp-sec{margin-bottom:14px}
 .edlux li{cursor:pointer;color:#c9c4bb}.edlux p{margin:0;color:#c9c4bb}
 .edwarn{color:#f0b9a4}
 @media (max-width:899px){.edlux{top:calc(46dvh - 8px);transform:translateY(-100%);left:8px;max-width:calc(100% - 16px)}.edlux ul{max-height:16dvh}}
+/* bản 27/11 — Trời · Màu */
+.p4sw{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.4);display:inline-block;flex:none}
+body.p4pick #stage,body.p4pick #view{cursor:crosshair}
+
 </style>
 </head>
 <body>
@@ -682,6 +686,7 @@ details.edfun>.tp-sec{margin-bottom:14px}
   </div>
 </div>
 
+<script src="ekk.js"></script>
 <script>
 (function(){
 "use strict";
@@ -4628,6 +4633,52 @@ async function carMockup(){const r=await carRender(),W=1080,H=1350,c=mk(W,H),x=c
   x.fillText(String(t?t.text:"một ngày ở ninh bình").replace(/\n/g," ").slice(0,26),sx+26+nw,ry+52,sw-nw-48);x.fillStyle="#8e8e93";x.font="400 18px "+F;x.fillText("26 tháng 11",sx+26,ry+88);
   x.fillStyle="#111";rrPath(x,sx+sw/2-66,sy+sh-20,132,7,4);x.fill();
   const gl=x.createLinearGradient(sx,sy,sx+sw,sy+sh*0.6);gl.addColorStop(0,"rgba(255,255,255,0)");gl.addColorStop(0.45,"rgba(255,255,255,.07)");gl.addColorStop(0.55,"rgba(255,255,255,0)");x.fillStyle=gl;x.fillRect(sx,sy,sw,sh);x.restore();return c.c;}
+
+/* ---------- Bản 27/11 (Edit Không Khó): Trời, Giữ một màu, Đơn sắc, Mặt nước, Gương ---------- */
+Object.assign(FX0,{sky4:"none",sky4A:80,sky4F:50,sky4M:60,spl:0,splH:0,splW:6,splS:5,splC:"",mono:"none",monoA:100,refl:0,reflY:58,reflR:50,reflD:45,mir:"off"});
+Object.keys(FX0).forEach(k=>{if(state.fx2[k]===undefined)state.fx2[k]=FX0[k];});
+const P4P={pick:false,cache:{src:null,an:null},last:null};
+function p4F(){const F=state.fx2;Object.keys(FX0).forEach(k=>{if(F[k]===undefined)F[k]=FX0[k];});return F;}
+function p4Key(){const F=p4F();return [F.sky4,F.sky4A,F.sky4F,F.sky4M,F.seed,F.spl,F.splH,F.splW,F.splS,F.mono,F.monoA,F.refl,F.reflY,F.reflR,F.reflD,F.mir].join("|");}
+function p4Look(F){return {splash:{on:!!F.spl,hue:F.splH,width:F.splW/100,soft:F.splS/100},mono:{on:F.mono!=="none",tone:F.mono,amt:F.monoA/100},reflect:{on:!!F.refl,y:F.reflY/100,ripple:F.reflR/100,dark:F.reflD/100},mirror:{on:F.mir}};}
+/* trời ở độ phân giải đầy đủ của ảnh: mask thô phân tích một lần cho mỗi ảnh nguồn */
+function p4Sky(cv,F){if(!window.EKK||F.sky4==="none"||F.sky4A<=0)return cv;let an=P4P.cache.src===cv?P4P.cache.an:null;if(!an){an=EKK.skyAnalyze(cv);P4P.cache={src:cv,an};}
+  P4P.last={found:an.found,cover:an.cover||0,hz:an.hz};if(!an.found)return cv;
+  const o=EKK.skyRender(cv,an,{mode:F.sky4,amt:F.sky4A/100,feather:F.sky4F/100,match:F.sky4M/100,seed:F.seed},cv.width,cv.height);if(!o)return cv;return EKK.copyCv(o);}
+function p4Stage(cv){const F=p4F();if(!window.EKK)return cv;let out=p4Sky(cv,F);const L=p4Look(F);if(EKK.lookActive(L)){const o=EKK.lookRender(out,L,out.width,out.height,0);if(o)out=EKK.copyCv(o);}return out;}
+{const _rk=rsKey;rsKey=function(){return _rk()+"|p4:"+p4Key();};}
+{const _fs=fxStage;fxStage=function(cv){return _fs(p4Stage(cv));};}
+/* chấm màu trên ảnh: lấy màu ở ảnh gốc (trước hiệu ứng) */
+document.addEventListener("pointerdown",e=>{if(!P4P.pick||!origPrev||!geoInfo)return;const st=$("stage");if(!st||!st.contains(e.target))return;const p=evOut(e);if(p.u<0||p.u>1||p.v<0||p.v>1)return;
+  e.stopPropagation();e.preventDefault();const s=outToSrc(p.u,p.v,geoInfo),x=Math.round(clamp01(s[0])*(origPrev.width-1)),y=Math.round(clamp01(s[1])*(origPrev.height-1));
+  const d=origPrev.getContext("2d").getImageData(Math.max(0,x-2),Math.max(0,y-2),5,5).data;let r=0,g=0,b=0;for(let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1];b+=d[i+2];}const n=d.length/4;p4SetHue(r/n,g/n,b/n);},true);
+function clamp01(v){return Math.max(0,Math.min(1,v));}
+function p4SetHue(r,g,b){const F=p4F(),h=EKK.hueOf(r,g,b);F.splH=h.h;F.spl=1;F.splC="rgb("+Math.round(r)+","+Math.round(g)+","+Math.round(b)+")";P4P.pick=false;document.body.classList.remove("p4pick");
+  if(h.s<.12)toast("Màu này gần như không có sắc, chọn chỗ có màu rõ hơn");else toast("Đã giữ màu đã chọn, phần còn lại đen trắng");retDirty=true;schedule();pushHistory();renderToolUI();}
+const SPL_PRE=[["red",0,"Đỏ"],["orange",.07,"Cam"],["yellow",.14,"Vàng"],["green",.3,"Xanh lá"],["teal",.47,"Ngọc"],["blue",.6,"Xanh dương"],["pink",.92,"Hồng"]];
+function p4Panel(){const w=el("div"),F=p4F(),redo=()=>{retDirty=true;schedule();},deb=(fn)=>{let t;return v=>{fn(v);clearTimeout(t);t=setTimeout(redo,90);};},ch=(k,v)=>{F[k]=v;redo();pushHistory();renderToolUI();};
+  const s=sec("Trời");s.appendChild(chipRow([["none","Gốc"],["deepen","Làm đậm trời"],["dusktint","Ấm chạng vạng"],["clouds","Mây mềm"],["dusk","Trời hoàng hôn"]],F.sky4,v=>ch("sky4",v)));
+  if(F.sky4!=="none"){s.appendChild(sld("Độ đậm",0,100,F.sky4A,deb(v=>{F.sky4A=v;}),()=>pushHistory()));s.appendChild(sld("Làm mềm mép",0,100,F.sky4F,deb(v=>{F.sky4F=v;}),()=>pushHistory()));
+    s.appendChild(sld("Khớp màu cảnh",0,100,F.sky4M,deb(v=>{F.sky4M=v;}),()=>pushHistory()));if(F.sky4==="clouds"||F.sky4==="dusk"){const r=el("div","btnrow");r.append(btn("Đổi mây","",()=>{F.seed=1+Math.floor(Math.random()*997);redo();pushHistory();}));s.appendChild(r);}
+    if(P4P.last&&!P4P.last.found)s.appendChild(hint("Không thấy bầu trời trong ảnh này."));}
+  s.appendChild(hint("Tự tìm vùng trời (cả sau cành cây, dây điện, vách núi). Làm đậm lấy lại vân mây trên trời trắng đục; Mây mềm và Trời hoàng hôn thay trời, chỉnh màu cảnh cho khớp."));w.appendChild(s);
+  const s2=sec("Giữ một màu");s2.appendChild(chipRow([[0,"Tắt"]].concat(SPL_PRE.map(p=>[p[0],p[2]])),F.spl?(SPL_PRE.find(p=>Math.abs(p[1]-F.splH)<.004)||["pick"])[0]:0,v=>{if(!v){ch("spl",0);return;}const p=SPL_PRE.find(x=>x[0]===v);F.splH=p[1];F.splC="";ch("spl",1);}));
+  const r2=el("div","btnrow"),pb=btn(P4P.pick?"Chạm vào ảnh để lấy màu…":"Chọn màu trên ảnh",P4P.pick?"primary":"",()=>{P4P.pick=!P4P.pick;document.body.classList.toggle("p4pick",P4P.pick);if(P4P.pick)toast("Chạm vào vùng có màu muốn giữ");renderToolUI();});
+  pb.setAttribute("aria-pressed",String(P4P.pick));r2.appendChild(pb);if(F.spl&&F.splC){const sw=el("span","p4sw");sw.style.background=F.splC;sw.title="Màu đang giữ";r2.appendChild(sw);}s2.appendChild(r2);
+  if(F.spl){s2.appendChild(sld("Độ rộng màu",1,30,F.splW,deb(v=>{F.splW=v;}),()=>pushHistory()));s2.appendChild(sld("Độ mềm",0,30,F.splS,deb(v=>{F.splS=v;}),()=>pushHistory()));}
+  s2.appendChild(hint("Giữ một sắc màu (chiếc nón, áo đỏ, đèn lồng), phần còn lại về đen trắng."));w.appendChild(s2);
+  const s3=sec("Đơn sắc");s3.appendChild(chipRow([["none","Tắt"]].concat(Object.keys(EKK.MONO).map(k=>[k,EKK.MONO[k].n])),F.mono,v=>ch("mono",v)));
+  if(F.mono!=="none")s3.appendChild(sld("Độ mạnh",0,100,F.monoA,deb(v=>{F.monoA=v;}),()=>pushHistory()));s3.appendChild(hint("Một màu mực trên nền giấy, như ảnh in trên tạp chí."));w.appendChild(s3);
+  const s4=sec("Mặt nước & gương");s4.appendChild(chipRow([[0,"Không phản chiếu"],[1,"Phản chiếu mặt nước"]],F.refl,v=>ch("refl",v)));
+  if(F.refl){s4.appendChild(sld("Đường mặt nước",20,90,F.reflY,deb(v=>{F.reflY=v;}),()=>pushHistory(),v=>v+"%"));s4.appendChild(sld("Gợn sóng",0,100,F.reflR,deb(v=>{F.reflR=v;}),()=>pushHistory()));s4.appendChild(sld("Độ tối mặt nước",0,100,F.reflD,deb(v=>{F.reflD=v;}),()=>pushHistory()));}
+  s4.appendChild(chipRow([["off","Không gương"],["v","Gương dọc"],["h","Gương ngang"],["q","Bốn góc"]],F.mir,v=>ch("mir",v)));
+  s4.appendChild(hint("Phản chiếu: nửa dưới thành mặt nước soi bóng cảnh phía trên, có gợn sóng nhẹ. Gương: đối xứng hai nửa."));w.appendChild(s4);
+  return w;}
+{const _fp=fxPanel;fxPanel=function(){const mine=fxTab==="p4";if(mine)fxTab="trend";const box=_fp();if(mine)fxTab="p4";try{const tabs=box.querySelector(".fxtabs");
+    if(tabs){const b=el("button","chip","Trời · Màu");b.type="button";b.setAttribute("aria-pressed",String(mine));b.onclick=()=>{fxTab="p4";renderToolUI();};tabs.appendChild(b);if(mine)tabs.querySelectorAll(".chip").forEach(x=>{if(x!==b)x.setAttribute("aria-pressed","false");});}
+    if(mine){[...box.children].forEach(c=>{if(c!==tabs)c.remove();});box.appendChild(p4Panel());}}catch(err){console.warn(err);}return box;};}
+if(window.__TPDEBUG)window.__TPDEBUG.p4={P4P,F:p4F,stage:p4Stage,setHue:p4SetHue,panel:()=>{fxTab="p4";setTool("fx2");renderToolUI();},load:f=>loadFile(f),src:()=>fullSrc,prev:()=>origPrev,redo:()=>{retDirty=true;schedule();},
+  final:()=>{const ret=buildRet(fullSrc,null);return ret;}};
 
 /* ---------- Boot ---------- */
 try{

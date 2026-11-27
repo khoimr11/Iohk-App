@@ -458,6 +458,7 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 @media (max-width:899px){.scope3{left:8px;bottom:8px;width:min(320px,calc(100% - 16px))}.sc3b{height:28px}}
 .sec h3,.ptitle{text-wrap:balance}.hint,.note{text-wrap:pretty}
 
+
 </style>
 </head>
 <body>
@@ -581,6 +582,7 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 <input type="file" id="fileSrt" accept=".srt,.vtt,text/plain" hidden>
 <div class="toast" id="toast" hidden role="status"></div>
 <div class="overlay" id="expBox" hidden><div class="dialog glass" id="expDlg"></div></div>
+<script src="ekk.js"></script>
 <script>
 (function(){
 "use strict";
@@ -3964,6 +3966,7 @@ const V3DBG={V3,gNew,gActive,matchGrade,gStats,aSpan,syncAnchors,addMarker,makeC
   makeProxy,pxWanted,useProxy,decGC,PDECS,decs,mp4Rot,fltTargets,chaptersTxt,markersTxt,posterBlob,mixAudio:n=>mixAudio(n),roleOf,gradeCopy,gradePaste,gradeOf,gradeApply,openChapterDlg,measureFilm,irFor,delSel,mselApply,rippleDelete,
   newClip,uid,layout,srcOf,BYP:v=>{BYP3=v;},effFor,isNeutral,cvFn,frameReady};
 window.__V3=V3DBG;
+
 
 /* ---------- wiring ---------- */
 function syncProjSel(){$("selRatio").value=P.ratio;$("selBg").value=P.bg;}
