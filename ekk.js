@@ -40,7 +40,7 @@ function glRun(name,fs,W,H,texs,uni){if(!glInit())return null;const g=GL.g,p=glP
   g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.drawArrays(g.TRIANGLE_STRIP,0,4);g.activeTexture(g.TEXTURE0);return GL.cv;}
 EKK.gl={init:glInit,run:glRun,ok:()=>!!glInit()};
 function mk(w,h){const c=document.createElement("canvas");c.width=Math.max(1,w|0);c.height=Math.max(1,h|0);return c;}
-function copyCv(src,o){o=o||mk(src.width,src.height);if(o.width!==src.width||o.height!==src.height){o.width=src.width;o.height=src.height;}const x=o.getContext("2d");x.globalCompositeOperation="copy";x.drawImage(src,0,0);x.globalCompositeOperation="source-over";return o;}
+function copyCv(src,o){const [w,h]=dimsOf(src);o=o||mk(w,h);if(o.width!==w||o.height!==h){o.width=w;o.height=h;}const x=o.getContext("2d");x.globalCompositeOperation="copy";x.drawImage(src,0,0);x.globalCompositeOperation="source-over";return o;}
 EKK.mk=mk;EKK.copyCv=copyCv;
 function dimsOf(s){return [s.displayWidth||s.videoWidth||s.naturalWidth||s.width,s.displayHeight||s.videoHeight||s.naturalHeight||s.height];}
 EKK.dimsOf=dimsOf;
@@ -183,8 +183,8 @@ EKK.hueOf=(r,g,b)=>{r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,
 /* ================= Khử nhiễu theo thời gian (trung bình khung, ngưỡng chuyển động) + làm nét ================= */
 const DN_FS=`uniform sampler2D u_C,u_P;uniform vec2 u_res;uniform float u_k,u_thr,u_sh,u_has;
 void main(){vec2 tx=1.0/u_res;vec3 c=texture2D(u_C,v).rgb;vec3 o=c;
- if(u_has>0.5){vec3 p=texture2D(u_P,v).rgb;vec3 cb=(c*4.0+texture2D(u_C,v+vec2(tx.x,0.0)).rgb+texture2D(u_C,v-vec2(tx.x,0.0)).rgb+texture2D(u_C,v+vec2(0.0,tx.y)).rgb+texture2D(u_C,v-vec2(0.0,tx.y)).rgb)/8.0;
-  float d=length(cb-p);float w=u_k*(1.0-smoothstep(u_thr*0.5,u_thr,d));o=mix(c,p,w);}
+ if(u_has>0.5){vec3 p=texture2D(u_P,v).rgb;vec3 cb=vec3(0.0),pb=vec3(0.0);for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 o2=v+vec2(float(i),float(j))*tx*1.5;cb+=texture2D(u_C,o2).rgb;pb+=texture2D(u_P,o2).rgb;}cb/=9.0;pb/=9.0;
+  float d=length(cb-pb);float w=u_k*(1.0-smoothstep(u_thr*0.5,u_thr,d));o=mix(c,p,w);}
  if(u_sh>0.001){vec3 b=(texture2D(u_C,v+vec2(tx.x,tx.y)).rgb+texture2D(u_C,v+vec2(-tx.x,tx.y)).rgb+texture2D(u_C,v+vec2(tx.x,-tx.y)).rgb+texture2D(u_C,v-tx).rgb)*0.25;
   vec3 hf=c-b;hf*=smoothstep(0.012,0.04,length(hf));o+=hf*u_sh*1.6;}
  gl_FragColor=vec4(clamp(o,0.0,1.0),1.0);}`;
@@ -280,13 +280,13 @@ EKK.filmStrip=function(ctx,W,H,frames,o){o=o||{};const vert=o.dir==="v",S=Math.m
   const zc=zi*(fw+gap)+fw/2;const offZ=L/2-zc;if(zoom>0)off=off+(offZ-off)*Math.min(1,zoom*1.6);
   const fillK=Math.max(W/(vert?fh:fw),H/(vert?fw:fh))*1.001,zs=1+(fillK-1)*Math.pow(zoom,2.2);
   ctx.save();ctx.fillStyle=o.bg||"#14110e";ctx.fillRect(0,0,W,H);ctx.translate(W/2,H/2);ctx.scale(zs,zs);if(vert)ctx.rotate(Math.PI/2);ctx.translate(-L/2,0);
-  const base=o.base||"#1b1714",hole=o.bg||"#14110e",edge=o.edge||"rgba(217,164,92,.78)";
+  const base=o.base||"#2b2520",hole=o.bg||"#14110e",edge=o.edge||"rgba(217,164,92,.78)";
   ctx.fillStyle=base;ctx.fillRect(off-gap-fw,-stripW/2,total+gap+fw*2,stripW);
   /* lỗ răng: 8 lỗ mỗi khung (chuẩn 35mm) */
   const ph=bh*.34,pw=ph*1.35,pitch=(fw+gap)/8,rr=ph*.22;ctx.fillStyle=hole;
   const k0=Math.floor(-off/pitch)-2,k1=Math.ceil((L-off)/pitch)+2;for(let k=k0;k<=k1;k++){const x=off+k*pitch+pitch*.3;[-1,1].forEach(sd=>{const y=sd*(stripW/2-bh*.5)-ph/2;rrect(ctx,x,y,pw,ph,rr);ctx.fill();});}
   /* mã viền và số khung (IBM Plex Mono) */
-  const mono='"IBM Plex Mono","JetBrains Mono",ui-monospace,Menlo,monospace';ctx.fillStyle=edge;ctx.font="400 "+Math.max(7,bh*.2).toFixed(1)+"px "+mono;ctx.textBaseline="middle";
+  const mono='"IBM Plex Mono","JetBrains Mono",ui-monospace,Menlo,monospace';ctx.fillStyle=edge;ctx.font="400 "+Math.max(8,bh*.25).toFixed(1)+"px "+mono;ctx.textBaseline="middle";
   for(let i=0;i<n;i++){const x=off+i*(fw+gap);if(x>L+fw||x+fw<-fw)continue;const num=(o.num0||12)+i;
     ctx.textAlign="left";ctx.fillText(String(num)+(i%2?"A":""),x+fw*.04,stripW/2-bh*.12);ctx.fillText("▸ "+num,x+fw*.55,-stripW/2+bh*.13);
     if(i%3===0){ctx.textAlign="left";ctx.globalAlpha=.8;ctx.fillText(o.label||"IOHK 400  ·  NINH BÌNH  ·  11.2026",x+fw*.18,stripW/2-bh*.12);ctx.globalAlpha=1;}
@@ -318,7 +318,10 @@ EKK.sub={
   /* tách câu dài: tối đa 2 dòng, mỗi dòng ≤ max ký tự; câu quá dài chia thành nhiều phụ đề theo tỉ lệ ký tự */
   split(list,max){max=max||42;const out=[];list.forEach(c=>{const words=String(c.text).replace(/\s+/g," ").trim().split(" ");const lines=[];let cur="";
       words.forEach(w=>{if((cur+" "+w).trim().length>max&&cur){lines.push(cur);cur=w;}else cur=(cur+" "+w).trim();});if(cur)lines.push(cur);
-      const groups=[];for(let i=0;i<lines.length;i+=2)groups.push(lines.slice(i,i+2));const tot=lines.join("").length||1;let t=c.s;
+      let groups=[];if(lines.length<=2)groups=[lines];else{/* chia đều số chữ cho các phụ đề, mỗi phụ đề ≤ 2 dòng */const g=Math.ceil(lines.length/2),all=words.join(" ").length,per=all/g;let cur2=[],len=0;
+        words.forEach(w=>{if(len+w.length>per&&cur2.length&&groups.length<g-1){groups.push(cur2.join(" "));cur2=[];len=0;}cur2.push(w);len+=w.length+1;});if(cur2.length)groups.push(cur2.join(" "));
+        groups=groups.map(t=>{const L=[];let cu="";t.split(" ").forEach(w=>{if((cu+" "+w).trim().length>max&&cu){L.push(cu);cu=w;}else cu=(cu+" "+w).trim();});if(cu)L.push(cu);return L;});}
+      const tot=groups.map(g=>g.join("")).join("").length||1;let t=c.s;
       groups.forEach(g=>{const len=g.join("").length,d=(c.e-c.s)*len/tot;out.push({s:t,e:t+d,text:g.join("\n")});t+=d;});});return out;},
   /* nhận biết có giọng nói (năng lượng), 100 khung / giây */
   vad(pcm,sr){const hop=Math.round(sr/100),n=Math.floor(pcm.length/hop),e=new Float32Array(n);for(let i=0;i<n;i++){let s=0;for(let j=0;j<hop;j++){const v=pcm[i*hop+j];s+=v*v;}e[i]=Math.sqrt(s/hop);}

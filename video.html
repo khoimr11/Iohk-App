@@ -458,6 +458,8 @@ input[type=color]{width:28px;height:28px;border:0;padding:0;background:none;bord
 @media (max-width:899px){.scope3{left:8px;bottom:8px;width:min(320px,calc(100% - 16px))}.sc3b{height:28px}}
 .sec h3,.ptitle{text-wrap:balance}.hint,.note{text-wrap:pretty}
 
+/* bản 27/11 — Cảnh */
+body.p4pick #pv{cursor:crosshair}
 
 </style>
 </head>
@@ -3967,6 +3969,269 @@ const V3DBG={V3,gNew,gActive,matchGrade,gStats,aSpan,syncAnchors,addMarker,makeC
   newClip,uid,layout,srcOf,BYP:v=>{BYP3=v;},effFor,isNeutral,cvFn,frameReady};
 window.__V3=V3DBG;
 
+/* ================= Bản 27/11 — Edit Không Khó: khung dọc ↔ ngang, trời, giữ một màu, mặt nước, chuyển cảnh mực / sương / mưa / lật trang / tròn / xé giấy, cuộn phim, kết phim, phụ đề tự động, làm nét đêm ================= */
+const P4={byp:false,proc:new Map(),sky:new Map(),stills:new Map(),pick:false,asr:{busy:false,msg:""},dn:new Map()};
+const WARM_BLACK="#14110e";
+function p4Of(c){return c&&c.p4||null;}
+function p4Key(o){return JSON.stringify(o||{});}
+function p4Active(c){const o=c&&c.p4;if(!o||!window.EKK)return false;return !!((o.sky&&o.sky.mode&&o.sky.mode!=="none")||EKK.lookActive(o.look)||(o.dn&&o.dn.on)||(o.glow&&o.glow.on));}
+
+/* ---------- A. Xử lý khung nguồn: khử nhiễu đêm, trời, giữ một màu / đơn sắc / mặt nước / gương, viền sáng ---------- */
+function frameId(S){const s=S.s;return s.timestamp!=null?s.timestamp:s.currentTime!=null?Math.round(s.currentTime*1000):(s._p4id||(s._p4id=uid()));}
+function p4Proc(c,t,S){const o=c.p4,lt=(t==null?T:t)-c._start,st=c.kind==="video"?srcTime(c,clamp(lt,0,c._dur)):0;const k=Math.min(1,1920/Math.max(S.w,S.h)),W=Math.max(2,Math.round(S.w*k)),H=Math.max(2,Math.round(S.h*k));
+  const key=frameId(S)+"|"+W+"|"+p4Key(o)+"|"+(o.look&&o.look.reflect&&o.look.reflect.on?Math.round(lt*30):"");let P=P4.proc.get(c.id);if(P&&P.key===key)return P.out;
+  if(!P){P={buf:document.createElement("canvas")};P4.proc.set(c.id,P);}const buf=P.buf;if(buf.width!==W||buf.height!==H){buf.width=W;buf.height=H;}
+  let cur=S.s;const step=cv=>{if(!cv)return;EKK.copyCv(cv,buf);cur=buf;};
+  try{if(o.dn&&o.dn.on){let st0=P4.dn.get(c.id);if(!st0){st0={};P4.dn.set(c.id,st0);}if(st0.st==null||st<st0.st-1e-4||st-st0.st>.25||c.kind!=="video")st0.ok=false;st0.st=st;
+      step(EKK.denoise(cur,st0,{amt:c.kind==="video"?o.dn.amt:0,thr:.05+.15*(o.dn.amt||0),sharp:o.dn.sharp||0},W,H));}
+    if(o.sky&&o.sky.mode&&o.sky.mode!=="none"){const an=skyFor(c,st,cur);if(an&&an.found)step(EKK.skyRender(cur,an,{mode:o.sky.mode,amt:(o.sky.amt==null?80:o.sky.amt)/100,feather:(o.sky.fea==null?50:o.sky.fea)/100,match:(o.sky.match==null?60:o.sky.match)/100,seed:o.sky.seed||7,time:st},W,H));}
+    if(o.look&&EKK.lookActive(o.look))step(EKK.lookRender(cur,o.look,W,H,lt));
+    if(o.glow&&o.glow.on&&SEG){const pm=pmGet(c,t==null?T:t,S);if(pm){if(cur!==buf)step(cur);glowInto(buf,pmCanvas(pm),o.glow);}}}
+  catch(e){console.warn(e);}
+  P.key=key;P.out={s:cur===S.s?S.s:buf,w:cur===S.s?S.w:W,h:cur===S.s?S.h:H};return P.out;}
+/* mask trời: phân tích mỗi khung ở 240 px, trung bình với các khung lân cận đã phân tích (giữ mép trời ổn định khi phát) */
+function skyFor(c,st,src){let M=P4.sky.get(c.id);if(!M){M=new Map();P4.sky.set(c.id,M);}const q=Math.round(st*8);let an=M.get(q);
+  if(!an){an=EKK.skyAnalyze(src,{size:200});M.set(q,an);if(M.size>240){const k0=M.keys().next().value;M.delete(k0);}}if(!an.found){const nb=[M.get(q-1),M.get(q+1)].find(x=>x&&x.found);if(!nb)return an;an=Object.assign({},nb,{Lum:an.Lum&&an.w===nb.w?an.Lum:nb.Lum});}
+  const neigh=[];[[-1,.6],[1,.6],[-2,.3],[2,.3]].forEach(([d,w])=>{const o=M.get(q+d);if(o&&o.found&&o.w===an.w&&o.h===an.h)neigh.push({m:o.m,w:o.w,h:o.h,wt:w});});
+  const b=EKK.skyBlend(an,neigh.map(x=>Object.assign({},x,{w:an.w,h:an.h})));return b;}
+function glowInto(cv,mask,g){const W=cv.width,H=cv.height,x=cv.getContext("2d"),S=Math.min(W,H),G=P4.glowC||(P4.glowC=document.createElement("canvas"));if(G.width!==W||G.height!==H){G.width=W;G.height=H;}
+  const gx=G.getContext("2d");gx.setTransform(1,0,0,1,0,0);gx.globalCompositeOperation="copy";gx.filter="blur("+Math.round(S*.012*(g.size||1))+"px)";gx.drawImage(mask,0,0,W,H);gx.filter="none";
+  gx.globalCompositeOperation="destination-out";gx.drawImage(mask,0,0,W,H);gx.globalCompositeOperation="source-in";gx.fillStyle=g.color||"#fff3df";gx.fillRect(0,0,W,H);gx.globalCompositeOperation="source-over";
+  x.save();x.globalCompositeOperation="screen";x.globalAlpha=clamp((g.amt==null?55:g.amt)/100,0,1);x.drawImage(G,0,0);x.globalAlpha*=.6;x.drawImage(G,0,0);x.restore();}
+{const _so=srcOf;srcOf=function(c,t){const S=_so(c,t);if(!S||P4.byp||!c||c.type!=="clip"||!p4Active(c))return S;return p4Proc(c,t,S);};}
+
+/* ---------- B. Khung dọc → ngang 16:9 (và ngang → dọc): nền mờ cùng clip, mở rộng nền, bám chủ thể ---------- */
+const RFL=rfMk(),RFB=rfMk(),RFE=rfMk(),RFS=rfMk();
+function rfOn(c){return c&&c.rf&&c.rf.mode&&c.rf.mode!=="off"&&c.type==="clip"&&c.kind!=="empty"&&!c.cell&&isMain(c);}
+function rfPathAt(c,lt){const p=c.rf&&c.rf.path;if(!p||!p.x||!p.x.length)return null;const st=srcTime(c,clamp(lt,0,c._dur)),f=(st-p.t0)*p.fps,i=clamp(Math.floor(f),0,p.x.length-1),j=Math.min(p.x.length-1,i+1),u=clamp(f-i,0,1);
+  return {x:p.x[i]+(p.x[j]-p.x[i])*u,y:p.y[i]+(p.y[j]-p.y[i])*u};}
+function softBlur(dst,src,sx,sy,sw,sh,W,H,amt){/* làm mờ mạnh bằng thu nhỏ rồi phóng lại + filter khi trình duyệt hỗ trợ */const k=Math.max(4,Math.round(Math.min(W,H)/(18+amt*40)));
+  const s=RFS.c,w=Math.max(2,Math.round(W/k)),h=Math.max(2,Math.round(H/k));if(s.width!==w||s.height!==h){s.width=w;s.height=h;}const x=RFS.x;x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation="copy";x.imageSmoothingQuality="high";
+  x.filter="blur("+Math.max(1,(1.2+amt*2)).toFixed(1)+"px)";x.drawImage(src,sx,sy,sw,sh,0,0,w,h);x.filter="none";x.globalCompositeOperation="source-over";dst.imageSmoothingEnabled=true;dst.imageSmoothingQuality="high";dst.drawImage(s,0,0,w,h,0,0,W,H);}
+{const _dv=drawVisual;drawVisual=function(ctx,W,H,c,t,alpha,xf,isBg){if(!rfOn(c)||c._rfIn)return _dv(ctx,W,H,c,t,alpha,xf,isBg);
+  const S=srcOf(c,t);if(!S)return _dv(ctx,W,H,c,t,alpha,xf,isBg);const cr=c.crop||{l:0,t:0,r:0,b:0},sw=S.w*(1-cr.l-cr.r),sh=S.h*(1-cr.t-cr.b),ar=sw/sh,fr=W/H;
+  if(Math.abs(Math.log(ar/fr))<.08)return _dv(ctx,W,H,c,t,alpha,xf,isBg);const rf=c.rf,lt=t-c._start;
+  if(rf.mode==="track"){const p=rfPathAt(c,lt)||{x:.5,y:.45},z=Math.max(1,(rf.zoom||100)/100),sc=Math.max(W/sw,H/sh)*z*val(c,"s",lt)/100,dw=sw*sc,dh=sh*sc,tx=rf.tx==null?.5:rf.tx,ty=rf.ty==null?.45:rf.ty;
+    let dx=tx*W-p.x*dw+dw/2-W/2,dy=ty*H-p.y*dh+dh/2-H/2;dx=clamp(dx,-(dw-W)/2,(dw-W)/2);dy=clamp(dy,-(dh-H)/2,(dh-H)/2);
+    xf=Object.assign({},xf);xf.dx=(xf.dx||0)+dx;xf.dy=(xf.dy||0)+dy;xf.scale=(xf.scale||1)*z;const f0=c.fit;c.fit="fill";c._rfIn=1;try{return _dv(ctx,W,H,c,t,alpha,xf,isBg);}finally{c.fit=f0;c._rfIn=0;}}
+  /* nền mờ / mở rộng: vẽ clip vừa khung lên lớp riêng, lấy đúng vùng ảnh để làm nền */
+  const lx=rfCanvas(RFL,W,H);const f0=c.fit;c.fit="fit";c._rfIn=1;let ok;try{ok=_dv(lx,W,H,c,t,1,xf,false);}finally{c.fit=f0;c._rfIn=0;}const b=c._box;if(!b)return ok;
+  const x0=clamp(b.ox-b.dw/2,0,W),y0=clamp(b.oy-b.dh/2,0,H),x1=clamp(b.ox+b.dw/2,0,W),y1=clamp(b.oy+b.dh/2,0,H),iw=x1-x0,ih=y1-y0;if(iw<4||ih<4){ctx.drawImage(RFL.c,0,0);return ok;}
+  const bx=rfCanvas(RFB,W,H),dim=rf.dim==null?.26:rf.dim/100;
+  if(rf.mode==="blur"){const z=1.08,k=Math.max(W/iw,H/ih)*z,cw=W/k,ch=H/k;softBlur(bx,RFL.c,x0+(iw-cw)/2,y0+(ih-ch)/2,cw,ch,W,H,(rf.blur==null?60:rf.blur)/100);
+    bx.fillStyle="rgba(12,10,8,"+dim+")";bx.fillRect(0,0,W,H);bx.globalCompositeOperation="saturation";bx.fillStyle="rgba(128,128,128,.22)";bx.fillRect(0,0,W,H);bx.globalCompositeOperation="source-over";}
+  else{/* mở rộng: soi gương mép ảnh ra hai bên, mờ dần theo khoảng cách, tối dần ra mép */const horiz=iw<W-2,ex=rfCanvas(RFE,W,H);
+    if(horiz){const L=x0,Rr=W-x1;ex.save();ex.translate(x0,0);ex.scale(-1,1);ex.drawImage(RFL.c,x0,y0,Math.min(iw,L+2),ih,0,y0,Math.min(iw,L+2),ih);ex.restore();
+      ex.save();ex.translate(x1,0);ex.scale(-1,1);ex.drawImage(RFL.c,x1-Math.min(iw,Rr+2),y0,Math.min(iw,Rr+2),ih,-Math.min(iw,Rr+2),y0,Math.min(iw,Rr+2),ih);ex.restore();}
+    else{const Tt=y0,Bb=H-y1;ex.save();ex.translate(0,y0);ex.scale(1,-1);ex.drawImage(RFL.c,x0,y0,iw,Math.min(ih,Tt+2),x0,0,iw,Math.min(ih,Tt+2));ex.restore();
+      ex.save();ex.translate(0,y1);ex.scale(1,-1);ex.drawImage(RFL.c,x0,y1-Math.min(ih,Bb+2),iw,Math.min(ih,Bb+2),x0,-Math.min(ih,Bb+2),iw,Math.min(ih,Bb+2));ex.restore();}
+    softBlur(bx,RFE.c,0,0,W,H,W,H,(rf.blur==null?60:rf.blur)/100);
+    const m=Math.max(4,Math.round(Math.min(W,H)/90)),nc=document.createElement("canvas");nc.width=Math.max(2,Math.round(W/m));nc.height=Math.max(2,Math.round(H/m));nc.getContext("2d").drawImage(RFE.c,0,0,nc.width,nc.height);
+    const g=horiz?bx.createLinearGradient(0,0,W,0):bx.createLinearGradient(0,0,0,H);const a0=horiz?x0/W:y0/H,a1=horiz?x1/W:y1/H,sp=.12;
+    g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(clamp(a0-sp,0,1),"rgba(0,0,0,0)");g.addColorStop(clamp(a0,0,1),"rgba(0,0,0,1)");g.addColorStop(clamp(a1,0,1),"rgba(0,0,0,1)");g.addColorStop(clamp(a1+sp,0,1),"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,0)");
+    const tmp=rfCanvas(RFE,W,H);tmp.imageSmoothingQuality="high";tmp.drawImage(nc,0,0,W,H);tmp.globalCompositeOperation="destination-in";tmp.fillStyle=g;tmp.fillRect(0,0,W,H);tmp.globalCompositeOperation="source-over";bx.drawImage(RFE.c,0,0);
+    const v=horiz?bx.createLinearGradient(0,0,W,0):bx.createLinearGradient(0,0,0,H),dk="rgba(12,10,8,"+(.2+dim)+")";v.addColorStop(0,dk);v.addColorStop(clamp(a0,0,1),"rgba(12,10,8,"+(dim*.25)+")");v.addColorStop(clamp(a1,0,1),"rgba(12,10,8,"+(dim*.25)+")");v.addColorStop(1,dk);bx.fillStyle=v;bx.fillRect(0,0,W,H);}
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=alpha;ctx.drawImage(RFB.c,0,0);/* bóng rất nhẹ quanh ảnh */ctx.shadowColor="rgba(0,0,0,.28)";ctx.shadowBlur=Math.min(W,H)*.02;ctx.drawImage(RFL.c,0,0);ctx.restore();return ok;};}
+/* phân tích quỹ đạo chủ thể: AI tách người (nếu có) hoặc vùng da, 5 lần / giây, làm mượt */
+async function rfAnalyze(c,onP){const m=media.get(c.mid);if(!m)return null;if(!SEG)await rfEnsureSeg(true).catch(()=>null);const fps=5;const xs=[],ys=[];
+  const look=(src,w,h)=>{if(SEG){const o=pmCompute(src,w,h);if(o){let sx=0,sn=0,top=o.h,bot=0;for(let y=0;y<o.h;y++)for(let x=0;x<o.w;x++){const a=o.a[y*o.w+x];if(a>128){sx+=x;sn++;if(y<top)top=y;if(y>bot)bot=y;}}
+        if(sn>o.w*o.h*.004)return {x:(sx/sn+.5)/o.w,y:(top+(bot-top)*.22+.5)/o.h};}}const s=EKK.saliency(src);return s?{x:s.x,y:s.y}:null;};
+  if(c.kind==="image"){const r=look(m.canvas,m.w,m.h);c.rf.path={t0:0,fps,x:[r?r.x:.5],y:[r?r.y:.45]};return c.rf.path;}
+  const t0=c.in,t1=c.out,n=Math.max(1,Math.ceil((t1-t0)*fps)+1);let d=null,v=null;if(m.vt)d=new VDec(m);else{v=document.createElement("video");v.muted=true;v.src=m.url;v.preload="auto";await new Promise(r=>{v.onloadeddata=r;setTimeout(r,4000);});}
+  try{for(let i=0;i<n;i++){const st=clamp(t0+i/fps,0,m.dur-.01);let src=null,w=m.w,h=m.h;if(d){src=await d.frameAtExact(st);if(src){w=src.displayWidth;h=src.displayHeight;}}else{await seekWait(v,st);src=v;w=v.videoWidth;h=v.videoHeight;}
+      let r=null;if(src){if(m.vt&&m.vt.rot&&src.timestamp!=null){const R=rotFrame("rfA",{s:src,w,h},m.vt.rot);r=look(R.s,R.w,R.h);}else r=look(src,w,h);}xs.push(r?r.x:null);ys.push(r?r.y:null);if(onP)onP(i/n);if(i%3===0)await new Promise(r=>setTimeout(r,0));}}
+  finally{if(d)d.close();if(v){v.removeAttribute("src");v.load();}}
+  c.rf.path={t0,fps,x:EKK.smoothPath(xs,fps,{sigma:.35,dead:.025,vmax:.7}),y:EKK.smoothPath(ys,fps,{sigma:.45,dead:.03,vmax:.6})};return c.rf.path;}
+function rfTargets(it){const L=selClips3().filter(x=>x.type==="clip"&&isMain(x)&&!x.cell);if(L.length>1)return L;return [it];}
+function rfSection(it){const s=sec("Khung dọc ↔ ngang"),rf=it.rf||{mode:"off"};const [a,b]=baseDims();const m=media.get(it.mid);const sa=m&&m.w?m.w/m.h:1;
+  s.appendChild(el("p","hint",(a>b?"Dự án khung ngang":"Dự án khung dọc")+(m&&m.w?(sa<1?" · clip quay dọc":" · clip quay ngang"):"")+". Chọn cách lấp khoảng trống hoặc cắt khung theo người."));
+  const tg=rfTargets(it);const setAll=fn=>{tg.forEach(c=>{c.rf=Object.assign({mode:"off"},c.rf||{});fn(c.rf,c);});commit();};
+  s.appendChild(chipRow([["off","Giữ nguyên"],["blur","Nền mờ cùng clip"],["extend","Mở rộng nền"],["track","Bám chủ thể"]],rf.mode||"off",v=>{setAll(r=>{r.mode=v;});if(v==="track")tg.forEach(c=>{if(!(c.rf.path&&c.rf.path.x))rfRun(c);});}));
+  if(rf.mode==="blur"||rf.mode==="extend"){s.appendChild(sld("Độ mờ nền",0,100,1,rf.blur==null?60:rf.blur,v=>v+"%",v=>{it.rf.blur=v;requestDraw();},v=>setAll(r=>{r.blur=v;})));
+    s.appendChild(sld("Tối nền",0,70,1,rf.dim==null?26:rf.dim,v=>v+"%",v=>{it.rf.dim=v;requestDraw();},v=>setAll(r=>{r.dim=v;})));}
+  if(rf.mode==="track"){s.appendChild(segRow([[.45,"Người hơi cao"],[.5,"Người giữa khung"],[.38,"Một phần ba trên"]],rf.ty==null?.45:rf.ty,v=>setAll(r=>{r.ty=v;})));
+    s.appendChild(sld("Phóng thêm",100,140,1,rf.zoom||100,v=>v+"%",v=>{it.rf.zoom=v;requestDraw();},v=>setAll(r=>{r.zoom=v;})));
+    const st=el("p","hint",rf.path&&rf.path.x?"Đã dò chủ thể ("+rf.path.x.length+" điểm, đã làm mượt).":"Chưa dò chủ thể: khung đang giữa.");st.id="rfMsg";s.appendChild(st);
+    const r=el("div","btnrow");r.appendChild(tbtn("Dò lại chủ thể",()=>tg.forEach(c=>rfRun(c))));s.appendChild(r);}
+  if(tg.length>1)s.appendChild(el("p","hint","Đang áp cho "+tg.length+" clip đã chọn."));
+  const r2=el("div","btnrow");r2.appendChild(tbtn("Áp cho mọi clip khác khung",()=>{const fr=baseDims()[0]/baseDims()[1];let n=0;P.main.forEach(c=>{const mm=media.get(c.mid);if(!mm||!mm.w||c.cell||c.kind==="empty")return;const ar=(mm.vt&&mm.vt.rot%180?mm.h/mm.w:mm.w/mm.h);if(Math.abs(Math.log(ar/fr))<.08)return;c.rf=Object.assign({},it.rf||{mode:"blur"},{path:c.rf&&c.rf.path});n++;if(c.rf.mode==="track"&&!(c.rf.path&&c.rf.path.x))rfRun(c);});commit();toast("Đã áp cho "+n+" clip");}));s.appendChild(r2);
+  return s;}
+async function rfRun(c){toast("Đang dò chủ thể trong clip…",4000);try{await rfAnalyze(c,p=>{const e=$("rfMsg");if(e)e.textContent="Đang dò chủ thể "+Math.round(p*100)+"%";});commit();toast("Đã dò chủ thể, khung sẽ đi theo người");}catch(e){console.warn(e);toast("Chưa dò được chủ thể, khung giữ ở giữa");}}
+
+/* ---------- C. Chuyển cảnh mới: mực tàu loang, sương mờ, giọt mưa loang, lật trang, mặt nạ tròn mở lớp, xé giấy ---------- */
+TRANS.push(["ink","Mực tàu loang","t-fade"],["fog","Sương mờ","t-fade"],["rain","Giọt mưa loang","t-fade"],["page","Lật trang","t-slideL"],["rings","Tròn mở lớp","t-circle"],["tear","Xé giấy","t-wipe"]);
+const P4TR=new Set(["ink","fog","rain","page","rings","tear"]);
+function p4Trans(ctx,W,H,t,a,b){const tr=b.trans,p=clamp((t-b._start)/Math.max(1e-3,b._td),0,1);let ok=true;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+  try{const ta=tr.type==="tear"?b._start:t;ok=trLayer(TRA,W,H,a,ta)!==false;ok=(trLayer(TRB,W,H,b,t)!==false)&&ok;const A=TRA.c,B=TRB.c,o={seed:tr.seed||3,soft:(tr.soft==null?50:tr.soft)/100,ink:tr.ink||"#16130f",fog:"#e9e6df",paper:"#F3EEE6"};
+    if(EKK.TR_GPU[tr.type]!=null){const cv=EKK.transRender(tr.type,A,B,p,o,W,H);if(cv)ctx.drawImage(cv,0,0,W,H);else ctx.drawImage(p<.5?A:B,0,0);}
+    else if(tr.type==="page")EKK.pageTurn(ctx,W,H,p,A,B,o);else if(tr.type==="rings")EKK.irisRings(ctx,W,H,p,A,B,{rings:tr.count||4});else EKK.paperTear(ctx,W,H,p,A,B,o);}
+  finally{ctx.restore();}
+  for(const c of [a,b]){const lt=t-c._start,end=c._start+c._dur-t;if(c.fadeIn>0&&lt<c.fadeIn&&P.main.indexOf(c)===0)fill(ctx,W,H,"#000",1-lt/c.fadeIn);if(c.fadeOut>0&&end<c.fadeOut&&P.main.indexOf(c)===P.main.length-1)fill(ctx,W,H,"#000",1-end/c.fadeOut);}return ok;}
+{const _dm=drawMain;drawMain=function(ctx,W,H,t){const act=mainAt(t);if(act.length===2&&P4TR.has(act[1].trans.type)&&window.EKK)return p4Trans(ctx,W,H,t,act[0],act[1]);return _dm(ctx,W,H,t);};}
+function p4TransExtras(it){const tr=it.trans,s=sec("Tuỳ chỉnh");if(tr.type==="ink"||tr.type==="fog")s.appendChild(sld("Độ mềm mép",0,100,1,tr.soft==null?50:tr.soft,v=>v+"%",v=>{tr.soft=v;requestDraw();},()=>commit()));
+  if(tr.type==="ink"){s.appendChild(chipRow([["#16130f","Mực đen"],["#2b2f3a","Mực chàm"],["#4a1e1c","Mực son"]],tr.ink||"#16130f",v=>{tr.ink=v;commit();}));}
+  if(tr.type==="rings")s.appendChild(sld("Số vòng",2,7,1,tr.count||4,v=>String(v),v=>{tr.count=v;requestDraw();},()=>commit()));
+  if(tr.type!=="page"&&tr.type!=="rings")s.appendChild(tbtn("Đổi hình",()=>{tr.seed=1+Math.floor(Math.random()*97);commit();seek(Math.max(0,it._start+it._td*.45));}));
+  s.appendChild(el("p","hint",{ink:"Cảnh mới hiện ra qua các vệt mực loang, viền mực mảnh. Hợp mở chương, 1–1,5 giây.",fog:"Một màn sương trôi ngang rồi tan, để lộ cảnh mới. Hợp cảnh núi, mặt nước.",rain:"Giọt mưa nở trên kính, nhìn qua giọt thấy cảnh mới.",page:"Trang ảnh lật như tạp chí, mặt sau giấy kem, bóng mềm.",rings:"Các vòng tròn đồng tâm mở lần lượt, mỗi vòng một đường kẻ kem mảnh.",tear:"Khung cũ đứng hình rồi bị xé ngang, mép giấy kem, cảnh mới ở dưới."}[tr.type]||""));return s;}
+/* sổ ảnh lật trang: áp lật trang cho các clip đang chọn (hoặc cả phim) */
+function lookbookFlip(){const L=selClips3().filter(isMain);const list=L.length>1?L:P.main;list.forEach((c,i)=>{if(P.main.indexOf(c)>0)c.trans={type:"page",dur:.9};if(c.kind==="image"){c.out=Math.max(c.out,2.6);c.motion="none";}});commit();toast("Đã đặt lật trang cho "+list.length+" clip");}
+
+/* ---------- D. Hiện vào / kết thúc bằng mặt nạ: mực, sương, tròn mở lớp, chia 3 phần; đóng màn tròn, đóng rèm ---------- */
+ANIM_IN.push(["ink","Mực tàu loang"],["fog","Sương mờ"],["rings","Tròn mở lớp"],["split3","Chia 3 phần"]);
+ANIM_OUT.push(["irisClose","Đóng màn tròn"],["curtain","Đóng rèm"]);
+const RV_IN=new Set(["ink","fog","rings","split3"]),RV_OUT=new Set(["irisClose","curtain"]);
+const RVL=rfMk(),RVU=rfMk(),RVM=rfMk();
+function rvPhase(it,lt,dur){if(it.ain&&RV_IN.has(it.ain.type)&&lt<it.ain.dur)return {k:it.ain.type,p:clamp(lt/it.ain.dur,0,1)};const rem=dur-lt;if(it.aout&&RV_OUT.has(it.aout.type)&&rem<it.aout.dur)return {k:it.aout.type,p:clamp(1-rem/it.aout.dur,0,1)};return null;}
+function rvCompose(ctx,W,H,ph,drawLayer,seed){/* under = những gì đã vẽ; layer = mục cần hiện */const ux=rfCanvas(RVU,W,H);ux.drawImage(ctx.canvas,0,0);const lx=rfCanvas(RVL,W,H);const ok=drawLayer(lx);
+  const k=ph.k,p=ph.p,e=ease(p);ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+  if(k==="ink"||k==="fog"){const bx=rfCanvas(RVM,W,H);bx.drawImage(RVU.c,0,0);bx.drawImage(RVL.c,0,0);const cv=EKK.transRender(k,RVU.c,RVM.c,p,{seed:seed||3,soft:.5},W,H);if(cv)ctx.drawImage(cv,0,0,W,H);else ctx.drawImage(RVM.c,0,0);}
+  else if(k==="rings"){const bx=rfCanvas(RVM,W,H);bx.drawImage(RVU.c,0,0);bx.drawImage(RVL.c,0,0);const tmp=document.createElement("canvas");tmp.width=W;tmp.height=H;const t2=tmp.getContext("2d");EKK.irisRings(t2,W,H,p,RVU.c,RVM.c,{rings:4});ctx.drawImage(tmp,0,0);}
+  else if(k==="split3"){const n=3,g=Math.max(1,Math.round(Math.min(W,H)*.004*(1-e)));for(let i=0;i<n;i++){const st=i*.14,q=easeOut(clamp((p-st)/(1-.28),0,1));if(q<=0)continue;const x0=W*i/n,w=W/n,dir=i%2?1:-1,off=(1-q)*H*.55*dir;
+      ctx.save();ctx.beginPath();ctx.rect(x0+(i?g:0),0,w-(i?g:0),H);ctx.clip();ctx.globalAlpha=Math.min(1,q*1.4);ctx.drawImage(RVL.c,0,off);ctx.restore();}}
+  else if(k==="irisClose"){const R=Math.hypot(W,H)/2*(1-e),fe=Math.min(W,H)*.03;ctx.drawImage(RVU.c,0,0);ctx.fillStyle=WARM_BLACK;ctx.fillRect(0,0,W,H);
+    if(R>1){const mx=rfCanvas(RVM,W,H);mx.drawImage(RVL.c,0,0);mx.globalCompositeOperation="destination-in";const gg=mx.createRadialGradient(W/2,H/2,Math.max(0,R-fe),W/2,H/2,R);gg.addColorStop(0,"rgba(0,0,0,1)");gg.addColorStop(1,"rgba(0,0,0,0)");mx.fillStyle=gg;mx.fillRect(0,0,W,H);mx.globalCompositeOperation="source-over";ctx.drawImage(RVM.c,0,0);}}
+  else if(k==="curtain"){ctx.drawImage(RVU.c,0,0);ctx.drawImage(RVL.c,0,0);const w=W/2*e;[0,1].forEach(sd=>{const x=sd?W-w:0;const g2=ctx.createLinearGradient(x,0,x+w,0);const a="#1a1512",b2="#100d0b";g2.addColorStop(0,sd?a:b2);g2.addColorStop(1,sd?b2:a);ctx.fillStyle=g2;ctx.fillRect(x,0,w,H);
+      ctx.fillStyle="rgba(0,0,0,.35)";const sx=sd?W-w:w;const sg=ctx.createLinearGradient(sx,0,sx+(sd?-1:1)*Math.min(W,H)*.03,0);sg.addColorStop(0,"rgba(0,0,0,.35)");sg.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=sg;ctx.fillRect(sd?sx-Math.min(W,H)*.03:sx,0,Math.min(W,H)*.03,H);});}
+  ctx.restore();return ok;}
+{const _dv=drawVisual;drawVisual=function(ctx,W,H,c,t,alpha,xf,isBg){if(c._rvIn2||c.type!=="clip"||c.kind==="empty"||!window.EKK)return _dv(ctx,W,H,c,t,alpha,xf,isBg);const ph=rvPhase(c,t-c._start,c._dur);if(!ph)return _dv(ctx,W,H,c,t,alpha,xf,isBg);
+  return rvCompose(ctx,W,H,ph,lx=>{c._rvIn2=1;const ai=c.ain,ao=c.aout;if(RV_IN.has(ai.type))c.ain={type:"none",dur:ai.dur};if(RV_OUT.has(ao.type))c.aout={type:"none",dur:ao.dur};try{if(isBg){lx.fillStyle=bgCol();lx.fillRect(0,0,W,H);}return _dv(lx,W,H,c,t,alpha,xf,isBg);}finally{c.ain=ai;c.aout=ao;c._rvIn2=0;}},c.seed);};}
+
+{const _dt=drawText;drawText=function(ctx,W,H,it,t){const lt=t-it.start;if(!it._rvIn2&&window.EKK&&it.ain&&it.ain.type==="ink"&&lt>=0&&lt<it.ain.dur){const ph={k:"ink",p:clamp(lt/it.ain.dur,0,1)};
+    return rvCompose(ctx,W,H,ph,lx=>{it._rvIn2=1;const ai=it.ain;it.ain={type:"none",dur:ai.dur};try{_dt(lx,W,H,it,t);}finally{it.ain=ai;it._rvIn2=0;}return true;},3);}return _dt(ctx,W,H,it,t);};}
+
+/* ---------- E. Cuộn phim 35mm: dải phim có lỗ răng, mã viền, số khung; cuộn ngang / dọc, phóng vào một khung ---------- */
+async function p4Stills(ids){const out=[];for(const id of ids){const c=findItem(id);if(!c)continue;if(P4.stills.has(id)){out.push(P4.stills.get(id));continue;}const m=media.get(c.mid);if(!m)continue;
+    let cv=null;try{if(c.kind==="image"&&m.canvas){cv=m.canvas;}else{layout();const t=c._start+Math.min(.6,c._dur*.4);await frameReady(t);const S=srcOf(c,t);if(S){const k=720/Math.max(S.w,S.h);cv=document.createElement("canvas");cv.width=Math.round(S.w*k);cv.height=Math.round(S.h*k);cv.getContext("2d").drawImage(S.s,0,0,cv.width,cv.height);}}}catch(e){}
+    if(cv){P4.stills.set(id,cv);out.push(cv);}}return out;}
+async function addFilmStrip(o){o=o||{};layout();let ids=o.ids;if(!ids){const L=selClips3().filter(x=>x.type==="clip"&&x.kind!=="empty").map(x=>x.id);ids=L.length>1?L:P.main.filter(c=>c.kind!=="empty").slice(0,8).map(c=>c.id);}
+  if(!ids.length)return toast("Thêm vài ảnh hoặc clip trước khi tạo cuộn phim");await p4Stills(ids);const [a,b]=baseDims();
+  const ed={k:"strip",ids,dir:o.dir||(a>=b?"h":"v"),zoom:o.zoom!==false,zi:o.zi==null?Math.min(ids.length-1,Math.floor(ids.length/2)):o.zi,label:o.label||"IOHK 400  ·  NINH BÌNH  ·  11.2026",num0:12};
+  const it=addEd(ed,{start:o.start!=null?o.start:T,dur:o.dur||6});requestDraw();return it;}
+function stripFrames(e){const L=[];(e.ids||[]).forEach(id=>{const s=P4.stills.get(id);if(s)L.push(s);});if(L.length<(e.ids||[]).length&&!e._loading){e._loading=1;p4Stills(e.ids).then(()=>{e._loading=0;requestDraw();});}return L;}
+{const _de=drawEd;drawEd=function(ctx,W,H,it,t){const e=it.ed;if(!e||e.k!=="strip"||!window.EKK)return _de(ctx,W,H,it,t);const lt=t-it.start;if(lt<0||lt>it.dur)return;const fr=stripFrames(e);
+  const zs=e.zoom?.36:0,pr=clamp(lt/it.dur,0,1),pScroll=e.zoom?clamp(pr/(1-zs),0,1):pr,pz=e.zoom?clamp((pr-(1-zs))/zs,0,1):0;const ez=pz<.5?2*pz*pz:1-Math.pow(-2*pz+2,2)/2;
+  ctx.save();const a=clamp(lt/(10/FPS),0,1);ctx.globalAlpha=a;EKK.filmStrip(ctx,W,H,fr,{dir:e.dir,p:ease(pScroll)*.82,zoom:ez,zi:e.zi,label:e.label,num0:e.num0});ctx.restore();tBoxes.set(it.id,{x:W/2,y:H/2,w:W*.9,h:H*.5,ax:0});};}
+{const _el=edLabel;edLabel=function(e){return e&&e.k==="strip"?"Cuộn phim · "+(e.ids||[]).length+" khung":_el(e);};}
+{const _bp=buildPanel;buildPanel=function(k){const it=selItem();if(k==="text"&&it&&it.ed&&it.ed.k==="strip")return stripPanel(it);return _bp(k);};}
+function stripPanel(it){const e=it.ed,box=el("div","sec");box.style.gap="14px";box.appendChild(el("p","hint","Ảnh và clip đặt vào dải phim 35mm (lỗ răng, mã viền, số khung chữ mono), cuộn chậm qua khung hình. Hợp làm đoạn mở đầu hoặc mở chương."));
+  const s=sec("Hướng cuộn");s.appendChild(segRow([["h","Ngang"],["v","Dọc"]],e.dir,v=>{e.dir=v;commit();}));box.appendChild(s);
+  const s2=sec("Kết thúc");s2.appendChild(segRow([[true,"Phóng vào một khung"],[false,"Chỉ cuộn"]],!!e.zoom,v=>{e.zoom=v;commit();}));if(e.zoom)s2.appendChild(sld("Khung phóng vào",1,(e.ids||[]).length,1,(e.zi||0)+1,v=>"Khung "+v,v=>{e.zi=v-1;requestDraw();},()=>commit()));box.appendChild(s2);
+  const s3=sec("Mã viền");const i=document.createElement("input");i.className="field";i.value=e.label||"";i.setAttribute("aria-label","Mã viền");i.oninput=()=>{e.label=i.value;requestDraw();};i.onchange=()=>commit();s3.appendChild(i);box.appendChild(s3);
+  box.appendChild(sld("Thời lượng",2,20,.1,it.dur,v=>v.toFixed(1)+"s",v=>{it.dur=v;live();},()=>commit()));
+  const r=el("div","btnrow");r.append(tbtn("Lấy lại khung từ clip",()=>{(e.ids||[]).forEach(id=>P4.stills.delete(id));p4Stills(e.ids).then(()=>requestDraw());}),tbtn("Xoá",delSel,"warn"));box.appendChild(r);return box;}
+
+/* ---------- F. Kết: đóng màn, nhạc dừng đột ngột, kết phim ---------- */
+function endCurtain(kind){const c=P.main[P.main.length-1];if(!c)return toast("Chưa có clip nào");c.aout={type:kind||"irisClose",dur:1.6};commit();seek(Math.max(0,c._start+c._dur-1.8));toast("Clip cuối đóng màn về đen ấm");}
+async function hardStop(){layout();const t=T;let n=0;P.tracks.forEach(tr=>{if(tr.type!=="audio")return;tr.items.forEach(a=>{if(!isMusicItem(a))return;const end=a.start+(a.out-a.in);if(t>a.start+.1&&t<end){a.out=a.in+(t-a.start);a.fadeOut=.03;n++;}});});
+  const c=mainAt(t)[0];if(c&&c.kind==="video"){sel=c.id;await freezeFrame();}
+  try{const f=await sfxMake("room");const m=await addMedia(f);if(m){const it={id:uid(),type:"audio",mid:m.id,start:t,in:0,out:Math.min(3,m.dur),vol:55,fadeIn:.04,fadeOut:.6,role:"room"};P.tracks.push(newTrack("audio"));P.tracks[P.tracks.length-1].items.push(it);}}catch(e){}
+  commit();toast(n?"Nhạc dừng tại "+fmtTC(t)+", giữ khung 3 giây với room tone":"Không có nhạc tại đầu phát; đã giữ khung với room tone");}
+async function filmEnding(){layout();if(!P.main.length)return toast("Chưa có clip nào");const last=P.main[P.main.length-1];last.fadeOut=Math.max(last.fadeOut||0,1.5);
+  const c=await solidClip(EDCOL.ink,false,5);if(c){P.main.push(c);layout();}const s=c?c._start:total;
+  const ed=ED_DEF.title();ed.title=(P.name&&!/^Dự án/.test(P.name))?P.name:"Năm ngày, một mùa thu";ed.sub="Khôi & Thư";ed.meta="Hà Nội · Ninh Bình · 11.2026";ed.f=18;addEd(ed,{start:s+.6,dur:3.8});
+  layout();P.tracks.forEach(tr=>{if(tr.type!=="audio")return;tr.items.forEach(a=>{if(!isMusicItem(a))return;const m=media.get(a.mid);const want=total-a.start;if(want>0){a.out=Math.min(m?m.dur:a.out,a.in+want);a.fadeOut=Math.min(3.5,(a.out-a.in)*.4);}});});
+  commit();seek(Math.max(0,s-1));toast("Đã thêm kết phim: tắt dần về đen, tên phim, nhạc ngân đuôi");}
+/* vệt sáng / sao băng rất nhẹ (lớp hiệu ứng) */
+function addStreak(){layout();const it=addFxLayer({dur:2.4,streak:{ang:-24,len:.22,amt:70,y:.22}});it.fx="none";commit();return it;}
+{const _af=applyFxLayer;applyFxLayer=function(ctx,W,H,it,t){if(!it.streak)return _af(ctx,W,H,it,t);const s=it.streak,lt=t-it.start,p=clamp(lt/it.dur,0,1);if(p<=0||p>=1)return;const S=Math.min(W,H),D=Math.hypot(W,H),a=s.ang*Math.PI/180;
+  const hx=lerp(-.1,1.1,easeOut(p))*W,hy=H*s.y+Math.tan(-a)*(hx-W/2)*.5,len=D*s.len*(1-.3*p),tx=hx-Math.cos(a)*len,ty=hy+Math.sin(a)*len,al=(s.amt/100)*Math.sin(p*Math.PI);
+  ctx.save();ctx.globalCompositeOperation="screen";const g=ctx.createLinearGradient(tx,ty,hx,hy);g.addColorStop(0,"rgba(255,240,220,0)");g.addColorStop(.85,"rgba(255,244,228,"+(al*.55)+")");g.addColorStop(1,"rgba(255,252,246,"+al+")");
+  ctx.strokeStyle=g;ctx.lineCap="round";ctx.lineWidth=Math.max(1,S*.0022);ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(hx,hy);ctx.stroke();const rg=ctx.createRadialGradient(hx,hy,0,hx,hy,S*.012);rg.addColorStop(0,"rgba(255,250,240,"+al*.8+")");rg.addColorStop(1,"rgba(255,250,240,0)");ctx.fillStyle=rg;ctx.fillRect(hx-S*.02,hy-S*.02,S*.04,S*.04);ctx.restore();};}
+{const _pf=panelsFor;panelsFor=function(){const it=selItem();if(it&&it.type==="fx"&&it.streak)return [["fxl","Vệt sáng"]];return _pf();};}
+{const _bp=buildPanel;buildPanel=function(k){const it=selItem();if(k==="fxl"&&it&&it.streak){const s=it.streak,box=el("div","sec");box.style.gap="14px";box.appendChild(el("p","hint","Một vệt sáng mảnh lướt qua trời, rất nhẹ. Đặt trên cảnh trời chạng vạng hoặc đêm."));
+    box.append(sld("Góc",-60,60,1,s.ang,v=>v+"°",v=>{s.ang=v;requestDraw();},()=>commit()),sld("Độ cao",5,60,1,Math.round(s.y*100),v=>v+"%",v=>{s.y=v/100;requestDraw();},()=>commit()),sld("Độ sáng",10,100,1,s.amt,v=>v+"%",v=>{s.amt=v;requestDraw();},()=>commit()),sld("Thời lượng",.6,6,.1,it.dur,v=>v.toFixed(1)+"s",v=>{it.dur=v;live();},()=>commit()));
+    const r=el("div","btnrow");r.appendChild(tbtn("Xoá",delSel,"warn"));box.appendChild(r);return box;}return _bp(k);};}
+
+/* ---------- G. Tách nền 3 lớp (trời, cảnh, người) — chuyển động thị sai nhẹ ---------- */
+const PXL=rfMk(),PXS=rfMk(),PXP=rfMk();
+{const _dv=drawVisual;drawVisual=function(ctx,W,H,c,t,alpha,xf,isBg){const pr=c.p4&&c.p4.par;if(!pr||!pr.on||c._pxIn||c.type!=="clip"||c.kind==="empty"||c.cell||!window.EKK)return _dv(ctx,W,H,c,t,alpha,xf,isBg);
+  const lt=t-c._start,p=clamp(lt/Math.max(.1,c._dur),0,1),e=ease(p),k=(pr.amt==null?60:pr.amt)/100;c._pxIn=1;let ok;
+  try{const L=rfCanvas(PXL,W,H);if(isBg){L.fillStyle=bgCol();L.fillRect(0,0,W,H);}ok=_dv(L,W,H,c,t,1,xf,isBg);
+    const zoom=(z,dx)=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.translate(W/2+dx,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);};
+    /* lớp giữa: toàn khung */zoom(1+.04*k*e,0);ctx.globalAlpha=alpha;ctx.drawImage(PXL.c,0,0);ctx.restore();
+    /* trời: chậm nhất */const S=srcOf(c,t);if(S){const an=skyFor(c,c.kind==="video"?srcTime(c,lt):0,S.s);if(an&&an.found&&c._box){const sx=rfCanvas(PXS,W,H),mc=document.createElement("canvas");mc.width=an.w;mc.height=an.h;const mx=mc.getContext("2d"),id=mx.createImageData(an.w,an.h);
+        for(let i=0;i<an.m.length;i++){id.data[i*4]=id.data[i*4+1]=id.data[i*4+2]=255;id.data[i*4+3]=an.m[i]*255;}mx.putImageData(id,0,0);sx.drawImage(PXL.c,0,0);sx.globalCompositeOperation="destination-in";const b=c._box;sx.filter="blur("+Math.round(Math.min(W,H)*.004)+"px)";sx.drawImage(mc,b.ox-b.dw/2,b.oy-b.dh/2,b.dw,b.dh);sx.filter="none";sx.globalCompositeOperation="source-over";
+        zoom(1+.012*k*e,0);ctx.globalAlpha=alpha;ctx.drawImage(PXS.c,0,0);ctx.restore();}}
+    /* người: nhanh nhất */const pm=SEG?personFrame(W,H,t,[c]):null;if(pm){const px=rfCanvas(PXP,W,H);px.drawImage(PXL.c,0,0);px.globalCompositeOperation="destination-in";px.drawImage(pm,0,0);px.globalCompositeOperation="source-over";zoom(1+.085*k*e,-W*.01*k*e);ctx.globalAlpha=alpha;ctx.drawImage(PXP.c,0,0);ctx.restore();}
+  }finally{c._pxIn=0;}return ok;};}
+
+/* ---------- H. Phụ đề tự động (Whisper trên máy), sửa lệch, tách dòng dài ---------- */
+function subItems(){const L=[];P.tracks.forEach(tr=>{if(tr.type==="text")tr.items.forEach(i=>{if(i.sub&&!i.ed)L.push(i);});});return L.sort((a,b)=>a.start-b.start);}
+async function speechPcm(){layout();const buf=await mixAudio(true);if(!buf)return null;return await EKK.sub.to16k(buf);}
+function asrMsg(m){P4.asr.msg=m;const e=$("asrMsg");if(e)e.textContent=m;}
+async function autoSubs(){if(P4.asr.busy)return;P4.asr.busy=true;asrMsg("Đang đọc âm thanh…");try{const pcm=await speechPcm();if(!pcm){asrMsg("Phim chưa có tiếng nói để nhận.");return;}
+    asrMsg("Đang tải mô hình nhận giọng nói (lần đầu khoảng 80–150 MB, lưu lại cho lần sau)…");let list;
+    try{list=await EKK.sub.transcribe(pcm,(p,f)=>asrMsg("Đang tải mô hình… "+Math.round(p*100)+"%"));}catch(e){console.warn(e);asrMsg("Chưa tải được mô hình nhận giọng nói (cần mạng ở lần đầu). Bạn vẫn dán lời thoại ở trên hoặc nhập file SRT được.");toast("Không tải được mô hình nhận giọng nói");return;}
+    const L=EKK.sub.split(list,P.subMax||42);L.forEach(c=>addTextSilent(TEXT_TPL[0],c.text,c.s,Math.max(.4,c.e-c.s)));commit();asrMsg("Đã tạo "+L.length+" dòng phụ đề. Kiểm tra lại tên riêng, dấu câu.");toast("Đã tạo "+L.length+" dòng phụ đề");}
+  finally{P4.asr.busy=false;}}
+function shiftSubs(d,scale,t0){const L=subItems();if(!L.length)return toast("Chưa có phụ đề");t0=t0==null?L[0].start:t0;scale=scale||1;L.forEach(i=>{const s=(i.start-t0)*scale+t0+d,e=(i.start+i.dur-t0)*scale+t0+d;i.start=Math.max(0,s);i.dur=Math.max(.2,e-s);});commit();}
+async function syncSubs(){const L=subItems();if(!L.length)return toast("Chưa có phụ đề");asrMsg("Đang so phụ đề với giọng nói…");const pcm=await speechPcm();if(!pcm){asrMsg("Không có tiếng để so.");return null;}
+  const vad=EKK.sub.vad(pcm,16000);const r=EKK.sub.align(L.map(i=>({s:i.start,e:i.start+i.dur})),vad,{range:3});shiftSubs(r.shift,r.scale,L[0].start);
+  asrMsg("Đã khớp: lệch "+(r.shift>=0?"+":"")+r.shift.toFixed(2)+" s"+(Math.abs(r.scale-1)>.001?", co giãn "+(r.scale*100).toFixed(1)+"%":"")+".");return r;}
+function splitLongSubs(max){const L=subItems();let n=0;L.forEach(i=>{const parts=EKK.sub.split([{s:i.start,e:i.start+i.dur,text:i.text.replace(/\n/g," ")}],max||42);if(parts.length===1){if(parts[0].text!==i.text){i.text=parts[0].text;n++;}return;}
+    const tr=trackOf(i.id);const k=tr.items.indexOf(i);tr.items.splice(k,1);parts.forEach(p=>{const o=JSON.parse(JSON.stringify(i));o.id=uid();o.start=p.s;o.dur=Math.max(.3,p.e-p.s);o.text=p.text;tr.items.push(o);});n++;});commit();toast(n?"Đã tách "+n+" phụ đề dài":"Không có dòng nào quá dài");}
+function subSection(){const s=sec("Phụ đề tự động từ giọng nói");s.appendChild(el("p","hint","Nhận giọng nói tiếng Việt bằng Whisper chạy ngay trong trình duyệt, âm thanh không gửi đi đâu. Lần đầu cần tải mô hình."));
+  s.appendChild(segRow([["onnx-community/whisper-tiny","Nhanh (tiny)"],["onnx-community/whisper-base","Chính xác hơn (base)"]],EKK.sub.model(),v=>EKK.sub.setModel(v)));
+  const r=el("div","btnrow");r.appendChild(tbtn(P4.asr.busy?"Đang nhận giọng nói…":"Tạo phụ đề tự động",()=>autoSubs(),"primary"));s.appendChild(r);const m=el("p","hint",P4.asr.msg||"");m.id="asrMsg";m.setAttribute("aria-live","polite");s.appendChild(m);
+  const s2=sec("Sửa lệch phụ đề");const r2=el("div","btnrow");[[-5,"−5 khung"],[-1,"−1 khung"],[1,"+1 khung"],[5,"+5 khung"]].forEach(([f,l])=>r2.appendChild(tbtn(l,()=>{shiftSubs(f/FPS);toast("Dời phụ đề "+(f>0?"+":"")+f+" khung");})));s2.appendChild(r2);
+  const r3=el("div","btnrow");r3.append(tbtn("Khớp với giọng nói",()=>syncSubs()),tbtn("Kéo giãn: dòng cuối về đầu phát",()=>{const L=subItems();if(L.length<2)return toast("Cần ít nhất 2 dòng");const t0=L[0].start,t1=L[L.length-1].start;if(T<=t0+.1)return toast("Đưa đầu phát tới chỗ dòng cuối cần bắt đầu");shiftSubs(0,(T-t0)/(t1-t0),t0);toast("Đã co giãn phụ đề");}));s2.appendChild(r3);
+  s2.appendChild(el("p","hint","Khớp với giọng nói: app dò đoạn có tiếng rồi tự tìm độ lệch (±3 giây) và co giãn nhỏ để phụ đề rơi đúng lời. Kéo giãn: đặt dòng đầu đúng trước, rồi đưa đầu phát tới chỗ dòng cuối."));
+  const r4=el("div","btnrow");r4.appendChild(tbtn("Tách dòng dài (tối đa 2 dòng × 42 ký tự)",()=>splitLongSubs(42)));s2.appendChild(r4);const box=el("div","sec");box.style.gap="14px";box.append(s,s2);return box;}
+
+/* ---------- I. Bảng "Cảnh" cho clip ---------- */
+function P4o(it){if(!it.p4)it.p4={};return it.p4;}
+function sceneTargets(it){const L=selClips3().filter(x=>x.type==="clip"&&x.kind!=="empty");return L.length>1?L:[it];}
+function scenePanel(it){const box=el("div","sec");box.style.gap="16px";const o=P4o(it),tg=sceneTargets(it);const apply=fn=>{tg.forEach(c=>fn(P4o(c),c));commit();};
+  if(isMain(it)&&!it.cell)box.appendChild(rfSection(it));
+  const sk=o.sky||{mode:"none"},s=sec("Trời");s.appendChild(chipRow([["none","Gốc"],["deepen","Làm đậm trời"],["dusktint","Ấm chạng vạng"],["clouds","Mây mềm"],["dusk","Trời hoàng hôn"]],sk.mode||"none",v=>apply(q=>{q.sky=Object.assign({amt:80,fea:50,match:60},q.sky||{},{mode:v});})));
+  if(sk.mode&&sk.mode!=="none"){s.append(sld("Độ đậm",0,100,1,sk.amt==null?80:sk.amt,v=>v+"%",v=>{o.sky.amt=v;requestDraw();},v=>apply(q=>{q.sky.amt=v;})),sld("Làm mềm mép",0,100,1,sk.fea==null?50:sk.fea,v=>v+"%",v=>{o.sky.fea=v;requestDraw();},v=>apply(q=>{q.sky.fea=v;})),
+      sld("Khớp màu cảnh",0,100,1,sk.match==null?60:sk.match,v=>v+"%",v=>{o.sky.match=v;requestDraw();},v=>apply(q=>{q.sky.match=v;})));if(sk.mode==="clouds"||sk.mode==="dusk")s.appendChild(tbtn("Đổi mây",()=>apply(q=>{q.sky.seed=1+Math.floor(Math.random()*97);})));}
+  s.appendChild(el("p","hint","Tự tìm trời ở từng khung (cả sau vách núi, cành cây), mép trời được giữ ổn định giữa các khung. Làm đậm lấy lại vân mây trời trắng đục; Mây mềm, Trời hoàng hôn thay trời và chỉnh màu cảnh cho khớp."));box.appendChild(s);
+  const lk=o.look||{},sp=lk.splash||{},s2=sec("Giữ một màu · đơn sắc");
+  s2.appendChild(chipRow([["off","Tắt"],["0","Đỏ"],["0.07","Cam"],["0.14","Vàng"],["0.3","Xanh lá"],["0.6","Xanh dương"]],sp.on?String(sp.hue):"off",v=>apply(q=>{q.look=Object.assign({},q.look||{});q.look.splash=v==="off"?{on:false}:Object.assign({width:.06,soft:.05},q.look.splash||{},{on:true,hue:+v});})));
+  const pr=el("div","btnrow");const pb=tbtn(P4.pick?"Bấm vào khung xem trước…":"Chọn màu trên khung hình",()=>{P4.pick=!P4.pick;document.body.classList.toggle("p4pick",P4.pick);if(P4.pick)toast("Bấm vào vùng có màu muốn giữ trên khung xem trước");showInspector();},P4.pick?"primary":"");pb.setAttribute("aria-pressed",String(P4.pick));pr.appendChild(pb);s2.appendChild(pr);
+  if(sp.on)s2.append(sld("Độ rộng màu",1,30,1,Math.round((sp.width||.06)*100),v=>v+"%",v=>{o.look.splash.width=v/100;requestDraw();},()=>commit()),sld("Độ mềm",0,30,1,Math.round((sp.soft==null?.05:sp.soft)*100),v=>v+"%",v=>{o.look.splash.soft=v/100;requestDraw();},()=>commit()));
+  const mo=lk.mono||{};s2.appendChild(chipRow([["none","Không đơn sắc"]].concat(Object.keys(EKK.MONO).map(k=>[k,EKK.MONO[k].n])),mo.on?mo.tone:"none",v=>apply(q=>{q.look=Object.assign({},q.look||{});q.look.mono=v==="none"?{on:false}:{on:true,tone:v,amt:1};})));box.appendChild(s2);
+  const rf=lk.reflect||{},mi=lk.mirror||{},s3=sec("Mặt nước · gương");s3.appendChild(segRow([[false,"Không phản chiếu"],[true,"Phản chiếu mặt nước"]],!!rf.on,v=>apply(q=>{q.look=Object.assign({},q.look||{});q.look.reflect=Object.assign({y:.58,ripple:.5,dark:.45},q.look.reflect||{},{on:v});})));
+  if(rf.on)s3.append(sld("Đường mặt nước",20,90,1,Math.round((rf.y||.58)*100),v=>v+"%",v=>{o.look.reflect.y=v/100;requestDraw();},()=>commit()),sld("Gợn sóng",0,100,1,Math.round((rf.ripple==null?.5:rf.ripple)*100),v=>v+"%",v=>{o.look.reflect.ripple=v/100;requestDraw();},()=>commit()),sld("Độ tối mặt nước",0,100,1,Math.round((rf.dark==null?.45:rf.dark)*100),v=>v+"%",v=>{o.look.reflect.dark=v/100;requestDraw();},()=>commit()));
+  s3.appendChild(chipRow([["off","Không gương"],["v","Gương dọc"],["h","Gương ngang"],["q","Bốn góc"]],mi.on||"off",v=>apply(q=>{q.look=Object.assign({},q.look||{});q.look.mirror={on:v};})));box.appendChild(s3);
+  const dn=o.dn||{},s4=sec("Đêm · làm nét");s4.appendChild(chipRow([["off","Tắt"],["night","Đêm (khử nhiễu)"],["sharp","Làm nét"],["both","Đêm + làm nét"]],!dn.on?"off":dn.preset||"both",v=>apply((q,c)=>{q.dn=v==="off"?{on:false}:{on:true,preset:v,amt:v==="sharp"?0:.65,sharp:v==="night"?.12:v==="sharp"?.45:.35};})));
+  if(dn.on)s4.append(sld("Khử nhiễu",0,100,1,Math.round((dn.amt||0)*100),v=>v+"%",v=>{o.dn.amt=v/100;requestDraw();},()=>commit()),sld("Làm nét",0,100,1,Math.round((dn.sharp||0)*100),v=>v+"%",v=>{o.dn.sharp=v/100;requestDraw();},()=>commit()));
+  s4.appendChild(el("p","hint","Khử nhiễu theo thời gian: trộn các khung liên tiếp ở vùng đứng yên, bỏ qua vùng chuyển động nên không nhoè người. Làm nét nhẹ, chỉ ở chi tiết thật, không làm nổi hạt."));
+  if(it.kind==="image")s4.appendChild(tbtn("Làm nét ảnh bằng AI (x2)",()=>aiSharpenStill(it)));box.appendChild(s4);
+  const gl=o.glow||{},s5=sec("Viền sáng · tách nền 3 lớp");s5.appendChild(segRow([[false,"Không viền sáng"],[true,"Viền sáng quanh người"]],!!gl.on,v=>{if(v)rfEnsureSeg().catch(()=>{});apply(q=>{q.glow=Object.assign({amt:45,size:1},q.glow||{},{on:v});});}));
+  if(gl.on)s5.appendChild(sld("Độ sáng viền",0,100,1,gl.amt==null?45:gl.amt,v=>v+"%",v=>{o.glow.amt=v;requestDraw();},()=>commit()));
+  const pa=o.par||{};s5.appendChild(segRow([[false,"Không tách lớp"],[true,"Tách nền 3 lớp (trời · cảnh · người)"]],!!pa.on,v=>{if(v)rfEnsureSeg(true).catch(()=>{});apply(q=>{q.par=Object.assign({amt:60},q.par||{},{on:v});});}));
+  if(pa.on)s5.appendChild(sld("Độ sâu",0,100,1,pa.amt==null?60:pa.amt,v=>v+"%",v=>{o.par.amt=v;requestDraw();},()=>commit()));
+  s5.appendChild(el("p","hint","Cần AI tách người (tải lần đầu). Tách 3 lớp: trời đi chậm, cảnh đi vừa, người tiến gần hơn, như máy quay đẩy nhẹ."));box.appendChild(s5);
+  if(tg.length>1)box.appendChild(el("p","hint","Đang áp cho "+tg.length+" clip đã chọn."));
+  const r=el("div","btnrow");r.append(tbtn("Đặt lại cảnh",()=>apply(q=>{for(const k in q)delete q[k];})),tbtn("Áp cho mọi clip",()=>{const src=JSON.stringify(it.p4||{});allVisualClipsAll().forEach(c=>{c.p4=JSON.parse(src);});commit();toast("Đã áp cho mọi clip");}));box.appendChild(r);return box;}
+async function aiSharpenStill(it){const m=media.get(it.mid);if(!m||!m.canvas)return;toast("Đang tải mô hình làm nét AI…",5000);
+  try{const L=u=>new Promise((res,rej)=>{if([...document.scripts].some(s=>s.src===u))return res();const s=document.createElement("script");s.src=u;s.crossOrigin="anonymous";s.onload=res;s.onerror=()=>rej(new Error(u));document.head.appendChild(s);});
+    await L("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");await L("https://cdn.jsdelivr.net/npm/@plotdb/upscaler@0.0.5/index.min.js");
+    const up=new WebUpscaler({modelType:"realesrgan",model:"general_fast",tileSize:64,overlap:12,modelBaseUrl:new URL("models",location.href).href,backend:null});await up.warmup();
+    const k=Math.min(1,1024/Math.max(m.w,m.h)),iw=Math.round(m.w*k),ih=Math.round(m.h*k),c=document.createElement("canvas");c.width=iw;c.height=ih;const x=c.getContext("2d");x.drawImage(m.canvas,0,0,iw,ih);
+    const r=await up.upscaleImageData(x.getImageData(0,0,iw,ih));const o=document.createElement("canvas");o.width=r.width;o.height=r.height;o.getContext("2d").putImageData(r instanceof ImageData?r:new ImageData(new Uint8ClampedArray(r.data),r.width,r.height),0,0);
+    m.canvas=o;m.w=o.width;m.h=o.height;imgTex.delete(m.id);commit();toast("Đã làm nét ảnh bằng AI");}
+  catch(e){console.warn(e);P4o(it).dn={on:true,preset:"sharp",amt:0,sharp:.5};commit();toast("Không tải được mô hình AI (cần mạng); đã dùng Làm nét thường");}}
+/* chọn màu trên khung xem trước: đọc màu gốc (tạm tắt hiệu ứng cảnh) */
+document.addEventListener("pointerdown",e=>{if(!P4.pick||e.target!==pv)return;const it=selItem();if(!it||it.type!=="clip")return;e.stopPropagation();e.preventDefault();const r=pv.getBoundingClientRect(),x=Math.round((e.clientX-r.left)/r.width*pv.width),y=Math.round((e.clientY-r.top)/r.height*pv.height);
+  P4.byp=true;let d;try{syncMedia(T,false);drawFrame(pctx,pv.width,pv.height,T,false);d=pctx.getImageData(clamp(x-2,0,pv.width-5),clamp(y-2,0,pv.height-5),5,5).data;}finally{P4.byp=false;P4.proc.clear();}
+  let R=0,G=0,B=0;for(let i=0;i<d.length;i+=4){R+=d[i];G+=d[i+1];B+=d[i+2];}const n=d.length/4,h=EKK.hueOf(R/n,G/n,B/n);P4.pick=false;document.body.classList.remove("p4pick");
+  const o=P4o(it);o.look=Object.assign({},o.look||{});o.look.splash=Object.assign({width:.06,soft:.05},o.look.splash||{},{on:true,hue:h.h});commit();toast(h.s<.12?"Màu này gần như không có sắc, chọn chỗ có màu rõ hơn":"Đã giữ màu đã chọn, phần còn lại đen trắng");},true);
+
+/* ---------- J. Gắn vào giao diện ---------- */
+{const _pf=panelsFor;panelsFor=function(){const L=_pf();const it=selItem();if(it&&it.type==="clip"&&it.kind!=="empty"&&(it.kind==="video"||it.kind==="image")){const i=L.findIndex(x=>x[0]==="color");L.splice(i<0?1:i+1,0,["scene","Cảnh"]);}return L;};}
+{const _bp=buildPanel;buildPanel=function(k){const it=selItem();if(k==="scene"&&it)return scenePanel(it);const box=_bp(k);try{if(k==="trans"&&it&&it.trans&&P4TR.has(it.trans.type))box.appendChild(p4TransExtras(it));}catch(e){console.warn(e);}return box;};}
+{const _lp=libPanel;libPanel=function(k){const box=_lp(k);try{if(k==="fx"){const s=sec("Mở đầu & kết phim");const g=el("div","grid2");
+      [["Cuộn phim 35mm",()=>addFilmStrip()],["Sổ ảnh lật trang",lookbookFlip],["Đóng màn tròn",()=>endCurtain("irisClose")],["Đóng rèm",()=>endCurtain("curtain")],["Nhạc dừng đột ngột",hardStop],["Kết phim",filmEnding],["Vệt sáng nhẹ",addStreak]].forEach(([l,fn])=>g.appendChild(tbtn(l,fn)));
+      s.append(g,el("p","hint","Cuộn phim: ảnh và clip đang chọn (hoặc 8 clip đầu) chạy trong dải phim 35mm rồi phóng vào một khung. Nhạc dừng đột ngột: cắt nhạc tại đầu phát, giữ khung 3 giây với room tone. Kết phim: tắt dần về đen, tên phim, nhạc ngân đuôi."));box.insertBefore(s,box.children[1]||null);}
+    if(k==="cc")box.appendChild(subSection());}catch(e){console.warn(e);}return box;};}
+{const _bm=buildMTools;buildMTools=function(){_bm();if(isDesk())return;const it=selItem();if(it&&it.type==="clip"&&(it.kind==="video"||it.kind==="image")){const box=$("mtools"),b=el("button","mt");b.type="button";b.innerHTML='<svg class="i" viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 3-3 6 5"/><circle cx="16" cy="7" r="2"/></svg>Cảnh';b.onclick=()=>openPanel("scene");const ref=[...box.children].find(x=>x.textContent==="Màu");if(ref)ref.after(b);else box.appendChild(b);}};}
+window.__P4={P4,EKK:window.EKK,rfAnalyze,rfPathAt,p4Proc,skyFor,addFilmStrip,p4Stills,endCurtain,hardStop,filmEnding,addStreak,autoSubs,syncSubs,shiftSubs,splitLongSubs,subItems,speechPcm,scenePanel,lookbookFlip,P4TR,
+  setSeg:s=>{SEG=s;PMK.cache.clear();PMK.bytes=0;requestDraw();},pmCompute};
+async function p4RenderAt(t,W,H){layout();const c=document.createElement("canvas");c.width=W;c.height=H;const was=exporting;exporting=true;try{T=t;await frameReady(t);drawFrame(c.getContext("2d"),W,H,t,false);}finally{exporting=was;}return c;}
+window.__P4.renderAt=p4RenderAt;
 
 /* ---------- wiring ---------- */
 function syncProjSel(){$("selRatio").value=P.ratio;$("selBg").value=P.bg;}
