@@ -270,3 +270,37 @@ Bộ hiệu ứng dùng chung nằm trong `ekk.js` (cả Ảnh và Video Pro), c
 - Ảnh trong video có nút **Làm nét ảnh bằng AI (x2)**, dùng cùng mô hình Real-ESRGAN của chế độ Ảnh.
 
 **Thêm**: **Viền sáng** quanh người và **Tách nền 3 lớp** (trời đi chậm, cảnh đi vừa, người tiến gần), cả hai cần AI tách người.
+
+### Cập nhật 27/11 (chiều) — Chữ kiểu Apple, khung động, Video Pro theo 11 ref
+
+**Chữ trên post và video viết tiếng Anh, kiểu Apple**
+- Phông tự host: **Inter Display** (tiêu đề), **Inter Text** (chữ nhỏ) và **Newsreader Display** (serif kiểu New York). Giấy phép OFL, đủ dấu tiếng Việt cho dòng phụ. Xem `fonts/LICENSES.txt`.
+- Hai cặp chữ mới cho cả Ảnh và Video Pro: **Apple · Sans** (Inter Display giãn chữ âm −1,5 đến −2%, chữ hoa nhỏ giãn dương) và **Apple · Editorial** (Newsreader mảnh + Inter chữ hoa nhỏ).
+- 16 mẫu tạp chí, 4 mẫu dựng sẵn và các mẫu tên phim, địa danh, credits của Video Pro đã viết lại bằng tiếng Anh cho chuyến đi ("Five Days, One Autumn", "Slow water, slow days", "18—22.11.2026"…). Ngày tháng khớp timeline thật.
+- Carousel → **Chữ trên post**: chọn Tiếng Anh / Tiếng Việt, bật **Dòng phụ tiếng Việt** để thêm một dòng nhỏ có dấu ("Ninh Bình") dưới tiêu đề lớn. Giao diện app vẫn là tiếng Việt.
+- **Kiểm tra sang** cho tiếng Anh: báo chữ mồ côi ở dòng cuối, đoạn văn quá dài hoặc quá ngắn (dễ đọc nhất 45–75 ký tự/dòng), chữ hoa chưa giãn. Mẫu tự giữ hai chữ cuối đi cùng nhau và tự thu chữ khi tiêu đề tiếng Anh dài tràn lề.
+- **Bộ nhận diện**: lưu cặp chữ, bảng màu, preset/LUT, lề một lần ở Carousel, Video Pro bấm "Áp bộ nhận diện" là dùng lại.
+
+**Khung động (video chạy trong khung ảnh của carousel)**
+- Ô ảnh nào trong carousel hay mẫu tạp chí cũng nhận được video: chọn video như chọn ảnh hoặc kéo thả vào khổ. Chỉnh điểm đầu, điểm cuối, tốc độ 0.5–2x, tắt hoặc giữ tiếng, màu riêng cho video (Khôi & Thư, Nước ngọc…), **hoà vòng lặp** để chỗ nối không thấy vết cắt.
+- Video chạy ngay trong khổ đang chỉnh và trong khung điện thoại khi bấm **Xem thử**.
+- **Xuất**: slide có video ra MP4 H.264 (kèm tiếng AAC nếu giữ tiếng), slide tĩnh ra JPG, đánh số đúng thứ tự (01.jpg, 02.mp4, …) trong một file zip. Khổ 1080×1350, 1080×1440 hoặc 1080×1920, dài 3–15 giây. Mọi slide video cùng độ dài và cùng nhịp, nên video vắt qua mép hai slide vẫn liền khi vuốt.
+- **Cinemagraph**: chọn video → Cinemagraph → tô vùng muốn chuyển động (nước, tóc, đèn lồng), phần còn lại đứng yên ở khung bạn chọn. Xuất MP4 lặp.
+
+**Ghép lớp kiểu Photoshop (ref F9) và poster động (ref F4)**
+- **Hoà trộn lớp** cho ảnh, chữ, khối: Multiply (bỏ nền trắng), Screen (bỏ nền đen), Overlay, Soft light, Color, Luminosity… kèm độ mờ lớp.
+- **Chữ chứa ảnh / video**: chữ tiêu đề lớn mang ảnh hoặc video chạy bên trong, xuất MP4 nếu là video.
+- **Lặp có bước**: nhân một lớp nhiều lần theo bước ngang/dọc, mờ dần.
+- Mẫu **Poster động 4:5** và **Bìa Reel poster 9:16**: lưới Swiss, người tách nền bằng AI đứng trước chữ khổng lồ và một khối tròn màu trầm của series, chuyển động rất chậm; xuất ảnh tĩnh hoặc MP4.
+
+**Video Pro theo 11 ref Facebook**
+- **Vệt bóng** (thư viện Hiệu ứng → Người): người để lại các bóng mờ dần như "Safe zone", chỉ trên vùng người, nền giữ nguyên. Chỉnh số bóng, khoảng cách, độ mờ dần, màu bóng.
+- **Không gian ảnh 3D**: ảnh và clip trong thư viện đặt ở nhiều độ sâu trong phòng tối có đèn spot (hoặc nền giấy), máy ảo dolly / lia / xoay nhẹ, xa thì nhoè và chìm vào bóng tối, bóng đổ mềm.
+- **Chữ theo nhịp**: từng từ chữ hoa hiện bằng vệt nhoè chuyển động. Bấm **Chạm theo nhịp**, video phát, mỗi lần nghe một từ thì chạm phím cách để đặt mốc.
+- **Thẻ mùa**: thẻ đen ấm, serif mảnh nhỏ, dòng phụ rất nhỏ, mờ vào/ra 1 giây. **Chèn thẻ mùa theo chương** tự đặt thẻ ở mỗi marker chương.
+- **Phụ đề thơ song ngữ**: tiếng Anh lớn, tiếng Việt nhỏ bên dưới, serif mảnh, giữa thấp, bóng mềm.
+- **Khung nhỏ nở toàn màn** (chuyển cảnh): cảnh sau hiện trong một khung nhỏ có viền mảnh giữa nền đen rồi nở ra toàn khung.
+- **Poster phim** "THE / 2026 / SEASON" với hai dòng nhỏ hai bên; **Cột lời kể** cuộn chậm cạnh hình; **Địa danh dọc** ("Ninh Bình" xếp dọc + "ninh binh, vietnam"); **Chữ khoét hình** (video lộ ra qua chữ lớn).
+- **Đổi khung dọc/ngang**: "Bám chủ thể" chừa khoảng trên đầu ít nhất 8% và đặt mắt gần đường một phần ba; "Nền mờ" và "Mở rộng nền" sáng hơn, mềm hơn, hơi giảm bão hoà, cùng màu với clip.
+
+Giới hạn: xuất MP4 cần Chrome, Edge hoặc Safari mới (có WebCodecs); tách người cho poster và vệt bóng cần tải mô hình AI lần đầu (cần mạng).
